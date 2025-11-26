@@ -1,0 +1,7 @@
+# Config files (sensitive)
+config.php
+
+# Large folders - user uploads and media files (should not be in version control)
+uploads/
+Video/
+Picture/

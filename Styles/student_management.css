@@ -1,0 +1,514 @@
+/* Main Content Header */
+.main-content {
+    background: #111;
+    background-image: 
+        linear-gradient(45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%);
+    padding: 20px 0 20px 20px;
+}
+
+.page-title {
+    color: #fff;
+    font-size: 24px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+}
+
+/* Form Container */
+.student-form-container {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #0f0;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    max-width: 900px;
+    margin-left: 20px;
+    margin-right: 20px;
+    width: calc(100% - 40px);
+}
+
+/* Form Layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 10px;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-group {
+    margin-bottom: 8px;
+    max-width: 380px;
+}
+
+.form-group label {
+    display: block;
+    color: #fff;
+    margin-bottom: 3px;
+    font-size: 13px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    max-width: 100%;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #0f0;
+    border-radius: 3px;
+    color: #000;
+    font-size: 13px;
+}
+
+/* Special Fields */
+.belt-rank-container {
+    display: flex;
+    gap: 6px;
+    max-width: 100%;
+}
+
+.belt-rank-container select {
+    flex: 1;
+}
+
+.discount-container {
+    display: flex;
+    gap: 6px;
+    max-width: 100%;
+}
+
+.discount-container input {
+    flex: 1;
+}
+
+.discount-container select {
+    width: 120px;
+}
+
+/* Action Buttons */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+
+.btn i {
+    font-size: 14px;
+}
+
+.btn-save {
+    background: #0f0;
+    color: #000;
+}
+
+.btn-update {
+    background: #00a0fc;
+    color: #fff;
+}
+
+.btn-clear {
+    background: #ff3333;
+    color: #fff;
+}
+
+.btn-export {
+    background: #ffc107;
+    color: #000;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Table Container */
+.table-container {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #0f0;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 30px;
+    margin-left: 20px;
+    margin-right: 20px;
+    max-width: 900px;
+    width: calc(100% - 40px);
+    overflow-x: auto;
+    /* Enable smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+    position: relative; /* allow toolbar to pin to top-right */
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: max-content; /* Ensures table maintains readability */
+}
+
+.student-table th,
+.student-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    white-space: nowrap; /* Prevents text wrapping */
+}
+
+.student-table th {
+    background: rgba(0, 255, 0, 0.1);
+    color: #0f0;
+    font-weight: normal;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.student-table td {
+    color: #fff;
+}
+
+.student-table tbody tr:hover {
+    background: rgba(0, 255, 0, 0.05);
+}
+
+/* Status Colors */
+.status-active {
+    color: #0f0;
+}
+
+.status-freeze {
+    color: #ff3333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .table-container {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: calc(100% - 30px);
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-container {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: calc(100% - 20px);
+    }
+    .main-content {
+        min-height: 100vh;
+        height: 100vh;
+        background: #111;
+        background-image: 
+            linear-gradient(45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%);
+        padding: 10px;
+    }
+    .container {
+        min-height: 100vh;
+        height: 100vh;
+    }
+    .page-title {
+        text-align: center;
+    }
+    .student-form-container {
+        width: 92vw;
+        max-width: 420px;
+        margin-left: auto;   /* center horizontally */
+        margin-right: auto;  /* center horizontally */
+        margin-bottom: 20px;
+        padding: 12px;
+        box-sizing: border-box;
+    }
+    .student-form-container input,
+    .student-form-container select {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        display: block;
+    }
+    .belt-rank-container,
+    .discount-container {
+        display: block !important;
+    }
+    .belt-rank-container select,
+    .discount-container input {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        display: block !important;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        gap: 10px;
+    }
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        overflow: hidden;
+    }
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 260px;
+        font-size: 14px;
+        padding: 10px 12px;
+        gap: 10px;
+        min-width: 0;
+        box-sizing: border-box;
+        text-align: center;
+        margin-left: auto;   /* center buttons */
+        margin-right: auto;  /* center buttons */
+    }
+    .btn .btn-content {
+        margin-left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn i {
+        font-size: 16px;
+        width: 18px;
+        min-width: 18px;
+        max-width: 18px;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0;
+    }
+    .btn span {
+        display: inline-block;
+        vertical-align: middle;
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+	.student-card-list {
+		width: 92vw;
+		max-width: 420px;
+		margin: 0 auto 20px auto;
+	}
+	.student-card {
+		background: rgba(0, 0, 0, 0.7);
+		border: 1px solid #0f0;
+		border-radius: 6px;
+		padding: 10px;
+		margin-bottom: 12px;
+		box-shadow: 0 0 8px rgba(0, 255, 0, 0.1);
+	}
+	.student-card .card-header .title {
+		color: #fff;
+		font-weight: 600;
+		margin-bottom: 4px;
+	}
+	.student-card .card-header .meta {
+		color: #9ee29e;
+		font-size: 12px;
+	}
+	.student-card .card-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 8px;
+	}
+	.student-card .card-actions .btn-edit,
+	.student-card .card-actions .btn-delete,
+	.student-card .card-actions .btn-toggle {
+		background: transparent;
+		border: 1px solid rgba(0,255,0,0.3);
+		color: #fff;
+		border-radius: 4px;
+		padding: 6px 10px;
+	}
+	.student-card .card-body {
+		margin-top: 8px;
+		color: #ddd;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: none;
+    background: none;
+}
+
+.dropdown-toggle:hover {
+    background-color: rgba(0, 255, 0, 0.1);
+    color: var(--primary-color);
+}
+
+.dropdown-toggle .arrow {
+    margin-left: auto;
+    transition: transform 0.3s;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-toggle .arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    display: none;
+    background: rgba(0, 0, 0, 0.95);
+    border-left: 2px solid #0f0;
+    width: 100%;
+}
+
+/* Show dropdown content on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 20px 12px 50px !important;
+    font-size: 14px;
+    position: relative;
+    transition: all 0.3s ease;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    width: 100%;
+}
+
+.dropdown-content a i {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.dropdown-content a:hover {
+    background: rgba(0, 255, 0, 0.1);
+    color: #0f0;
+    padding-left: 55px !important;
+}
+
+/* Ensure proper containment */
+nav a, .dropdown-toggle, .dropdown-content a {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    border: none;
+} 
+
+@media (min-width: 768px) {
+	/* Hide mobile-only elements on desktop when Bootstrap CSS isn't loaded */
+	.d-md-none { display: none !important; }
+    /* create space so absolute toolbar doesn't overlap table header */
+    .table-container { padding-top: 56px; }
+} 
+
+/* Table toolbar (desktop search pinned to top-right of table container) */
+.table-toolbar {
+    position: absolute;
+    top: 14px;
+    left: auto;            /* pin to opposite corner */
+    right: 12px !important; /* pin to top-right */
+    display: flex;          /* ensure proper horizontal layout without Bootstrap */
+    align-items: center;
+    justify-content: flex-end;
+    background: transparent;
+    border-bottom: none;
+    margin: 0;
+    padding: 0;
+    z-index: 2;
+}
+
+/* Prevent Bootstrap's input-group width:100% from stretching the search field */
+.table-toolbar .input-group {
+    width: 260px !important;
+    max-width: 260px !important;
+}
+
+.table-container .input-group-text {
+    background: #fff;
+}
+
+/* Search bar styling copied from Payments page */
+.table-toolbar .search-container {
+	position: relative;
+	width: 180px;
+	min-width: 150px;
+	flex-shrink: 1;
+}
+
+.table-toolbar .search-container input {
+	width: 100%;
+	padding: 8px 35px 8px 15px;
+	border: 1px solid #0f0;
+	border-radius: 20px;
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	font-size: 14px;
+	outline: none;
+	transition: all 0.3s ease;
+	box-sizing: border-box;
+}
+
+.table-toolbar .search-container input:focus {
+	box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.table-toolbar .search-container input::placeholder {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.table-toolbar .search-icon {
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #0f0;
+	font-size: 14px;
+	pointer-events: none;
+}
+
+/* Hard override in case another stylesheet forces white inputs */
+#studentsDesktopToolbar .search-container #studentSearchBox {
+	background: rgba(0, 0, 0, 0.5) !important;
+	border: 1px solid #0f0 !important;
+	border-radius: 20px !important;
+	color: #fff !important;
+	padding: 8px 35px 8px 15px !important;
+}
