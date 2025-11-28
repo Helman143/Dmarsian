@@ -50,14 +50,9 @@
 </IfModule>
 
 # PHP Configuration
-<IfModule mod_php.c>
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-    php_value max_execution_time 300
-    php_value max_input_time 300
-    php_value memory_limit 256M
-    php_value date.timezone "Asia/Manila"
-</IfModule>
+# Note: PHP settings should be configured in php.ini or .user.ini
+# mod_php is not used with PHP-FPM (common on modern servers)
+# If you need PHP settings, create a .user.ini file instead
 
 # Disable directory browsing
 Options -Indexes
@@ -66,21 +61,9 @@ Options -Indexes
 # ErrorDocument 404 /404.php
 # ErrorDocument 500 /500.php
 
-# Protect sensitive files and directories
-<FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
+# Protect sensitive files and directories (Apache 2.4 syntax)
 <FilesMatch "\.(env|log|ini|conf|sql|bak|backup)$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Allow access to specific file types
-<FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|css|js|woff|woff2|ttf|eot|pdf|mp4|webm)$">
-    Order allow,deny
-    Allow from all
+    Require all denied
 </FilesMatch>
 
 # Enable compression

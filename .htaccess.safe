@@ -1,0 +1,15 @@
+# Safe .htaccess - Minimal configuration
+# Use this if the main .htaccess is causing issues
+
+# Enable Rewrite Engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# UTF-8 encoding
+AddDefaultCharset UTF-8
+
