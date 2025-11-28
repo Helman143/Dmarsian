@@ -10,7 +10,9 @@ config.php
 
 # Composer
 /vendor/
-composer.lock
+# composer.lock should be committed for consistent deployments
+composer.phar
+composer-setup.php
 
 # Large folders - user uploads and media files (should not be in version control)
 uploads/
