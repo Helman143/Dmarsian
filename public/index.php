@@ -2,6 +2,9 @@
 /**
  * Entry point for DigitalOcean App Platform
  * Routes requests to appropriate PHP files
+ * 
+ * LANDING PAGE: webpage.php is the default landing page for all visitors
+ * Root URL (/) and index requests are automatically routed to webpage.php
  */
 
 // Enable error reporting for debugging (disable in production after fixing)
@@ -30,8 +33,13 @@ $requestPath = ltrim($requestPath, '/');
 // Remove query string from path for file checking
 $requestPath = strtok($requestPath, '?');
 
-// Default to webpage.php for root
-if (empty($requestPath) || $requestPath === '/') {
+// LANDING PAGE ROUTING: Default to webpage.php for root and common index requests
+// This makes webpage.php the landing page for all visitors visiting the root URL
+// The root index.php (admin login) is accessible via /index.php explicitly
+if (empty($requestPath) || 
+    $requestPath === '/' || 
+    $requestPath === 'index.html' ||
+    $requestPath === 'index') {
     $requestPath = 'webpage.php';
 }
 
