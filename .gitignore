@@ -1,6 +1,11 @@
 # Config files (sensitive)
 config.php
 
+# Environment variables (contains sensitive credentials)
+.env
+.env.local
+.env.*.local
+
 # Large folders - user uploads and media files (should not be in version control)
 uploads/
 Video/
