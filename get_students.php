@@ -1,4 +1,7 @@
 <?php
+// Set execution time limit to prevent timeouts
+set_time_limit(30); // 30 seconds max
+
 // Set JSON header first to ensure proper response type
 header('Content-Type: application/json');
 
@@ -108,37 +111,32 @@ function recoverBeltRank(mysqli $conn, array $student)
         $result = $stmt->get_result();
         $stmt->close();
     } else {
-        // Order by the numeric part of jeja_no so STD numbers appear 1,2,3,...
-        $result = $conn->query("SELECT * FROM students ORDER BY CAST(REPLACE(jeja_no, 'STD-', '') AS UNSIGNED) ASC");
+        // Optimized query: Use simpler ordering to avoid CAST/REPLACE overhead
+        // Order by jeja_no directly (lexicographic sort works for zero-padded numbers)
+        // If needed, can sort in PHP after fetching
+        $result = $conn->query("SELECT * FROM students ORDER BY jeja_no ASC");
         if (!$result) {
             throw new Exception("Failed to execute query: " . $conn->error);
         }
     }
 
-    // Limit belt rank recovery to avoid timeout - only recover for first 50 students
-    $recoveryCount = 0;
-    $maxRecoveries = 50;
-
+    // DISABLED: Belt rank recovery causes 504 timeouts
+    // Recovery can be done via a separate background job or admin action
+    // For now, just return the data as-is to ensure fast response
+    
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            // Attempt to recover belt rank if missing (but limit to avoid timeout)
-            if (isMissingBelt($row['belt_rank']) && $recoveryCount < $maxRecoveries) {
-                $recovered = recoverBeltRank($conn, $row);
-                if (!isMissingBelt($recovered)) {
-                    $row['belt_rank'] = $recovered;
-                    // Persist recovered value (but don't wait if it fails)
-                    $upd = $conn->prepare("UPDATE students SET belt_rank = ? WHERE id = ?");
-                    if ($upd) {
-                        $upd->bind_param('si', $recovered, $row['id']);
-                        @$upd->execute(); // Use @ to suppress errors if update fails
-                        $upd->close();
-                    }
-                    $recoveryCount++;
-                }
-            }
+            // Just add the student data - no recovery to avoid timeout
             $students[] = $row;
         }
     }
+
+    // Sort students by numeric STD number in PHP (faster than SQL CAST)
+    usort($students, function($a, $b) {
+        $numA = (int) str_replace('STD-', '', $a['jeja_no']);
+        $numB = (int) str_replace('STD-', '', $b['jeja_no']);
+        return $numA <=> $numB;
+    });
 
     // Clear any output before sending JSON
     ob_clean();
