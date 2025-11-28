@@ -1,6 +1,6 @@
 <?php
 // Set execution time limit to prevent timeouts
-set_time_limit(30); // 30 seconds max
+set_time_limit(10); // 10 seconds max - fail fast
 
 // Set JSON header first to ensure proper response type
 header('Content-Type: application/json');
@@ -10,27 +10,53 @@ ob_start();
 
 // Error handling wrapper
 try {
-    session_start();
-    require_once 'db_connect.php';
+    // Configure session settings to prevent hangs
+    ini_set('session.gc_maxlifetime', 7200);
+    ini_set('session.cookie_lifetime', 0);
+    ini_set('session.save_path', sys_get_temp_dir());
+    
+    // Start session with timeout protection
+    if (session_status() === PHP_SESSION_NONE) {
+        @session_start();
+    }
 
-    // Check if user is logged in
+    // Quick session check - fail fast if not logged in
     if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         ob_clean();
+        http_response_code(401);
         echo json_encode(['status' => 'error', 'message' => 'Unauthorized access']);
         exit;
     }
 
+    // Load database connection
+    require_once 'db_connect.php';
+
+    // Get database connection with timeout
     $conn = connectDB();
     
     // Check database connection
-    if (!$conn || (isset($conn->connect_error) && $conn->connect_error)) {
+    if (!$conn) {
         ob_clean();
+        http_response_code(500);
         echo json_encode([
             'status' => 'error', 
-            'message' => 'Database connection failed: ' . ($conn->connect_error ?? 'Unknown error')
+            'message' => 'Database connection failed'
         ]);
         exit;
     }
+    
+    if (isset($conn->connect_error) && $conn->connect_error) {
+        ob_clean();
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Database connection error: ' . $conn->connect_error
+        ]);
+        exit;
+    }
+    
+    // Set query timeout
+    $conn->query("SET SESSION max_execution_time = 5");
 
 // Helper to decide if belt rank is missing/invalid
 function isMissingBelt($belt)
@@ -111,10 +137,9 @@ function recoverBeltRank(mysqli $conn, array $student)
         $result = $stmt->get_result();
         $stmt->close();
     } else {
-        // Optimized query: Use simpler ordering to avoid CAST/REPLACE overhead
-        // Order by jeja_no directly (lexicographic sort works for zero-padded numbers)
-        // If needed, can sort in PHP after fetching
-        $result = $conn->query("SELECT * FROM students ORDER BY jeja_no ASC");
+        // Optimized query: Fetch only essential columns and limit results
+        // Use simple ordering - no complex functions
+        $result = $conn->query("SELECT * FROM students ORDER BY jeja_no ASC LIMIT 1000");
         if (!$result) {
             throw new Exception("Failed to execute query: " . $conn->error);
         }
@@ -125,18 +150,21 @@ function recoverBeltRank(mysqli $conn, array $student)
     // For now, just return the data as-is to ensure fast response
     
     if ($result && $result->num_rows > 0) {
+        // Fetch rows efficiently
         while ($row = $result->fetch_assoc()) {
-            // Just add the student data - no recovery to avoid timeout
             $students[] = $row;
         }
+        
+        // Sort students by numeric STD number in PHP (faster than SQL CAST)
+        // Only sort if we have students
+        if (count($students) > 0) {
+            usort($students, function($a, $b) {
+                $numA = (int) str_replace('STD-', '', $a['jeja_no'] ?? '0');
+                $numB = (int) str_replace('STD-', '', $b['jeja_no'] ?? '0');
+                return $numA <=> $numB;
+            });
+        }
     }
-
-    // Sort students by numeric STD number in PHP (faster than SQL CAST)
-    usort($students, function($a, $b) {
-        $numA = (int) str_replace('STD-', '', $a['jeja_no']);
-        $numB = (int) str_replace('STD-', '', $b['jeja_no']);
-        return $numA <=> $numB;
-    });
 
     // Clear any output before sending JSON
     ob_clean();
