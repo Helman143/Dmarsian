@@ -287,6 +287,20 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     async function loadStudents() {
         try {
             const response = await fetch('get_students.php');
+            
+            // Check if response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Expected JSON but got:', text.substring(0, 200));
+                throw new Error('Server returned non-JSON response. Check console for details.');
+            }
+            
             const result = await response.json();
             
             if (result.status === 'success') {
@@ -383,6 +397,37 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             }
         } catch (error) {
             console.error('Error loading students:', error);
+            
+            // Show user-friendly error message
+            const tbody = document.getElementById('studentTableBody');
+            const cardList = document.getElementById('adminStudentCardList');
+            
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="15" style="text-align: center; padding: 20px; color: #dc3545;">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Error loading students: ${error.message}
+                            <br><small>Please refresh the page or contact support if the problem persists.</small>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            if (cardList) {
+                cardList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #dc3545;">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Error loading students: ${error.message}
+                        <br><small>Please refresh the page or contact support if the problem persists.</small>
+                    </div>
+                `;
+            }
+            
+            // Show alert for critical errors
+            if (error.message.includes('JSON') || error.message.includes('504')) {
+                alert('Failed to load students. The server may be experiencing issues. Please try again in a moment.');
+            }
         }
     }
 
