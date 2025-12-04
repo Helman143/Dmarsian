@@ -111,3 +111,6 @@ echo "3. Fix any syntax errors found"
 echo "4. Ensure .env file is configured"
 echo "5. Run: sudo systemctl restart apache2"
 
+
+
+

@@ -1,155 +1,268 @@
-# DigitalOcean Deployment Checklist
+# DigitalOcean App Platform Deployment Checklist
 
-## Critical Steps to Fix 500 Internal Server Error
+Use this checklist to ensure a smooth deployment process.
 
-### Step 1: Pull Latest Changes
-```bash
-cd /var/www/your-app-directory
-git pull origin main
-```
+---
 
-### Step 2: Check Apache Error Log (MOST IMPORTANT)
-```bash
-sudo tail -50 /var/log/apache2/error.log
-```
-**This will show you the EXACT error!** Look for:
-- PHP syntax errors
-- Missing files
-- Permission denied
-- Database connection errors
+## Pre-Deployment Preparation
 
-### Step 3: Test Basic PHP
-Visit in browser: `https://yourdomain.com/simple_test.php`
-- If this works: PHP is fine, issue is in your code
-- If this fails: PHP configuration problem
+### Code & Repository
+- [ ] All code committed to Git
+- [ ] `.env` file NOT committed (in `.gitignore`)
+- [ ] `config.php` NOT committed (in `.gitignore`)
+- [ ] `composer.json` and `composer.lock` committed
+- [ ] `vendor/` directory NOT committed
+- [ ] `uploads/` directory NOT committed
+- [ ] Test files removed or excluded
+- [ ] Code pushed to GitHub repository
 
-### Step 4: Test Full Diagnostic
-Visit: `https://yourdomain.com/test.php`
-This will show you exactly what's wrong.
+### Configuration Files
+- [ ] `app.yaml` exists and configured
+- [ ] `public/index.php` exists (entry point)
+- [ ] `env-loader.php` exists
+- [ ] `composer.json` has all dependencies
+- [ ] `.gitignore` properly configured
 
-### Step 5: Verify Critical Files Exist
-```bash
-ls -la config.php env-loader.php .env db_connect.php
-```
+### Database
+- [ ] Database dump available (`Database/db.sql`)
+- [ ] Database schema reviewed
+- [ ] Initial data prepared (if needed)
+- [ ] Database credentials documented (not in code)
 
-### Step 6: Create .env File (If Missing)
-```bash
-cp env.example .env
-nano .env
-# Add your database credentials:
-# DB_HOST=localhost
-# DB_USER=your_user
-# DB_PASS=your_password
-# DB_NAME=capstone_db
-chmod 600 .env
-```
+### Environment Variables
+- [ ] List of all required environment variables prepared
+- [ ] SMTP2GO API key obtained
+- [ ] Email configuration ready
+- [ ] All sensitive values documented
 
-### Step 7: Install Composer Dependencies
-```bash
-composer install --no-dev --optimize-autoloader
-```
+---
 
-### Step 8: Set File Permissions
-```bash
-sudo chown -R www-data:www-data .
-sudo chmod -R 755 .
-sudo chmod -R 777 uploads/
-sudo chmod 600 .env
-```
+## DigitalOcean App Platform Setup
 
-### Step 9: Test Database Connection
-```bash
-php -r "require 'config.php'; var_dump(\$conn->connect_error);"
-```
+### Account & Access
+- [ ] DigitalOcean account created
+- [ ] Billing information added
+- [ ] GitHub account connected
+- [ ] Repository access granted
 
-### Step 10: Check PHP Syntax
-```bash
-php -l config.php
-php -l env-loader.php
-php -l get_posts.php
-php -l webpage.php
-```
+### App Creation
+- [ ] App created in App Platform
+- [ ] GitHub repository connected
+- [ ] Branch selected (main)
+- [ ] Autodeploy enabled (optional)
 
-### Step 11: Enable Apache Modules
-```bash
-sudo a2enmod rewrite
-sudo a2enmod headers
-sudo systemctl restart apache2
-```
+### App Configuration
+- [ ] `app.yaml` reviewed and updated
+- [ ] PHP version selected (8.1 or 8.2 recommended)
+- [ ] Instance size selected (basic-xxs to start)
+- [ ] Build command configured
+- [ ] Run command configured
+- [ ] HTTP port set to 8080
 
-### Step 12: Temporarily Disable .htaccess (If Needed)
-```bash
-mv .htaccess .htaccess.bak
-sudo systemctl restart apache2
-# Test if site loads
-# If it works, the issue is in .htaccess
-```
+### Database Component
+- [ ] Database component added
+- [ ] MySQL 8 selected
+- [ ] Database name matches `app.yaml` (`db`)
+- [ ] Database plan selected
+- [ ] Automatic backups enabled
+- [ ] Backup retention period set (7-30 days)
 
-## Common Error Messages & Fixes
+### Environment Variables
+- [ ] `APP_ENV` set to `production`
+- [ ] `SMTP2GO_API_KEY` set (in dashboard)
+- [ ] `SMTP2GO_SENDER_EMAIL` set (in dashboard)
+- [ ] `SMTP2GO_SENDER_NAME` set
+- [ ] `ADMIN_BCC_EMAIL` set (in dashboard)
+- [ ] Database variables verified (auto-set)
 
-### "Call to undefined function mysqli_connect()"
-**Fix:** Install PHP MySQL extension
-```bash
-sudo apt install php8.2-mysqli
-sudo systemctl restart apache2
-```
+### File Upload Storage (CRITICAL)
+- [ ] DigitalOcean Space created (if using Spaces)
+- [ ] Spaces credentials obtained
+- [ ] `SPACES_KEY` set (in dashboard)
+- [ ] `SPACES_SECRET` set (in dashboard)
+- [ ] `SPACES_NAME` set (in dashboard)
+- [ ] `SPACES_REGION` set (in dashboard)
+- [ ] Upload code modified to use Spaces
+- [ ] OR: External storage service configured
 
-### "Failed to open stream: Permission denied"
-**Fix:** Set proper ownership
-```bash
-sudo chown -R www-data:www-data /var/www/your-app-directory
-```
+---
 
-### "Database connection failed"
-**Fix:** Check .env file and database credentials
-```bash
-# Verify database exists
-mysql -u your_user -p -e "SHOW DATABASES;"
+## Deployment
 
-# Verify user has permissions
-mysql -u root -p
-GRANT ALL PRIVILEGES ON capstone_db.* TO 'your_user'@'localhost';
-FLUSH PRIVILEGES;
-```
+### Initial Deployment
+- [ ] App deployed successfully
+- [ ] Build logs reviewed (no errors)
+- [ ] Runtime logs reviewed (no errors)
+- [ ] App URL accessible
 
-### "Class 'PHPMailer\PHPMailer\PHPMailer' not found"
-**Fix:** Install Composer dependencies
-```bash
-composer install --no-dev
-```
+### Database Setup
+- [ ] Database connection details obtained
+- [ ] Database schema imported (`Database/db.sql`)
+- [ ] Database tables verified
+- [ ] Initial data imported (if needed)
+- [ ] Database connection tested
 
-### "Parse error: syntax error"
-**Fix:** Check the file mentioned in error log
-```bash
-php -l filename.php
-```
+### Configuration Verification
+- [ ] Environment variables verified
+- [ ] Database connection working
+- [ ] PHP configuration applied (if using `.platform/php.ini`)
+- [ ] Health check endpoint working (`/health.php`)
 
-## Quick Test Sequence
+---
 
-1. `simple_test.php` - Basic PHP test
-2. `test.php` - Full diagnostic
-3. `webpage.php` - Main page
-4. `get_posts.php?category=achievement` - API endpoint
+## Post-Deployment Testing
 
-## After Fixing
+### Basic Functionality
+- [ ] Homepage loads (`/` or `/webpage.php`)
+- [ ] Admin login page loads (`/admin_login.php`)
+- [ ] Admin login works
+- [ ] Admin dashboard loads
+- [ ] No PHP errors in logs
 
-1. Remove test files:
-   ```bash
-   rm simple_test.php test.php diagnostic.php
-   ```
+### Core Features
+- [ ] Student enrollment form works
+- [ ] Student enrollment submission works
+- [ ] Payment processing works
+- [ ] Dues calculation works
+- [ ] Post creation works
+- [ ] File upload works (if Spaces implemented)
+- [ ] Email sending works (test with trial registration)
 
-2. Restore .htaccess if disabled:
-   ```bash
-   mv .htaccess.bak .htaccess
-   ```
+### Security Checks
+- [ ] HTTPS working (automatic)
+- [ ] Sensitive files not accessible (`.env`, `config.php`)
+- [ ] Error messages don't expose sensitive info
+- [ ] Session security working
+- [ ] Input validation working
 
-3. Run optimization:
-   ```bash
-   ./optimize.sh
-   ```
+### Performance Checks
+- [ ] Page load times acceptable
+- [ ] Database queries optimized
+- [ ] Static assets loading correctly
+- [ ] No memory leaks (monitor over time)
 
-4. Monitor error log:
-   ```bash
-   sudo tail -f /var/log/apache2/error.log
-   ```
+---
 
+## Monitoring & Maintenance
+
+### Monitoring Setup
+- [ ] App Platform monitoring enabled
+- [ ] Alerts configured for:
+  - [ ] High error rates
+  - [ ] Database connection failures
+  - [ ] High memory/CPU usage
+  - [ ] Deployment failures
+- [ ] Health check endpoint monitored
+
+### Backup & Recovery
+- [ ] Database backups enabled
+- [ ] Backup restoration tested
+- [ ] Backup schedule verified
+- [ ] Backup retention period set
+- [ ] Recovery procedure documented
+
+### Documentation
+- [ ] Deployment procedure documented
+- [ ] Environment variables documented
+- [ ] Database credentials documented (secure location)
+- [ ] Troubleshooting guide created
+- [ ] Team access configured
+
+---
+
+## Critical Issues to Address
+
+### Before Production Launch
+- [ ] **File Upload Storage** - Spaces or external storage implemented
+- [ ] **Environment Variables** - All secrets in dashboard, not code
+- [ ] **Database Backups** - Automatic backups enabled
+- [ ] **Error Handling** - Proper error handling implemented
+- [ ] **Session Security** - Secure session settings applied
+
+### Post-Launch (First Month)
+- [ ] **Input Validation** - Comprehensive review completed
+- [ ] **File Upload Security** - Enhanced validation added
+- [ ] **Monitoring** - Full monitoring setup
+- [ ] **Performance** - Initial optimization completed
+
+---
+
+## Quick Reference
+
+### App Platform URLs
+- **Dashboard:** https://cloud.digitalocean.com/apps
+- **Your App:** https://[your-app-name].ondigitalocean.app
+- **Health Check:** https://[your-app-name].ondigitalocean.app/health.php
+
+### Important Files
+- **App Config:** `app.yaml`
+- **Entry Point:** `public/index.php`
+- **Database Config:** `config.php`
+- **PHP Config:** `.platform/php.ini` or `.user.ini`
+- **Health Check:** `health.php`
+
+### Environment Variables (Set in Dashboard)
+- `SMTP2GO_API_KEY`
+- `SMTP2GO_SENDER_EMAIL`
+- `ADMIN_BCC_EMAIL`
+- `SPACES_KEY` (if using Spaces)
+- `SPACES_SECRET` (if using Spaces)
+- `SPACES_NAME` (if using Spaces)
+- `SPACES_REGION` (if using Spaces)
+
+### Database Variables (Auto-Set)
+- `DB_HOST`
+- `DB_USER`
+- `DB_PASS`
+- `DB_NAME`
+- `DB_PORT`
+
+---
+
+## Troubleshooting Quick Reference
+
+### App Won't Start
+1. Check build logs
+2. Check runtime logs
+3. Verify `run_command` in `app.yaml`
+4. Verify `public/index.php` exists
+
+### Database Connection Failed
+1. Verify database component is running
+2. Check environment variables
+3. Test connection using database console
+4. Verify database schema is imported
+
+### File Uploads Not Working
+1. Check if Spaces is configured (if using)
+2. Verify upload directory exists and is writable
+3. Check PHP upload settings
+4. Review upload code
+
+### 404 Errors
+1. Verify `public/index.php` exists
+2. Check routing logic
+3. Verify file paths are correct
+4. Check App Platform routes configuration
+
+---
+
+## Post-Deployment Sign-Off
+
+- [ ] All checklist items completed
+- [ ] All critical issues addressed
+- [ ] Application tested and working
+- [ ] Team trained on deployment process
+- [ ] Documentation complete
+- [ ] Monitoring and alerts configured
+- [ ] Backups verified
+- [ ] Ready for production use
+
+**Deployed By:** _________________  
+**Date:** _________________  
+**App URL:** _________________  
+**Database:** _________________  
+
+---
+
+**Last Updated:** 2025-01-XX

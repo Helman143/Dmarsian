@@ -177,3 +177,6 @@ echo ""
 echo -e "${BLUE}Note: Some operations may require sudo privileges${NC}"
 echo -e "${BLUE}Run with sudo for full optimization: sudo ./optimize.sh${NC}"
 
+
+
+

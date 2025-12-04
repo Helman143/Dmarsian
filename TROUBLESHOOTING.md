@@ -229,3 +229,6 @@ After fixing issues:
 - ✅ Restore `.htaccess` if disabled
 - ✅ Verify `.env` has correct permissions (600)
 
+
+
+

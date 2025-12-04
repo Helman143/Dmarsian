@@ -69,3 +69,6 @@ echo ""
 echo "To monitor errors in real-time, run:"
 echo "  sudo tail -f /var/log/apache2/error.log"
 
+
+
+

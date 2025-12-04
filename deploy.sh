@@ -58,3 +58,6 @@ echo "  2. Import database schema: mysql -u user -p database < Database/db.sql"
 echo "  3. Set proper ownership: chown -R www-data:www-data ."
 echo "  4. Restart Apache: systemctl restart apache2"
 
+
+
+

@@ -103,3 +103,6 @@ ini_set('display_startup_errors', 1);
 3. Restore .htaccess if disabled
 4. Run optimize.sh to clear caches
 
+
+
+
