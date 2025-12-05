@@ -41,7 +41,7 @@ function fetchPayments(searchTerm = '') {
     })
     .catch(() => {
         const tableBody = document.getElementById('paymentTableBody');
-        tableBody.innerHTML = '<tr><td colspan="10">Error fetching payment records.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9">Error fetching payment records.</td></tr>';
     });
 }
 
@@ -50,7 +50,7 @@ function populatePaymentTable(records, balancesMap = {}, statusesMap = {}) {
     const tableBody = document.getElementById('paymentTableBody');
     tableBody.innerHTML = '';
     if (!records.length) {
-        tableBody.innerHTML = '<tr><td colspan="10">No payment records found.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9">No payment records found.</td></tr>';
         return;
     }
     // Pre-compute per-student stats for fallback balance (current month totals, prior payments, discount)
@@ -101,7 +101,6 @@ function populatePaymentTable(records, balancesMap = {}, statusesMap = {}) {
             statusText = statusText.charAt(0).toUpperCase() + statusText.slice(1).toLowerCase();
         }
         row.innerHTML = `
-            <td>${record.id}</td>
             <td>${record.jeja_no ? record.jeja_no.replace(/^STD-/, '') : ''}</td>
             <td>${record.fullname}</td>
             <td>${record.date_paid}</td>

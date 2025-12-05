@@ -110,7 +110,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                     <table class="payment-table">
                         <thead>
                             <tr>
-                                <th>Transaction ID</th>
                                 <th>STD No.</th>
                                 <th>Fullname</th>
                                 <th>Date Paid</th>
