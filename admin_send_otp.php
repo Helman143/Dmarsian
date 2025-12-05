@@ -82,14 +82,24 @@ function sendEmailViaSMTP2GO(array $payload): array {
     return ['http_code' => $httpCode, 'body' => $response, 'error' => $curlErr, 'curl_errno' => $curlErrNo];
 }
 
+// Log incoming request
+error_log("========================================");
+error_log("OTP Request Received");
+error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
+error_log("POST Data: " . json_encode($_POST));
+error_log("========================================");
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    error_log("ERROR: Invalid request method. Expected POST, got: " . $_SERVER['REQUEST_METHOD']);
     header('Location: forgot_admin_password.php');
     exit();
 }
 
 // Check database connection
 if (!$conn || $conn->connect_error) {
-    error_log("Database connection error in admin_send_otp.php: " . ($conn->connect_error ?? 'Connection failed'));
+    error_log("ERROR: Database connection error in admin_send_otp.php: " . ($conn->connect_error ?? 'Connection failed'));
+    error_log("DEBUG: Check database environment variables: DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT");
+    // Still redirect to success page for security
     header('Location: forgot_admin_password.php?sent=1');
     exit();
 }
@@ -122,6 +132,7 @@ if ($stmt = $conn->prepare("SELECT id, email, username FROM admin_accounts WHERE
 
 // Always respond with success to avoid user enumeration
 if (!$admin || empty($admin['email'])) {
+    error_log("INFO: OTP request for identifier '{$identifier}' - account not found (security: showing success message)");
     header('Location: forgot_admin_password.php?sent=1');
     exit();
 }
@@ -146,6 +157,7 @@ if ($stmt = $conn->prepare("SELECT last_sent_at FROM admin_password_resets WHERE
 }
 
 if ($tooSoon) {
+    error_log("INFO: OTP request throttled for {$adminEmail} - too soon (less than 60 seconds since last request)");
     header('Location: forgot_admin_password.php?sent=1');
     exit();
 }
@@ -175,11 +187,16 @@ $apiKey = defined('SMTP2GO_API_KEY') ? SMTP2GO_API_KEY : getenv('SMTP2GO_API_KEY
 $senderEmail = defined('SMTP2GO_SENDER_EMAIL') ? SMTP2GO_SENDER_EMAIL : getenv('SMTP2GO_SENDER_EMAIL');
 
 // Enhanced logging for debugging
-error_log("OTP Email Debug - Checking configuration for {$adminEmail}");
+error_log("========================================");
+error_log("OTP Email Debug - Starting OTP send process");
+error_log("Admin Email: {$adminEmail}");
+error_log("Admin ID: {$adminId}");
+error_log("OTP Code: {$otp}");
 error_log("SMTP2GO_API_KEY from constant: " . (defined('SMTP2GO_API_KEY') ? 'SET (length: ' . strlen(SMTP2GO_API_KEY) . ')' : 'NOT SET'));
 error_log("SMTP2GO_API_KEY from getenv(): " . (getenv('SMTP2GO_API_KEY') ? 'SET (length: ' . strlen(getenv('SMTP2GO_API_KEY')) . ')' : 'NOT SET'));
 error_log("SMTP2GO_SENDER_EMAIL from constant: " . (defined('SMTP2GO_SENDER_EMAIL') ? 'SET (' . SMTP2GO_SENDER_EMAIL . ')' : 'NOT SET'));
 error_log("SMTP2GO_SENDER_EMAIL from getenv(): " . (getenv('SMTP2GO_SENDER_EMAIL') ? 'SET (' . getenv('SMTP2GO_SENDER_EMAIL') . ')' : 'NOT SET'));
+error_log("========================================");
 
 if (empty($apiKey) || $apiKey === '' || $apiKey === 'your_smtp2go_api_key_here') {
     error_log("ERROR: SMTP2GO_API_KEY is not configured. Cannot send OTP email to {$adminEmail}");
