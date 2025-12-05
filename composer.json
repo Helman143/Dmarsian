@@ -30,9 +30,6 @@
     "scripts": {
         "test": "phpunit",
         "test-verbose": "phpunit --verbose",
-        "post-install-cmd": [
-            "@php -r \"if (file_exists('PHPMailer-master')) { echo 'Note: PHPMailer-master folder exists. Consider removing it and using Composer version instead.\\n'; }\""
-        ]
     },
     "config": {
         "optimize-autoloader": true,
