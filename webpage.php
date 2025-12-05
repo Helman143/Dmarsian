@@ -1,5 +1,18 @@
 <?php
 // webpage.php
+
+// Load environment variables (for local development)
+// Only load if file exists (graceful fallback for production)
+if (file_exists(__DIR__ . '/env-loader.php')) {
+    require_once __DIR__ . '/env-loader.php';
+}
+
+// Get hero video URL from environment variable, fallback to local file
+$heroVideoUrl = getenv('HERO_VIDEO_URL');
+if (empty($heroVideoUrl)) {
+    // Fallback to local video for development
+    $heroVideoUrl = 'Video/quality_restoration_20251105174029661.mp4';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +112,7 @@
     </header>
     <section id="home" class="hero">
         <video class="hero-video" aria-hidden="true" autoplay muted loop playsinline preload="auto">
-            <source src="Video/quality_restoration_20251105174029661.mp4" type="video/mp4">
+            <source src="<?php echo htmlspecialchars($heroVideoUrl); ?>" type="video/mp4">
         </video>
         <div class="hero-overlay"></div>
         <div class="hero-content">
