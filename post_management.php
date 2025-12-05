@@ -4,7 +4,8 @@ require_once 'post_operations.php';
 // Fetch posts for display
 $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
-$category_filter = isset($_GET['category']) ? mysqli_real_escape_string($conn, $_GET['category']) : '';
+$category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
+$category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
 // Base query: exclude archived posts and filter by year
 $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
@@ -12,7 +13,7 @@ $params = [$year_filter];
 $types = "i";
 
 // Add category filter if specified
-if ($category_filter) {
+if (!empty($category_filter)) {
     if ($category_filter === 'achievement') {
         $sql .= " AND (category = 'achievement' OR category = 'achievement_event')";
     } elseif ($category_filter === 'event') {
@@ -81,9 +82,9 @@ mysqli_close($conn);
                 </div>
                 <div class="filter-dropdown">
                     <select id="category-filter" onchange="filterPosts()">
-                        <option value="" <?php echo $category_filter == '' ? 'selected' : ''; ?>>ALL CATEGORIES</option>
-                        <option value="achievement" <?php echo $category_filter == 'achievement' ? 'selected' : ''; ?>>Achievement</option>
-                        <option value="event" <?php echo $category_filter == 'event' ? 'selected' : ''; ?>>Event</option>
+                        <option value="" <?php echo $category_filter_raw == '' ? 'selected' : ''; ?>>ALL CATEGORIES</option>
+                        <option value="achievement" <?php echo strtolower($category_filter_raw) == 'achievement' ? 'selected' : ''; ?>>Achievement</option>
+                        <option value="event" <?php echo strtolower($category_filter_raw) == 'event' ? 'selected' : ''; ?>>Event</option>
                        
                     </select>
                     <i class="fas fa-chevron-down"></i>
