@@ -12,7 +12,8 @@
 // ============================================
 // Check if this is a root request BEFORE any other processing
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-$requestPath = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+$parsedPath = parse_url($requestUri, PHP_URL_PATH);
+$requestPath = ($parsedPath !== false && $parsedPath !== null) ? $parsedPath : '/';
 
 // If root request, serve webpage.php IMMEDIATELY
 if ($requestPath === '/' || trim($requestPath, '/') === '') {
@@ -43,9 +44,11 @@ if (!$isProduction) {
 // Set timezone
 date_default_timezone_set('Asia/Manila');
 
-// Get the requested URI for non-root requests
+// Process non-root requests
+// If we reach here, it's not a root request, so process normally
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-$requestPath = parse_url($requestUri, PHP_URL_PATH);
+$parsedPath = parse_url($requestUri, PHP_URL_PATH);
+$requestPath = ($parsedPath !== false && $parsedPath !== null) ? $parsedPath : '/';
 
 // Remove leading slash for processing
 $requestPath = ltrim($requestPath, '/');
