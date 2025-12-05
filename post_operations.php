@@ -52,8 +52,8 @@ function createPost() {
         }
     }
     
-    $sql = "INSERT INTO posts (title, description, image_path, category, post_date) 
-            VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO posts (title, description, image_path, category, post_date, status) 
+            VALUES (?, ?, ?, ?, ?, 'active')";
     
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "sssss", $title, $description, $image_path, $category, $post_date);

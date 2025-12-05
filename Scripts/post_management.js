@@ -348,7 +348,7 @@ async function filterPosts() {
     const categoryFilter = document.getElementById('category-filter').value;
     
     // Build URL with filters
-    let url = 'admin_post_management.php?';
+    let url = 'post_management.php?';
     if (yearFilter) url += `year=${yearFilter}`;
     if (categoryFilter) url += `${yearFilter ? '&' : ''}category=${categoryFilter}`;
     

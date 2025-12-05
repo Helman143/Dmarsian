@@ -6,10 +6,12 @@ $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $category_filter = isset($_GET['category']) ? mysqli_real_escape_string($conn, $_GET['category']) : '';
 
-$sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND (status = 'active' OR status IS NULL)";
+// Base query: exclude archived posts and filter by year
+$sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
 $params = [$year_filter];
 $types = "i";
 
+// Add category filter if specified
 if ($category_filter) {
     if ($category_filter === 'achievement') {
         $sql .= " AND (category = 'achievement' OR category = 'achievement_event')";
