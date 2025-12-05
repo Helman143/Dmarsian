@@ -25,30 +25,37 @@ if (!$isProduction) {
 // Set timezone
 date_default_timezone_set('Asia/Manila');
 
-// Get the requested URI
+// Get the requested URI - check for root requests FIRST
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = parse_url($requestUri, PHP_URL_PATH);
 
-// Check for root requests BEFORE processing - route to webpage.php
-// This makes webpage.php the landing page for all visitors visiting the root URL
-if ($requestPath === '/' || empty($requestPath)) {
-    $requestPath = '/webpage.php';
-}
-
-$requestPath = ltrim($requestPath, '/');
-
-// Remove query string from path for file checking
-$requestPath = strtok($requestPath, '?');
-
-// Additional check after processing - catch any remaining root/index requests
-if (empty($requestPath) || 
-    $requestPath === 'index.html' ||
-    $requestPath === 'index') {
+// CRITICAL: Check if this is a root request BEFORE any processing
+// Route root URL (/) directly to webpage.php
+if ($requestPath === '/' || $requestPath === '' || empty($requestPath)) {
     $requestPath = 'webpage.php';
+} else {
+    // Remove leading slash for processing
+    $requestPath = ltrim($requestPath, '/');
+    
+    // Remove query string from path for file checking
+    $requestPath = strtok($requestPath, '?');
+    
+    // Additional check: catch any remaining root/index requests
+    if (empty($requestPath) || 
+        $requestPath === 'index.html' ||
+        $requestPath === 'index') {
+        $requestPath = 'webpage.php';
+    }
 }
 
 // Build file path (go up one directory from public/)
 $filePath = __DIR__ . '/../' . $requestPath;
+
+// SAFETY CHECK: If somehow index.php is being requested for root, redirect to webpage.php
+if ($requestPath === 'index.php' && ($_SERVER['REQUEST_URI'] ?? '/') === '/') {
+    $requestPath = 'webpage.php';
+    $filePath = __DIR__ . '/../' . $requestPath;
+}
 
 // Normalize path to prevent directory traversal
 $filePath = realpath($filePath);
