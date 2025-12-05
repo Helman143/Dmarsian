@@ -388,7 +388,11 @@ if (empty($heroVideoUrl)) {
         if (!track) return;
 
         const cardsHtml = posts.map((post) => {
-            const imageSrc = post.image_path ? post.image_path : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
+            let imageSrc = post.image_path ? post.image_path : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
+            // Ensure path starts with / for absolute path (if not already a full URL)
+            if (post.image_path && !imageSrc.match(/^(https?:\/\/|\/)/)) {
+                imageSrc = '/' + imageSrc.replace(/^\//, '');
+            }
             return (
                 `<article class="slide-card post-card">`
               +   `<div class="image-wrap">`
@@ -502,7 +506,12 @@ if (empty($heroVideoUrl)) {
         return post.long_description || post.description || post.details || '';
     }
     function getPostImageSrc(post) {
-        return post.image_path || post.image || post.cover || '';
+        let imgSrc = post.image_path || post.image || post.cover || '';
+        // Ensure path starts with / for absolute path (if not already a full URL)
+        if (imgSrc && !imgSrc.match(/^(https?:\/\/|\/)/)) {
+            imgSrc = '/' + imgSrc.replace(/^\//, '');
+        }
+        return imgSrc;
     }
     function openPostModal(post) {
         const overlay = document.getElementById('postModal');

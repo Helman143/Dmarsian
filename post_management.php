@@ -101,7 +101,14 @@ mysqli_close($conn);
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
-                            <div class="post-image" style="background-image: url('<?php echo !empty($post['image_path']) ? $post['image_path'] : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image'; ?>');">
+                            <div class="post-image" style="background-image: url('<?php 
+                                $img_path = !empty($post['image_path']) ? $post['image_path'] : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
+                                // Ensure path starts with / for absolute path
+                                if (!empty($post['image_path']) && !preg_match('/^(https?:\/\/|\/)/', $img_path)) {
+                                    $img_path = '/' . ltrim($img_path, '/');
+                                }
+                                echo htmlspecialchars($img_path);
+                            ?>');">
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
