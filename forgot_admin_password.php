@@ -23,6 +23,12 @@ ini_set('display_errors', 1);
             <h2>Forgot Password</h2>
             <?php if (isset($_GET['sent'])): ?>
                 <p class="error-message" style="color:#2e7d32">If the account exists, an OTP has been sent to its email.</p>
+                <p style="font-size:12px;color:#666;margin-top:8px;text-align:center">
+                    <strong>Note:</strong> If you don't receive the email, please check:<br>
+                    1. Your spam/junk folder<br>
+                    2. That your email address is correct<br>
+                    3. Server error logs for detailed error messages
+                </p>
             <?php elseif (isset($_GET['error'])): ?>
                 <p class="error-message">Something went wrong. Please try again.</p>
             <?php endif; ?>

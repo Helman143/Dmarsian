@@ -24,21 +24,63 @@ date_default_timezone_set('Asia/Manila');
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
 
 function sendEmailViaSMTP2GO(array $payload): array {
+    // Validate required fields
+    if (empty($payload['api_key']) || empty($payload['to']) || empty($payload['sender'])) {
+        return [
+            'http_code' => 0,
+            'body' => json_encode(['error' => 'Missing required email parameters']),
+            'error' => 'Missing required email parameters'
+        ];
+    }
+    
     $url = 'https://api.smtp2go.com/v3/email/send';
+    $jsonPayload = json_encode($payload);
+    
+    // Check for JSON encoding errors
+    if ($jsonPayload === false) {
+        $jsonError = json_last_error_msg();
+        error_log("JSON encoding error in sendEmailViaSMTP2GO: " . $jsonError);
+        return [
+            'http_code' => 0,
+            'body' => json_encode(['error' => 'JSON encoding failed: ' . $jsonError]),
+            'error' => 'JSON encoding failed: ' . $jsonError
+        ];
+    }
+    
     $ch = curl_init($url);
+    if ($ch === false) {
+        error_log("Failed to initialize cURL for SMTP2GO");
+        return [
+            'http_code' => 0,
+            'body' => json_encode(['error' => 'Failed to initialize cURL']),
+            'error' => 'Failed to initialize cURL'
+        ];
+    }
+    
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30); // 30 second timeout
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 second connection timeout
+    
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
     curl_close($ch);
+    
     return ['http_code' => $httpCode, 'body' => $response, 'error' => $curlErr];
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: forgot_admin_password.php');
+    exit();
+}
+
+// Check database connection
+if (!$conn || $conn->connect_error) {
+    error_log("Database connection error in admin_send_otp.php: " . ($conn->connect_error ?? 'Connection failed'));
+    header('Location: forgot_admin_password.php?sent=1');
     exit();
 }
 
@@ -50,6 +92,7 @@ if ($identifier === '') {
 
 // Lookup admin by username or email
 $admin = null;
+$dbError = null;
 if ($stmt = $conn->prepare("SELECT id, email, username FROM admin_accounts WHERE username = ? OR email = ? LIMIT 1")) {
     $stmt->bind_param('ss', $identifier, $identifier);
     if ($stmt->execute()) {
@@ -57,8 +100,14 @@ if ($stmt = $conn->prepare("SELECT id, email, username FROM admin_accounts WHERE
         if ($res && $res->num_rows === 1) {
             $admin = $res->fetch_assoc();
         }
+    } else {
+        $dbError = $stmt->error;
+        error_log("Database query error in admin_send_otp.php: " . $dbError);
     }
     $stmt->close();
+} else {
+    $dbError = $conn->error;
+    error_log("Database prepare error in admin_send_otp.php: " . $dbError);
 }
 
 // Always respond with success to avoid user enumeration
@@ -111,6 +160,25 @@ if ($stmt = $conn->prepare("INSERT INTO admin_password_resets (email, admin_id, 
     $stmt->close();
 }
 
+// Validate SMTP2GO configuration before attempting to send
+$apiKey = defined('SMTP2GO_API_KEY') ? SMTP2GO_API_KEY : '';
+$senderEmail = defined('SMTP2GO_SENDER_EMAIL') ? SMTP2GO_SENDER_EMAIL : '';
+
+if (empty($apiKey) || $apiKey === '') {
+    error_log("ERROR: SMTP2GO_API_KEY is not configured. Cannot send OTP email to {$adminEmail}");
+    // Still redirect to success page for security (avoid user enumeration)
+    header('Location: forgot_admin_password.php?sent=1');
+    exit();
+}
+
+if (empty($senderEmail) || $senderEmail === '' || $senderEmail === 'your_email@example.com') {
+    error_log("ERROR: SMTP2GO_SENDER_EMAIL is not configured. Cannot send OTP email to {$adminEmail}");
+    error_log("Current value: " . ($senderEmail ?: 'empty'));
+    // Still redirect to success page for security (avoid user enumeration)
+    header('Location: forgot_admin_password.php?sent=1');
+    exit();
+}
+
 // Build email content
 $subject = 'Your Admin OTP Code';
 $text = "Your OTP code is: $otp\nThis code will expire in 5 minutes.";
@@ -121,10 +189,10 @@ $html = '<div style="font-family:Arial,Helvetica,sans-serif;line-height:1.5;colo
       . '</div>';
 
 $payload = [
-    'api_key' => SMTP2GO_API_KEY,
+    'api_key' => $apiKey,
     'to' => [$adminEmail],
-    'sender' => SMTP2GO_SENDER_EMAIL,
-    'sender_name' => SMTP2GO_SENDER_NAME ?: "D'Marsians Taekwondo Gym",
+    'sender' => $senderEmail,
+    'sender_name' => (defined('SMTP2GO_SENDER_NAME') && SMTP2GO_SENDER_NAME) ? SMTP2GO_SENDER_NAME : "D'Marsians Taekwondo Gym",
     'subject' => $subject,
     'text_body' => $text,
     'html_body' => $html
@@ -133,9 +201,82 @@ if (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL) {
     $payload['bcc'] = [ADMIN_BCC_EMAIL];
 }
 
-// Send email (ignore response for user privacy)
-sendEmailViaSMTP2GO($payload);
+// Send email and check response
+$emailResult = sendEmailViaSMTP2GO($payload);
 
+// Log the result for debugging
+$emailSent = false;
+$providerId = null;
+$errorMessage = null;
+
+if ($emailResult['http_code'] >= 200 && $emailResult['http_code'] < 300) {
+    // HTTP success, but need to check API response
+    $responseBody = json_decode($emailResult['body'], true);
+    
+    // Check for message_id which indicates successful send
+    if (isset($responseBody['data']) && isset($responseBody['data']['message_id'])) {
+        $providerId = $responseBody['data']['message_id'];
+        $emailSent = true;
+        error_log("OTP email sent successfully to {$adminEmail}. Message ID: {$providerId}");
+    } elseif (isset($responseBody['message_id'])) {
+        $providerId = $responseBody['message_id'];
+        $emailSent = true;
+        error_log("OTP email sent successfully to {$adminEmail}. Message ID: {$providerId}");
+    } elseif (isset($responseBody['data']) && isset($responseBody['data']['error'])) {
+        $errorMessage = $responseBody['data']['error'];
+        error_log("SMTP2GO API Error for OTP to {$adminEmail}: " . $errorMessage);
+        if (stripos($errorMessage, 'sender') !== false || stripos($errorMessage, 'verify') !== false || stripos($errorMessage, 'domain') !== false) {
+            error_log("HINT: This error often means the sender email ({$senderEmail}) is not verified in SMTP2GO. Please verify it in your SMTP2GO account.");
+        }
+    } elseif (isset($responseBody['errors']) && is_array($responseBody['errors']) && count($responseBody['errors']) > 0) {
+        foreach ($responseBody['errors'] as $err) {
+            $errorMsg = $err['message'] ?? 'Unknown error';
+            $errorMessage = $errorMsg;
+            error_log("SMTP2GO API Error for OTP to {$adminEmail}: " . $errorMsg);
+            if (stripos($errorMsg, 'sender') !== false || stripos($errorMsg, 'verify') !== false || stripos($errorMsg, 'domain') !== false) {
+                error_log("HINT: The sender email ({$senderEmail}) may not be verified in SMTP2GO. Please verify it in your SMTP2GO account.");
+            }
+        }
+    } elseif (isset($responseBody['error'])) {
+        $errorMessage = is_string($responseBody['error']) ? $responseBody['error'] : json_encode($responseBody['error']);
+        error_log("SMTP2GO API Error for OTP to {$adminEmail}: " . $errorMessage);
+    } else {
+        // No clear error, but also no message_id - log the full response for debugging
+        error_log("SMTP2GO response unclear for OTP to {$adminEmail}. HTTP: {$emailResult['http_code']}, Response: " . substr($emailResult['body'], 0, 500));
+        error_log("Full response: " . $emailResult['body']);
+    }
+} else {
+    // HTTP error
+    error_log("Failed to send OTP email to {$adminEmail}. HTTP Code: " . ($emailResult['http_code'] ?? 'N/A'));
+    error_log("Response: " . ($emailResult['body'] ?? 'No response'));
+    if (!empty($emailResult['error'])) {
+        $errorMessage = $emailResult['error'];
+        error_log("cURL Error: " . $errorMessage);
+    }
+    
+    // Try to parse response for more details
+    if (!empty($emailResult['body'])) {
+        $responseBody = json_decode($emailResult['body'], true);
+        if (isset($responseBody['errors']) && is_array($responseBody['errors'])) {
+            foreach ($responseBody['errors'] as $err) {
+                $errorMsg = $err['message'] ?? 'Unknown error';
+                $errorMessage = $errorMsg;
+                error_log("SMTP2GO Error Detail: " . $errorMsg);
+                if (stripos($errorMsg, 'sender') !== false || stripos($errorMsg, 'verify') !== false || stripos($errorMsg, 'domain') !== false) {
+                    error_log("HINT: The sender email ({$senderEmail}) may not be verified in SMTP2GO. Please verify it in your SMTP2GO account.");
+                }
+            }
+        }
+    }
+}
+
+// Log final status
+if (!$emailSent) {
+    error_log("WARNING: OTP email was NOT successfully sent to {$adminEmail}. Check SMTP2GO configuration and sender email verification.");
+}
+
+// Always redirect to success page for user privacy (avoid user enumeration)
+// Even if email fails, we don't reveal this to the user
 header('Location: forgot_admin_password.php?sent=1');
 exit();
 
