@@ -460,15 +460,51 @@ function initDashboard() {
                 });
                 const result = await resp.json();
                 if (result.status === 'success') {
-                    alert('Reminder sent successfully.');
+                    alert('Reminder sent successfully!\n\nIf you don\'t receive the email, please check:\n1. Spam/Junk folder\n2. Email configuration (SMTP2GO settings)\n3. Server error logs');
                     // Refresh the dues table only on success so rows are not removed on failure
                     fetchAndPopulateDues();
                 } else {
-                    const msg = result.message || result.error || 'Unknown error';
-                    alert('Send failed: ' + msg);
+                    let msg = result.message || result.error || 'Unknown error';
+                    let errorMsg = 'Send failed: ' + msg;
+                    
+                    // Add HTTP code if available
+                    if (result.http_code) {
+                        errorMsg += '\nHTTP Status: ' + result.http_code;
+                    }
+                    
+                    // Add debug info if available
+                    if (result.debug_info) {
+                        console.error('Email Debug Info:', result.debug_info);
+                        errorMsg += '\n\nDebug Info:\n';
+                        errorMsg += '- API Key Set: ' + (result.debug_info.api_key_set ? 'Yes' : 'No') + '\n';
+                        errorMsg += '- Sender Email Set: ' + (result.debug_info.sender_email_set ? 'Yes' : 'No');
+                    }
+                    
+                    if (msg.includes('SMTP2GO') || msg.includes('not configured')) {
+                        errorMsg += '\n\nPlease check your email configuration:\n';
+                        errorMsg += '1. Go to Digital Ocean App Platform Dashboard\n';
+                        errorMsg += '2. Settings → App-Level Environment Variables\n';
+                        errorMsg += '3. Ensure SMTP2GO_API_KEY is set\n';
+                        errorMsg += '4. Ensure SMTP2GO_SENDER_EMAIL is set\n';
+                        errorMsg += '5. Click Save and redeploy if needed';
+                    } else if (msg.includes('HTTP 401') || msg.includes('HTTP 403')) {
+                        errorMsg += '\n\nThis usually means:\n';
+                        errorMsg += '1. SMTP2GO API key is invalid or expired\n';
+                        errorMsg += '2. Check your SMTP2GO account dashboard\n';
+                        errorMsg += '3. Verify the API key is active';
+                    } else if (msg.includes('HTTP 400')) {
+                        errorMsg += '\n\nThis usually means:\n';
+                        errorMsg += '1. Sender email is not verified in SMTP2GO\n';
+                        errorMsg += '2. Invalid email format\n';
+                        errorMsg += '3. Check SMTP2GO dashboard for sender verification';
+                    }
+                    
+                    alert(errorMsg);
+                    console.error('Email send error:', result);
                 }
             } catch (err) {
-                alert('Error sending reminder: ' + err.message);
+                alert('Error sending reminder: ' + err.message + '\n\nPlease check:\n1. Server connection\n2. Email configuration\n3. Browser console for details');
+                console.error('Reminder send error:', err);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
@@ -491,15 +527,39 @@ function initDashboard() {
                 });
                 const result = await resp.json();
                 if (result.status === 'success') {
-                    alert('Bulk reminders processed: ' + (result.count || 0));
+                    let msg = 'Bulk reminders processed:\n';
+                    msg += '- Total: ' + (result.count || 0) + '\n';
+                    msg += '- Success: ' + (result.success_count || 0) + '\n';
+                    msg += '- Failed: ' + (result.failed_count || 0) + '\n';
+                    msg += '- Skipped: ' + (result.skipped_count || 0);
+                    if (result.failed_count > 0) {
+                        msg += '\n\nSome emails failed. Check server logs for details.';
+                    }
+                    if (result.success_count > 0) {
+                        msg += '\n\nIf emails are not received, check:\n1. Spam/Junk folder\n2. Email configuration\n3. SMTP2GO account status';
+                    }
+                    alert(msg);
                     // Refresh only when bulk send succeeds
                     fetchAndPopulateDues();
                 } else {
-                    const msg = result.message || result.error || 'Unknown error';
-                    alert('Bulk send failed: ' + msg);
+                    let msg = result.message || result.error || 'Unknown error';
+                    let errorMsg = 'Bulk send failed: ' + msg;
+                    
+                    if (msg.includes('SMTP2GO') || msg.includes('not configured')) {
+                        errorMsg += '\n\nPlease check your email configuration:\n';
+                        errorMsg += '1. Go to Digital Ocean App Platform Dashboard\n';
+                        errorMsg += '2. Settings → App-Level Environment Variables\n';
+                        errorMsg += '3. Ensure SMTP2GO_API_KEY is set\n';
+                        errorMsg += '4. Ensure SMTP2GO_SENDER_EMAIL is set\n';
+                        errorMsg += '5. Click Save and redeploy if needed';
+                    }
+                    
+                    alert(errorMsg);
+                    console.error('Bulk email send error:', result);
                 }
             } catch (err) {
-                alert('Error sending bulk reminders: ' + err.message);
+                alert('Error sending bulk reminders: ' + err.message + '\n\nPlease check:\n1. Server connection\n2. Email configuration\n3. Browser console for details');
+                console.error('Bulk reminder send error:', err);
             } finally {
                 bulkBtn.disabled = false;
                 bulkBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send All Reminders';

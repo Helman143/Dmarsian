@@ -221,16 +221,48 @@ function computeStudentDue(mysqli $conn, string $jejaNo): ?array {
 }
 
 function sendEmailViaSMTP2GO(array $payload): array {
+    // Validate required fields
+    if (empty($payload['api_key'])) {
+        error_log('SMTP2GO Error: API key is missing');
+        return ['http_code' => 0, 'body' => '', 'error' => 'SMTP2GO API key is not configured'];
+    }
+    if (empty($payload['sender'])) {
+        error_log('SMTP2GO Error: Sender email is missing');
+        return ['http_code' => 0, 'body' => '', 'error' => 'SMTP2GO sender email is not configured'];
+    }
+    if (empty($payload['to']) || !is_array($payload['to']) || count($payload['to']) === 0) {
+        error_log('SMTP2GO Error: No recipients specified');
+        return ['http_code' => 0, 'body' => '', 'error' => 'No email recipients specified'];
+    }
+
     $url = 'https://api.smtp2go.com/v3/email/send';
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+    
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
     curl_close($ch);
+    
+    // Log the response for debugging
+    error_log('SMTP2GO Response - HTTP Code: ' . $httpCode);
+    if ($curlErr) {
+        error_log('SMTP2GO cURL Error: ' . $curlErr);
+    }
+    if ($response) {
+        $decoded = json_decode($response, true);
+        if ($decoded) {
+            error_log('SMTP2GO Response: ' . json_encode($decoded));
+        } else {
+            error_log('SMTP2GO Raw Response: ' . substr($response, 0, 500));
+        }
+    }
+    
     return ['http_code' => $httpCode, 'body' => $response, 'error' => $curlErr];
 }
 
@@ -273,6 +305,19 @@ function logReminder(mysqli $conn, string $jejaNo, string $dueMonth, string $rec
 }
 
 function sendReminderForStudent(mysqli $conn, array $dueItem): array {
+    // Check SMTP2GO configuration first
+    if (empty(SMTP2GO_API_KEY) || SMTP2GO_API_KEY === 'your_smtp2go_api_key_here') {
+        $errorMsg = 'SMTP2GO API key is not configured. Please set SMTP2GO_API_KEY in your environment variables or .env file.';
+        error_log('Email Error: ' . $errorMsg);
+        return ['status' => 'failed', 'message' => $errorMsg, 'error' => $errorMsg];
+    }
+    
+    if (empty(SMTP2GO_SENDER_EMAIL) || SMTP2GO_SENDER_EMAIL === 'your_email@example.com') {
+        $errorMsg = 'SMTP2GO sender email is not configured. Please set SMTP2GO_SENDER_EMAIL in your environment variables or .env file.';
+        error_log('Email Error: ' . $errorMsg);
+        return ['status' => 'failed', 'message' => $errorMsg, 'error' => $errorMsg];
+    }
+
     $jejaNo = $dueItem['jeja_no'];
     $studentName = $dueItem['student_name'];
     $studentEmail = trim($dueItem['student_email'] ?? '');
@@ -282,10 +327,26 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
     $totalPayment = floatval($dueItem['total_payment']);
 
     $recipients = [];
-    if ($studentEmail !== '') { $recipients[] = $studentEmail; }
-    if ($parentEmail !== '' && $parentEmail !== $studentEmail) { $recipients[] = $parentEmail; }
+    if ($studentEmail !== '') { 
+        // Validate email format
+        if (filter_var($studentEmail, FILTER_VALIDATE_EMAIL)) {
+            $recipients[] = $studentEmail;
+        } else {
+            error_log("Invalid student email format for $jejaNo: $studentEmail");
+        }
+    }
+    if ($parentEmail !== '' && $parentEmail !== $studentEmail) { 
+        // Validate email format
+        if (filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
+            $recipients[] = $parentEmail;
+        } else {
+            error_log("Invalid parent email format for $jejaNo: $parentEmail");
+        }
+    }
     if (empty($recipients)) {
-        return ['status' => 'skipped', 'message' => 'No recipient emails for student'];
+        $errorMsg = 'No valid recipient emails for student ' . $jejaNo . '. Student: ' . ($studentEmail ?: 'none') . ', Parent: ' . ($parentEmail ?: 'none');
+        error_log('Email Error: ' . $errorMsg);
+        return ['status' => 'skipped', 'message' => $errorMsg];
     }
 
     // Email the accumulated total dues (Total Payment), regardless of partial payments
@@ -306,10 +367,13 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
         $payload['bcc'] = [ADMIN_BCC_EMAIL];
     }
 
+    error_log("Sending reminder email for $jejaNo to: " . implode(', ', $recipients));
     $resp = sendEmailViaSMTP2GO($payload);
     $providerId = null;
     $err = $resp['error'] ?: null;
     $status = ($resp['http_code'] >= 200 && $resp['http_code'] < 300) ? 'success' : 'failed';
+    $detailedError = null;
+    
     if ($resp['body']) {
         $decoded = json_decode($resp['body'], true);
         if (isset($decoded['data']) && isset($decoded['data']['message_id'])) {
@@ -317,9 +381,38 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
         } elseif (isset($decoded['message_id'])) {
             $providerId = $decoded['message_id'];
         }
-        if ($status !== 'success' && isset($decoded['errors'][0]['message'])) {
-            $err = $decoded['errors'][0]['message'];
+        if ($status !== 'success') {
+            if (isset($decoded['errors']) && is_array($decoded['errors']) && count($decoded['errors']) > 0) {
+                $err = $decoded['errors'][0]['message'] ?? 'Unknown SMTP2GO error';
+                $detailedError = json_encode($decoded['errors'], JSON_PRETTY_PRINT);
+                error_log('SMTP2GO API Error: ' . $err);
+                error_log('SMTP2GO Full Error Response: ' . $detailedError);
+            } elseif (isset($decoded['error'])) {
+                $err = is_string($decoded['error']) ? $decoded['error'] : json_encode($decoded['error']);
+                error_log('SMTP2GO API Error: ' . $err);
+            } else {
+                $err = 'HTTP ' . $resp['http_code'] . ' - Check SMTP2GO configuration';
+                $detailedError = 'Response body: ' . substr($resp['body'], 0, 500);
+                error_log('SMTP2GO HTTP Error: ' . $resp['http_code']);
+                error_log('SMTP2GO Response: ' . substr($resp['body'], 0, 500));
+            }
+        } else {
+            error_log("Email sent successfully for $jejaNo. Message ID: " . ($providerId ?: 'N/A'));
         }
+    } else {
+        if ($status !== 'success') {
+            $err = $err ?: 'No response from SMTP2GO API';
+            if ($resp['http_code'] == 0) {
+                $err = 'Failed to connect to SMTP2GO API. Check internet connection and API endpoint.';
+            }
+            error_log('SMTP2GO Error: ' . $err);
+        }
+    }
+    
+    // Build comprehensive error message
+    $errorMessage = $err;
+    if ($detailedError && $status !== 'success') {
+        $errorMessage .= ' | Details: ' . $detailedError;
     }
 
     foreach ($recipients as $rcpt) {
@@ -329,7 +422,18 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
         upsertReminderState($conn, $jejaNo, $dueMonth);
     }
 
-    return ['status' => $status, 'provider_id' => $providerId, 'error' => $err];
+    return [
+        'status' => $status, 
+        'provider_id' => $providerId, 
+        'error' => $err, 
+        'message' => $errorMessage ?: ($status === 'success' ? 'Email sent successfully' : 'Failed to send email'),
+        'http_code' => $resp['http_code'] ?? null,
+        'debug_info' => ($status !== 'success' && defined('APP_ENV') && APP_ENV === 'development') ? [
+            'api_key_set' => !empty(SMTP2GO_API_KEY),
+            'sender_email_set' => !empty(SMTP2GO_SENDER_EMAIL),
+            'response_body' => substr($resp['body'] ?? '', 0, 500)
+        ] : null
+    ];
 }
 
 function getAllCurrentDues(mysqli $conn): array {
@@ -383,15 +487,47 @@ if (empty($payload)) { $payload = $_POST; }
 $mode = isset($payload['mode']) ? $payload['mode'] : 'single';
 
 if ($mode === 'bulk') {
+    // Check configuration before processing
+    if (empty(SMTP2GO_API_KEY) || SMTP2GO_API_KEY === 'your_smtp2go_api_key_here') {
+        echo json_encode(['status' => 'error', 'message' => 'SMTP2GO API key is not configured. Please configure SMTP2GO_API_KEY in your environment variables.']);
+        exit();
+    }
+    if (empty(SMTP2GO_SENDER_EMAIL) || SMTP2GO_SENDER_EMAIL === 'your_email@example.com') {
+        echo json_encode(['status' => 'error', 'message' => 'SMTP2GO sender email is not configured. Please configure SMTP2GO_SENDER_EMAIL in your environment variables.']);
+        exit();
+    }
+    
     $dues = getAllCurrentDues($conn);
     $results = [];
+    $successCount = 0;
+    $failedCount = 0;
+    $skippedCount = 0;
+    
     foreach ($dues as $item) {
+        $result = sendReminderForStudent($conn, $item);
         $results[] = [
             'jeja_no' => $item['jeja_no'],
-            'result' => sendReminderForStudent($conn, $item)
+            'student_name' => $item['student_name'] ?? '',
+            'result' => $result
         ];
+        
+        if ($result['status'] === 'success') {
+            $successCount++;
+        } elseif ($result['status'] === 'skipped') {
+            $skippedCount++;
+        } else {
+            $failedCount++;
+        }
     }
-    echo json_encode(['status' => 'success', 'count' => count($results), 'results' => $results]);
+    
+    echo json_encode([
+        'status' => 'success', 
+        'count' => count($results),
+        'success_count' => $successCount,
+        'failed_count' => $failedCount,
+        'skipped_count' => $skippedCount,
+        'results' => $results
+    ]);
     exit();
 }
 
@@ -409,7 +545,12 @@ if ($due === null) {
 }
 
 $res = sendReminderForStudent($conn, $due);
-echo json_encode(['status' => $res['status'], 'provider_id' => $res['provider_id'], 'error' => $res['error']]);
+echo json_encode([
+    'status' => $res['status'], 
+    'provider_id' => $res['provider_id'] ?? null, 
+    'error' => $res['error'] ?? null,
+    'message' => $res['message'] ?? ($res['error'] ?? '')
+]);
 exit();
 ?>
 

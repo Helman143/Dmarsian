@@ -8,6 +8,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset(
     exit();
 }
 require_once 'db_connect.php';
+
 // Get user's name from session
 $userName = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin';
 $firstDayThisMonth = date('Y-m-01');
@@ -148,10 +149,12 @@ $lastDayThisMonth = date('Y-m-t');
                         </tbody>
                     </table>
                 </div>
+                
             </div>
         </div>
     </div>
-    <script src="Scripts/admin_dashboard.js"></script>
+
+    <script src="Scripts/admin_dashboard.js?v=20251030"></script>
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
