@@ -61,13 +61,44 @@ ini_set('display_errors', 1);
             </form>
             <script>
                 // Add loading state to form submission
-                document.getElementById('otpForm').addEventListener('submit', function() {
+                document.getElementById('otpForm').addEventListener('submit', function(e) {
                     const btn = document.getElementById('submitBtn');
                     const btnText = document.getElementById('btnText');
                     const btnLoader = document.getElementById('btnLoader');
+                    const identifier = document.getElementById('identifier').value.trim();
+                    
+                    // Validate input
+                    if (!identifier) {
+                        e.preventDefault();
+                        alert('Please enter your email or username');
+                        return false;
+                    }
+                    
+                    // Show loading state
                     btn.disabled = true;
                     btnText.style.display = 'none';
                     btnLoader.style.display = 'inline';
+                    
+                    // Log for debugging (remove in production)
+                    console.log('Form submitting to:', this.action);
+                    console.log('Identifier:', identifier);
+                    
+                    // Allow form to submit normally
+                    return true;
+                });
+                
+                // Debug: Check if form exists
+                window.addEventListener('DOMContentLoaded', function() {
+                    const form = document.getElementById('otpForm');
+                    const btn = document.getElementById('submitBtn');
+                    if (!form) {
+                        console.error('OTP form not found!');
+                    } else {
+                        console.log('OTP form found, action:', form.action);
+                    }
+                    if (!btn) {
+                        console.error('Submit button not found!');
+                    }
                 });
             </script>
             <div style="margin-top:12px;text-align:center">
