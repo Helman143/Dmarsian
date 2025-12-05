@@ -29,23 +29,29 @@ date_default_timezone_set('Asia/Manila');
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = parse_url($requestUri, PHP_URL_PATH);
 
-// CRITICAL: Check if this is a root request BEFORE any processing
-// Route root URL (/) directly to webpage.php
+// CRITICAL: If this is a root request, directly serve webpage.php
+// This ensures webpage.php is ALWAYS shown for the root URL
 if ($requestPath === '/' || $requestPath === '' || empty($requestPath)) {
-    $requestPath = 'webpage.php';
-} else {
-    // Remove leading slash for processing
-    $requestPath = ltrim($requestPath, '/');
-    
-    // Remove query string from path for file checking
-    $requestPath = strtok($requestPath, '?');
-    
-    // Additional check: catch any remaining root/index requests
-    if (empty($requestPath) || 
-        $requestPath === 'index.html' ||
-        $requestPath === 'index') {
-        $requestPath = 'webpage.php';
+    // Directly require webpage.php for root requests - no routing needed
+    $webpagePath = __DIR__ . '/../webpage.php';
+    if (file_exists($webpagePath)) {
+        chdir(dirname($webpagePath));
+        require $webpagePath;
+        exit;
     }
+}
+
+// Remove leading slash for processing
+$requestPath = ltrim($requestPath, '/');
+
+// Remove query string from path for file checking
+$requestPath = strtok($requestPath, '?');
+
+// Additional check: catch any remaining root/index requests
+if (empty($requestPath) || 
+    $requestPath === 'index.html' ||
+    $requestPath === 'index') {
+    $requestPath = 'webpage.php';
 }
 
 // Build file path (go up one directory from public/)
