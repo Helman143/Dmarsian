@@ -74,6 +74,9 @@ ini_set('display_errors', 1);
                 <a href="admin_verify_otp.php" style="text-decoration:none;color:#1976d2">Already have an OTP? Verify here</a>
             </div>
             <div style="margin-top:8px;text-align:center">
+                <a href="otp_diagnostic.php" style="text-decoration:none;color:#ff9800;font-size:13px">🔍 OTP Email Diagnostic Tool</a>
+            </div>
+            <div style="margin-top:8px;text-align:center">
                 <a href="admin_login.php" style="text-decoration:none;color:#555">Back to Login</a>
             </div>
         </div>
