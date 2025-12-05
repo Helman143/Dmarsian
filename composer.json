@@ -29,7 +29,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test-verbose": "phpunit --verbose",
+        "test-verbose": "phpunit --verbose"
     },
     "config": {
         "optimize-autoloader": true,
