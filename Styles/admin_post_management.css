@@ -290,6 +290,8 @@ nav a, .dropdown-toggle, .dropdown-content a {
     height: 300px;
     background-size: cover;
     background-position: center 22%;
+    background-repeat: no-repeat;
+    background-color: #2d2d2d;
     position: relative;
 }
 

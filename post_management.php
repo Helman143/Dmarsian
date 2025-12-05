@@ -102,13 +102,20 @@ mysqli_close($conn);
                     <?php foreach ($posts as $post): ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
                             <div class="post-image" style="background-image: url('<?php 
-                                $img_path = !empty($post['image_path']) ? $post['image_path'] : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
-                                // Ensure path starts with / for absolute path
-                                if (!empty($post['image_path']) && !preg_match('/^(https?:\/\/|\/)/', $img_path)) {
-                                    $img_path = '/' . ltrim($img_path, '/');
+                                // Check if image_path exists and is not empty
+                                $has_image = !empty($post['image_path']) && trim($post['image_path']) !== '';
+                                
+                                if ($has_image) {
+                                    $img_path = trim($post['image_path']);
+                                    // Ensure path starts with / for absolute path (if not already a full URL)
+                                    if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
+                                        $img_path = '/' . ltrim($img_path, '/');
+                                    }
+                                } else {
+                                    $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
                                 }
                                 echo htmlspecialchars($img_path);
-                            ?>');">
+                            ?>'); background-color: #2d2d2d;">
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
