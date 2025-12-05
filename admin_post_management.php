@@ -101,11 +101,12 @@ mysqli_close($conn);
                     <?php foreach ($posts as $post): ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
                             <div class="post-image" style="background-image: url('<?php 
-                                // Check if image_path exists and is not empty
-                                $has_image = !empty($post['image_path']) && trim($post['image_path']) !== '';
+                                // Check if image_path exists and is not empty (handle both NULL and empty string)
+                                $img_path_value = $post['image_path'] ?? '';
+                                $has_image = !empty($img_path_value) && trim($img_path_value) !== '' && $img_path_value !== null;
                                 
                                 if ($has_image) {
-                                    $img_path = trim($post['image_path']);
+                                    $img_path = trim($img_path_value);
                                     // Ensure path starts with / for absolute path (if not already a full URL)
                                     if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
                                         $img_path = '/' . ltrim($img_path, '/');

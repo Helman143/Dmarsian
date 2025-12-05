@@ -107,15 +107,22 @@ function updatePost() {
             $update_image = true;
         }
     } elseif ($remove_image) {
-        // Image should be removed
-        $image_path = '';
+        // Image should be removed - set to NULL in database
+        $image_path = null;
         $update_image = true;
     }
     
     if ($update_image) {
-        $sql = "UPDATE posts SET title=?, description=?, image_path=?, category=?, post_date=? WHERE id=?";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssssi", $title, $description, $image_path, $category, $post_date, $id);
+        // Handle NULL image_path for removal
+        if ($image_path === null) {
+            $sql = "UPDATE posts SET title=?, description=?, image_path=NULL, category=?, post_date=? WHERE id=?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "ssssi", $title, $description, $category, $post_date, $id);
+        } else {
+            $sql = "UPDATE posts SET title=?, description=?, image_path=?, category=?, post_date=? WHERE id=?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "sssssi", $title, $description, $image_path, $category, $post_date, $id);
+        }
     } else {
         $sql = "UPDATE posts SET title=?, description=?, category=?, post_date=? WHERE id=?";
         $stmt = mysqli_prepare($conn, $sql);

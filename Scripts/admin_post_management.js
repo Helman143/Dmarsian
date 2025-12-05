@@ -232,8 +232,8 @@ async function loadPostData(postId) {
             document.getElementById('post-category').value = post.category;
             document.getElementById('post-description').value = post.description;
             
-            // Handle image
-            if (post.image_path) {
+            // Handle image - check for both null and empty string
+            if (post.image_path && post.image_path.trim() !== '') {
                 const imageUploader = document.getElementById('image-uploader');
                 const imagePreview = document.getElementById('image-preview');
                 const previewImg = document.getElementById('preview-img');
@@ -243,9 +243,29 @@ async function loadPostData(postId) {
                 imageUploader.querySelector('p').style.display = 'none';
                 imageUploader.querySelector('span').style.display = 'none';
                 
-                // Show preview
-                previewImg.src = post.image_path;
+                // Show preview - normalize path
+                let imgSrc = post.image_path.trim();
+                if (!imgSrc.match(/^(https?:\/\/|\/)/)) {
+                    imgSrc = '/' + imgSrc.replace(/^\//, '');
+                }
+                previewImg.src = imgSrc;
                 imagePreview.style.display = 'block';
+                
+                // Reset remove image flag since image exists
+                const removeImageFlag = document.getElementById('remove-image-flag');
+                if (removeImageFlag) {
+                    removeImageFlag.value = '0';
+                }
+            } else {
+                // No image - ensure preview is hidden and flag is reset
+                const imagePreview = document.getElementById('image-preview');
+                if (imagePreview) {
+                    imagePreview.style.display = 'none';
+                }
+                const removeImageFlag = document.getElementById('remove-image-flag');
+                if (removeImageFlag) {
+                    removeImageFlag.value = '0';
+                }
             }
             
             // Update character count
@@ -356,9 +376,30 @@ async function archivePost(postId) {
 }
 
 async function archiveCurrentPost() {
-    if (currentPostId) {
-        await archivePost(currentPostId);
+    if (!currentPostId) {
+        alert('No post selected to archive');
+        return;
     }
+    
+    // First, save any pending changes (like image removal) before archiving
+    const removeImageFlag = document.getElementById('remove-image-flag');
+    const hasPendingChanges = removeImageFlag && removeImageFlag.value === '1';
+    
+    if (hasPendingChanges) {
+        // Save changes first, then archive
+        try {
+            await updatePost();
+            // Wait a moment for the update to complete
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+            console.error('Error saving changes before archiving:', error);
+            alert('Error saving changes. Please save manually before archiving.');
+            return;
+        }
+    }
+    
+    // Now archive the post
+    await archivePost(currentPostId);
 }
 
 async function filterPosts() {
