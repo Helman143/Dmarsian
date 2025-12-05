@@ -28,16 +28,20 @@ date_default_timezone_set('Asia/Manila');
 // Get the requested URI
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = parse_url($requestUri, PHP_URL_PATH);
+
+// Check for root requests BEFORE processing - route to webpage.php
+// This makes webpage.php the landing page for all visitors visiting the root URL
+if ($requestPath === '/' || empty($requestPath)) {
+    $requestPath = '/webpage.php';
+}
+
 $requestPath = ltrim($requestPath, '/');
 
 // Remove query string from path for file checking
 $requestPath = strtok($requestPath, '?');
 
-// LANDING PAGE ROUTING: Default to webpage.php for root and common index requests
-// This makes webpage.php the landing page for all visitors visiting the root URL
-// The root index.php (admin login) is accessible via /index.php explicitly
+// Additional check after processing - catch any remaining root/index requests
 if (empty($requestPath) || 
-    $requestPath === '/' || 
     $requestPath === 'index.html' ||
     $requestPath === 'index') {
     $requestPath = 'webpage.php';
