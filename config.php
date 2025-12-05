@@ -58,22 +58,71 @@ if (!empty($unresolved)) {
     $conn = false;
 } else {
     // Create connection using the same logic as db_connect.php
-    $conn = mysqli_init();
-    if ($conn === false) {
-        error_log('mysqli_init failed');
-    } else {
-        mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10);
-        mysqli_ssl_set($conn, null, null, null, null, null);
-        $flags = MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
-
-        if (!$conn->real_connect($servername, $username, $password, $database, $port, null, $flags)) {
-            $errno = mysqli_connect_errno();
-            $error = mysqli_connect_error();
-            error_log("Database connection failed ({$servername}:{$port}) [{$errno}]: {$error}");
+    // Disable mysqli exceptions to handle errors manually
+    $oldReport = mysqli_report(MYSQLI_REPORT_OFF);
+    
+    try {
+        $conn = mysqli_init();
+        if ($conn === false) {
+            error_log('mysqli_init failed');
             $conn = false;
         } else {
-            mysqli_set_charset($conn, 'utf8mb4');
+            // Set connection timeout to prevent long hangs
+            mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+            mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 5);
+            
+            // Managed DBs typically require SSL. Allow connection even if CA cert isn't provided
+            mysqli_ssl_set($conn, null, null, null, null, null);
+            $flags = MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT;
+
+            // Attempt connection with error handling
+            $connected = @$conn->real_connect($servername, $username, $password, $database, $port, null, $flags);
+            
+            if (!$connected) {
+                $errno = mysqli_connect_errno();
+                $error = mysqli_connect_error();
+                
+                // Log detailed error information
+                error_log("Database connection failed ({$servername}:{$port})");
+                error_log("Error Code: {$errno}");
+                error_log("Error Message: {$error}");
+                
+                // Provide specific guidance based on error
+                if ($errno == 2002 || strpos($error, 'timed out') !== false || strpos($error, 'Connection timed out') !== false) {
+                    error_log("CONNECTION TIMEOUT - This usually means:");
+                    error_log("1. Database firewall is blocking App Platform IPs");
+                    error_log("2. Database hostname/port is incorrect");
+                    error_log("3. Database is not accessible from App Platform network");
+                    error_log("SOLUTION: Check database 'Trusted Sources' settings and allow App Platform access");
+                    error_log("Go to: Digital Ocean -> Databases -> Your Database -> Settings -> Trusted Sources");
+                    error_log("Enable 'Allow connections from App Platform' or add App Platform to trusted sources");
+                } elseif ($errno == 1045) {
+                    error_log("ACCESS DENIED - Check username and password");
+                } elseif ($errno == 1049) {
+                    error_log("DATABASE NOT FOUND - Check DB_NAME environment variable");
+                }
+                
+                $conn = false;
+            } else {
+                mysqli_set_charset($conn, 'utf8mb4');
+                error_log("Database connection successful ({$servername}:{$port})");
+            }
         }
+    } catch (Exception $e) {
+        error_log("Database connection exception: " . $e->getMessage());
+        error_log("Exception Code: " . $e->getCode());
+        
+        if (strpos($e->getMessage(), 'timed out') !== false || strpos($e->getMessage(), 'Connection timed out') !== false) {
+            error_log("CONNECTION TIMEOUT DETECTED");
+            error_log("SOLUTION: Check database firewall/trusted sources settings");
+            error_log("Go to: Digital Ocean -> Databases -> Your Database -> Settings -> Trusted Sources");
+            error_log("Add App Platform or allow all App Platform IPs");
+        }
+        
+        $conn = false;
+    } finally {
+        // Restore previous mysqli_report setting
+        mysqli_report($oldReport);
     }
 }
 
