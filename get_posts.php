@@ -23,7 +23,7 @@ try {
     $category = isset($_GET['category']) ? $_GET['category'] : '';
     $year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 
-    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND status = 'active'";
+    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND (status = 'active' OR status IS NULL)";
     $params = [$year];
     $types = "i";
 

@@ -6,7 +6,7 @@ $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $category_filter = isset($_GET['category']) ? mysqli_real_escape_string($conn, $_GET['category']) : '';
 
-$sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND status = 'active'";
+$sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND (status = 'active' OR status IS NULL)";
 $params = [$year_filter];
 $types = "i";
 

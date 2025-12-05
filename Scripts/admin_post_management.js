@@ -311,7 +311,23 @@ async function archivePost(postId) {
         
         if (data.success) {
             alert(data.message);
-            location.reload(); // Refresh to remove archived post
+            // Remove the post card immediately from the DOM
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postCard) {
+                postCard.style.transition = 'opacity 0.3s';
+                postCard.style.opacity = '0';
+                setTimeout(() => {
+                    postCard.remove();
+                    // Check if grid is empty and show message
+                    const postGrid = document.getElementById('post-grid');
+                    if (postGrid && postGrid.querySelectorAll('.post-card').length === 0) {
+                        location.reload(true); // Force reload with cache bypass
+                    }
+                }, 300);
+            } else {
+                // Force reload with cache bypass to ensure fresh data
+                location.reload(true);
+            }
         } else {
             alert('Error: ' + data.message);
         }

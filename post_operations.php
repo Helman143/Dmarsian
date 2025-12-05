@@ -166,7 +166,7 @@ function fetchPosts() {
     $year_filter = isset($_POST['year']) ? (int)$_POST['year'] : date('Y');
     $category_filter = isset($_POST['category']) ? mysqli_real_escape_string($conn, $_POST['category']) : '';
     
-    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND status = 'active'";
+    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND (status = 'active' OR status IS NULL)";
     $params = [$year_filter];
     $types = "i";
     
