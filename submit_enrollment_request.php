@@ -77,7 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL && ADMIN_BCC_EMAIL !== $adminTo) {
             $payload['bcc'] = [ADMIN_BCC_EMAIL];
         }
-        sendEmailViaSMTP2GO($payload);
+        
+        // Send email notification (with error handling)
+        $emailResult = sendEmailViaSMTP2GO($payload);
+        if ($emailResult['http_code'] >= 200 && $emailResult['http_code'] < 300) {
+            error_log("Enrollment notification email sent successfully to: $adminTo");
+        } else {
+            error_log("Failed to send enrollment notification email. HTTP: " . ($emailResult['http_code'] ?? 'N/A') . ", Error: " . ($emailResult['error'] ?? 'Unknown'));
+        }
+        
         echo json_encode(['status' => 'success', 'message' => 'Enrollment request submitted! Please wait for approval.']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Failed to submit request.']);

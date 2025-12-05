@@ -88,7 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL && ADMIN_BCC_EMAIL !== $adminTo) {
             $payload['bcc'] = [ADMIN_BCC_EMAIL];
         }
-        sendEmailViaSMTP2GO($payload);
+        
+        // Send email notification (with error handling)
+        $emailResult = sendEmailViaSMTP2GO($payload);
+        if ($emailResult['http_code'] >= 200 && $emailResult['http_code'] < 300) {
+            error_log("Trial session notification email sent successfully to: $adminTo");
+        } else {
+            error_log("Failed to send trial session notification email. HTTP: " . ($emailResult['http_code'] ?? 'N/A') . ", Error: " . ($emailResult['error'] ?? 'Unknown'));
+        }
+        
         echo json_encode(['status' => 'success', 'message' => 'Trial session request submitted!']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Failed to save request.']);
