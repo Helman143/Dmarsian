@@ -22,23 +22,54 @@ ini_set('display_errors', 1);
             </div>
             <h2>Forgot Password</h2>
             <?php if (isset($_GET['sent'])): ?>
-                <p class="error-message" style="color:#2e7d32">If the account exists, an OTP has been sent to its email.</p>
-                <p style="font-size:12px;color:#666;margin-top:8px;text-align:center">
-                    <strong>Note:</strong> If you don't receive the email, please check:<br>
-                    1. Your spam/junk folder<br>
-                    2. That your email address is correct<br>
-                    3. Server error logs for detailed error messages
-                </p>
+                <div style="background:#e8f5e9;border:1px solid #4caf50;border-radius:4px;padding:12px;margin-bottom:16px">
+                    <p class="error-message" style="color:#2e7d32;margin:0 0 8px 0">
+                        <strong>✓ OTP Request Processed</strong>
+                    </p>
+                    <p style="font-size:13px;color:#555;margin:0">
+                        If the account exists, an OTP has been sent to its registered email address.
+                    </p>
+                </div>
+                <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:12px;margin-bottom:16px">
+                    <p style="font-size:12px;color:#856404;margin:0 0 6px 0">
+                        <strong>📧 Didn't receive the email?</strong>
+                    </p>
+                    <ul style="font-size:11px;color:#856404;margin:0;padding-left:20px;text-align:left">
+                        <li>Check your <strong>spam/junk folder</strong> - emails may be filtered</li>
+                        <li>Wait a few minutes - email delivery can take 2-5 minutes</li>
+                        <li>Verify you entered the correct <strong>email or username</strong></li>
+                        <li>Check if you have multiple email accounts</li>
+                    </ul>
+                    <p style="font-size:11px;color:#856404;margin:8px 0 0 0">
+                        <strong>Note:</strong> You can request a new OTP after 60 seconds if needed.
+                    </p>
+                </div>
             <?php elseif (isset($_GET['error'])): ?>
-                <p class="error-message">Something went wrong. Please try again.</p>
+                <div style="background:#ffebee;border:1px solid #f44336;border-radius:4px;padding:12px;margin-bottom:16px">
+                    <p class="error-message" style="margin:0">Something went wrong. Please try again.</p>
+                </div>
             <?php endif; ?>
-            <form action="admin_send_otp.php" method="POST">
+            <form action="admin_send_otp.php" method="POST" id="otpForm">
                 <div class="input-group">
-                    <input id="identifier" type="text" name="identifier" required>
+                    <input id="identifier" type="text" name="identifier" required autocomplete="username" placeholder=" ">
                     <label>Email or Username</label>
                 </div>
-                <button type="submit" class="login-btn">Send OTP</button>
+                <button type="submit" class="login-btn" id="submitBtn">
+                    <span id="btnText">Send OTP</span>
+                    <span id="btnLoader" style="display:none">Sending...</span>
+                </button>
             </form>
+            <script>
+                // Add loading state to form submission
+                document.getElementById('otpForm').addEventListener('submit', function() {
+                    const btn = document.getElementById('submitBtn');
+                    const btnText = document.getElementById('btnText');
+                    const btnLoader = document.getElementById('btnLoader');
+                    btn.disabled = true;
+                    btnText.style.display = 'none';
+                    btnLoader.style.display = 'inline';
+                });
+            </script>
             <div style="margin-top:12px;text-align:center">
                 <a href="admin_verify_otp.php" style="text-decoration:none;color:#1976d2">Already have an OTP? Verify here</a>
             </div>
