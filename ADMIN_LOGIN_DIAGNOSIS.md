@@ -59,7 +59,7 @@ After scanning your codebase, I've identified several potential reasons why admi
 ## How to Diagnose Your Issue
 
 ### Step 1: Run the Diagnostic Tool
-1. Open your browser and navigate to: `http://localhost/Dmarsian/diagnose_admin_login.php`
+1. Open your browser and navigate to: `C`
 2. Review all test results
 3. Pay special attention to:
    - **Test 3**: Check if you have any admin accounts
