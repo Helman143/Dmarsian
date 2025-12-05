@@ -177,3 +177,4 @@ If you've tried everything and still getting Error 1045:
 **REMEMBER:** This is an authentication issue. The code is working correctly. You MUST update the environment variables in App Platform with the correct database credentials from Digital Ocean.
 
 
+

@@ -348,6 +348,11 @@ App Platform uses nginx, not Apache, so `.htaccess` files are ignored. You can:
 | `SMTP2GO_SENDER_NAME` | Sender display name | `D'Marsians Taekwondo Gym` | App Platform Dashboard |
 | `ADMIN_BCC_EMAIL` | Admin BCC email | `admin@example.com` | App Platform Dashboard |
 | `APP_ENV` | Application environment | `production` | App Platform Dashboard |
+| `HERO_VIDEO_URL` | Hero video URL (DigitalOcean Spaces) | `https://space-name.region.digitaloceanspaces.com/videos/video.mp4` | App Platform Dashboard |
+| `SPACES_KEY` | DigitalOcean Spaces access key | `your_spaces_key` | App Platform Dashboard (optional) |
+| `SPACES_SECRET` | DigitalOcean Spaces secret key | `your_spaces_secret` | App Platform Dashboard (optional) |
+| `SPACES_NAME` | DigitalOcean Spaces name | `dmarsians-media` | App Platform Dashboard (optional) |
+| `SPACES_REGION` | DigitalOcean Spaces region | `nyc3` | App Platform Dashboard (optional) |
 
 ### Setting Environment Variables
 
