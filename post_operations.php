@@ -36,40 +36,91 @@ function createPost() {
     $post_date = mysqli_real_escape_string($conn, $_POST['post_date']);
     
     // Handle image upload
-    $image_path = '';
+    $image_path = null;
+    $upload_error = '';
+    
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = 'uploads/posts/';
         if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            if (!mkdir($upload_dir, 0777, true)) {
+                $upload_error = 'Failed to create upload directory';
+            }
         }
         
-        $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
-        $file_name = uniqid() . '.' . $file_extension;
-        $upload_path = $upload_dir . $file_name;
-        
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-            $image_path = $upload_path;
+        if (empty($upload_error)) {
+            $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'jfif'];
+            
+            if (in_array($file_extension, $allowed_extensions)) {
+                $file_name = uniqid() . '.' . $file_extension;
+                $upload_path = $upload_dir . $file_name;
+                
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
+                    $image_path = $upload_path;
+                } else {
+                    $upload_error = 'Failed to move uploaded file';
+                }
+            } else {
+                $upload_error = 'Invalid file type. Allowed: ' . implode(', ', $allowed_extensions);
+            }
         }
+    } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // File upload error (but not "no file" error)
+        $upload_errors = [
+            UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
+            UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
+            UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+            UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
+        ];
+        $upload_error = $upload_errors[$_FILES['image']['error']] ?? 'Unknown upload error';
     }
+    
+    // If there was an upload error and an image was attempted, fail the operation
+    if (!empty($upload_error) && isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        echo json_encode(['success' => false, 'message' => 'Image upload failed: ' . $upload_error]);
+        mysqli_close($conn);
+        return;
+    }
+    
+    // Verify uploaded file exists if image_path is set
+    if ($image_path !== null && !file_exists($image_path)) {
+        echo json_encode(['success' => false, 'message' => 'Uploaded file not found. Please try again.']);
+        mysqli_close($conn);
+        return;
+    }
+    
+    // Use empty string for image_path if no image was uploaded (database will store as NULL if column allows)
+    $image_path_value = $image_path !== null ? $image_path : '';
     
     $sql = "INSERT INTO posts (title, description, image_path, category, post_date, status) 
             VALUES (?, ?, ?, ?, ?, 'active')";
     
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "sssss", $title, $description, $image_path, $category, $post_date);
+    mysqli_stmt_bind_param($stmt, "sssss", $title, $description, $image_path_value, $category, $post_date);
     
     if (mysqli_stmt_execute($stmt)) {
         // Log activity
         $admin_account = getAdminAccountName($conn);
         $action_type = 'Post Create';
         $student_id = '';
-        $details = 'Created post: ' . $title;
+        $details = 'Created post: ' . $title . ($image_path ? ' (with image: ' . $image_path . ')' : ' (no image)');
         $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
         $log_stmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
         $log_stmt->execute();
         $log_stmt->close();
-        echo json_encode(['success' => true, 'message' => 'Post created successfully']);
+        
+        $message = 'Post created successfully';
+        if ($image_path) {
+            $message .= ' with image';
+        }
+        echo json_encode(['success' => true, 'message' => $message, 'image_path' => $image_path]);
     } else {
+        // If database insert fails, delete the uploaded file if it exists
+        if ($image_path !== null && file_exists($image_path)) {
+            @unlink($image_path);
+        }
         echo json_encode(['success' => false, 'message' => 'Error creating post: ' . mysqli_error($conn)]);
     }
     
@@ -103,8 +154,19 @@ function updatePost() {
         $upload_path = $upload_dir . $file_name;
         
         if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-            $image_path = $upload_path;
-            $update_image = true;
+            // Verify file actually exists after upload
+            if (file_exists($upload_path)) {
+                $image_path = $upload_path;
+                $update_image = true;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Uploaded file not found. Please try again.']);
+                mysqli_close($conn);
+                return;
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file. Please check permissions.']);
+            mysqli_close($conn);
+            return;
         }
     } elseif ($remove_image) {
         // Image should be removed - set to NULL in database

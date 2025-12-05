@@ -102,14 +102,20 @@ mysqli_close($conn);
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
                             <div class="post-image" style="background-image: url('<?php 
                                 // Check if image_path exists and is not empty (handle both NULL and empty string)
-                                $img_path_value = $post['image_path'] ?? '';
-                                $has_image = !empty($img_path_value) && trim($img_path_value) !== '' && $img_path_value !== null;
+                                $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
                                 
-                                if ($has_image) {
+                                // Check if we have a valid image path
+                                if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                                     $img_path = trim($img_path_value);
                                     // Ensure path starts with / for absolute path (if not already a full URL)
                                     if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
                                         $img_path = '/' . ltrim($img_path, '/');
+                                    }
+                                    // Verify file exists (remove leading / for file system check)
+                                    $file_path = ltrim($img_path, '/');
+                                    if (!file_exists($file_path)) {
+                                        // File doesn't exist - use placeholder
+                                        $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
                                     }
                                 } else {
                                     $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';

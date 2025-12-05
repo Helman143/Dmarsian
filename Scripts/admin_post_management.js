@@ -284,6 +284,14 @@ async function handleFormSubmit(e) {
     const formData = new FormData(e.target);
     formData.append('action', 'create');
     
+    // Debug: Check if image file is included
+    const imageFile = document.getElementById('image-upload').files[0];
+    if (imageFile) {
+        console.log('Image file selected:', imageFile.name, 'Size:', imageFile.size, 'Type:', imageFile.type);
+    } else {
+        console.log('No image file selected');
+    }
+    
     try {
         const response = await fetch('post_operations.php', {
             method: 'POST',
@@ -293,15 +301,22 @@ async function handleFormSubmit(e) {
         const data = await response.json();
         
         if (data.success) {
+            // Log image path for debugging
+            if (data.image_path) {
+                console.log('Image uploaded successfully:', data.image_path);
+            } else {
+                console.log('Post created but no image path returned');
+            }
             alert(data.message);
             closeModal();
-            location.reload(); // Refresh to show new post
+            // Use cache-busting reload to ensure fresh data
+            location.reload(true);
         } else {
             alert('Error: ' + data.message);
         }
     } catch (error) {
         console.error('Error creating post:', error);
-        alert('Error creating post');
+        alert('Error creating post: ' + error.message);
     }
 }
 
