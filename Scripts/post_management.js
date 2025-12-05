@@ -133,6 +133,12 @@ function resetForm() {
         imageInput.value = '';
     }
     
+    // Reset remove image flag
+    const removeImageFlag = document.getElementById('remove-image-flag');
+    if (removeImageFlag) {
+        removeImageFlag.value = '0';
+    }
+    
     // Hide preview
     if (imagePreview) {
         imagePreview.style.display = 'none';
@@ -159,8 +165,14 @@ function handleImageUpload() {
     const imageUploader = document.getElementById('image-uploader');
     const imagePreview = document.getElementById('image-preview');
     const previewImg = document.getElementById('preview-img');
+    const removeImageFlag = document.getElementById('remove-image-flag');
     
     if (file) {
+        // Reset remove image flag when new image is uploaded
+        if (removeImageFlag) {
+            removeImageFlag.value = '0';
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e) {
             // Hide uploader content
@@ -180,9 +192,15 @@ function removeImage() {
     const imageUploader = document.getElementById('image-uploader');
     const imagePreview = document.getElementById('image-preview');
     const imageInput = document.getElementById('image-upload');
+    const removeImageFlag = document.getElementById('remove-image-flag');
     
     // Reset file input
     imageInput.value = '';
+    
+    // Set flag to indicate image should be removed
+    if (removeImageFlag) {
+        removeImageFlag.value = '1';
+    }
     
     // Hide preview
     imagePreview.style.display = 'none';

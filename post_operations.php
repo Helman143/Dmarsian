@@ -85,10 +85,14 @@ function updatePost() {
     $description = mysqli_real_escape_string($conn, $_POST['description']);
     $category = mysqli_real_escape_string($conn, $_POST['category']);
     $post_date = mysqli_real_escape_string($conn, $_POST['post_date']);
+    $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] == '1';
     
-    // Handle image upload
-    $image_path = '';
+    // Handle image upload or removal
+    $image_path = null;
+    $update_image = false;
+    
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        // New image uploaded
         $upload_dir = 'uploads/posts/';
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);
@@ -100,10 +104,15 @@ function updatePost() {
         
         if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
             $image_path = $upload_path;
+            $update_image = true;
         }
+    } elseif ($remove_image) {
+        // Image should be removed
+        $image_path = '';
+        $update_image = true;
     }
     
-    if ($image_path) {
+    if ($update_image) {
         $sql = "UPDATE posts SET title=?, description=?, image_path=?, category=?, post_date=? WHERE id=?";
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "sssssi", $title, $description, $image_path, $category, $post_date, $id);

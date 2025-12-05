@@ -147,6 +147,7 @@ mysqli_close($conn);
                             <p>Upload Image</p>
                             <span>Drag & Drop or Click to upload</span>
                             <input type="file" id="image-upload" name="image" accept="image/*" hidden>
+                            <input type="hidden" id="remove-image-flag" name="remove_image" value="0">
                             <div id="image-preview" class="image-preview" style="display: none;">
                                 <img id="preview-img" src="" alt="Preview">
                                 <button type="button" id="remove-image" onclick="removeImage()">
