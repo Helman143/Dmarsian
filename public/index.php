@@ -7,6 +7,24 @@
  * Root URL (/) and index requests are automatically routed to webpage.php
  */
 
+// ============================================
+// CRITICAL: Handle root requests FIRST
+// ============================================
+// Check if this is a root request BEFORE any other processing
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$requestPath = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+
+// If root request, serve webpage.php IMMEDIATELY
+if ($requestPath === '/' || trim($requestPath, '/') === '') {
+    $webpagePath = __DIR__ . '/../webpage.php';
+    if (file_exists($webpagePath)) {
+        chdir(dirname($webpagePath));
+        require $webpagePath;
+        exit;
+    }
+}
+// ============================================
+
 // Enable error reporting for debugging (disable in production after fixing)
 // Check if we're in production mode
 $isProduction = (getenv('APP_ENV') === 'production' || getenv('APP_ENV') === 'prod');
@@ -25,21 +43,9 @@ if (!$isProduction) {
 // Set timezone
 date_default_timezone_set('Asia/Manila');
 
-// Get the requested URI - check for root requests FIRST
+// Get the requested URI for non-root requests
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $requestPath = parse_url($requestUri, PHP_URL_PATH);
-
-// CRITICAL: If this is a root request, directly serve webpage.php
-// This ensures webpage.php is ALWAYS shown for the root URL
-if ($requestPath === '/' || $requestPath === '' || empty($requestPath)) {
-    // Directly require webpage.php for root requests - no routing needed
-    $webpagePath = __DIR__ . '/../webpage.php';
-    if (file_exists($webpagePath)) {
-        chdir(dirname($webpagePath));
-        require $webpagePath;
-        exit;
-    }
-}
 
 // Remove leading slash for processing
 $requestPath = ltrim($requestPath, '/');
