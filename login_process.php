@@ -103,7 +103,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     ob_end_flush();
                     exit();
                 }
-            } catch (Exception $e) {
+            }
+        } catch (Exception $e) {
             error_log("Login error (user): " . $e->getMessage());
             if (isset($stmt)) {
                 $stmt->close();
