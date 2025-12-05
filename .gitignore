@@ -16,7 +16,7 @@ composer-setup.php
 
 # Large folders - user uploads and media files (should not be in version control)
 uploads/
-Video/
+# Video/ - Temporarily enabled for compressed video (29.61 MB)
 
 # Database dumps
 *.sql
