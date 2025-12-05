@@ -19,24 +19,6 @@ services:
   - key: APP_ENV
     value: production
     scope: RUN_TIME
-  - key: DB_HOST
-    value: ${db.HOSTNAME}
-    scope: RUN_TIME
-  - key: DB_USER
-    value: ${db.USERNAME}
-    scope: RUN_TIME
-  - key: DB_PASS
-    value: ${db.PASSWORD}
-    scope: RUN_TIME
-  - key: DB_NAME
-    value: ${db.DATABASE}
-    scope: RUN_TIME
-  - key: DB_PORT
-    value: ${db.PORT}
-    scope: RUN_TIME
-
-databases:
-- name: db
-  engine: MYSQL
-  version: "8"
-  production: false
+  # Database connection variables are set manually in App Platform dashboard
+  # Go to Settings -> App-Level Environment Variables to set:
+  # DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT
