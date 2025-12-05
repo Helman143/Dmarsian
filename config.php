@@ -43,11 +43,18 @@ if (strpos($portStr, '${') === 0) {
 // If we have unresolved template variables, don't attempt connection
 if (!empty($unresolved)) {
     error_log("CRITICAL: Database environment variables not resolved. Unresolved: " . implode(', ', $unresolved));
-    error_log("This usually means the database component is not linked or app.yaml configuration is incorrect.");
-    error_log("Please check your Digital Ocean App Platform configuration:");
-    error_log("1. Ensure the database component is created and running");
-    error_log("2. Verify the database component is linked to your app");
-    error_log("3. Check that app.yaml references the database component correctly");
+    error_log("SOLUTION: You are using an external database (not an App Platform component).");
+    error_log("You MUST manually set these environment variables in App Platform Dashboard:");
+    error_log("1. Go to: App Platform -> Your App -> Settings -> App-Level Environment Variables");
+    error_log("2. Click 'Edit'");
+    error_log("3. REMOVE any variables showing \${db.*} (template variables)");
+    error_log("4. ADD these variables with your ACTUAL database connection details:");
+    error_log("   - DB_HOST = your-database-hostname.db.ondigitalocean.com");
+    error_log("   - DB_USER = your-database-username");
+    error_log("   - DB_PASS = your-database-password");
+    error_log("   - DB_NAME = your-database-name");
+    error_log("   - DB_PORT = 25060 (or your database port)");
+    error_log("5. Click 'Save' and redeploy your app");
     $conn = false;
 } else {
     // Create connection using the same logic as db_connect.php
