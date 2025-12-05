@@ -97,7 +97,18 @@ if (!empty($unresolved)) {
                     error_log("Go to: Digital Ocean -> Databases -> Your Database -> Settings -> Trusted Sources");
                     error_log("Enable 'Allow connections from App Platform' or add App Platform to trusted sources");
                 } elseif ($errno == 1045) {
-                    error_log("ACCESS DENIED - Check username and password");
+                    error_log("ACCESS DENIED - Authentication failed");
+                    error_log("User: {$username}");
+                    error_log("This usually means:");
+                    error_log("1. Database password is incorrect in environment variables");
+                    error_log("2. Database username is incorrect");
+                    error_log("3. User doesn't have permission to connect from App Platform IP");
+                    error_log("SOLUTION:");
+                    error_log("1. Go to Digital Ocean -> Databases -> Your Database -> Users");
+                    error_log("2. Verify the username and reset password if needed");
+                    error_log("3. Copy the correct username and password");
+                    error_log("4. Update DB_USER and DB_PASS in App Platform environment variables");
+                    error_log("5. Ensure user has proper permissions");
                 } elseif ($errno == 1049) {
                     error_log("DATABASE NOT FOUND - Check DB_NAME environment variable");
                 }
