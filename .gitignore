@@ -15,7 +15,8 @@ composer.phar
 composer-setup.php
 
 # Large folders - user uploads and media files (should not be in version control)
-uploads/
+# uploads/ - Temporarily enabled for existing images (5.02 MB)
+# Note: New uploads will still be lost on redeploy - use DigitalOcean Spaces for production
 # Video/ - Temporarily enabled for compressed video (29.61 MB)
 
 # Database dumps
