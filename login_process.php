@@ -27,20 +27,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($login_type === 'admin') {
         // Super Admin login - check admin_accounts table
         try {
+            // Log login attempt (without password)
+            error_log("Admin login attempt - Username/Email: " . $username);
+            
             $stmt = $conn->prepare("SELECT id, username, password, email FROM admin_accounts WHERE username = ? OR email = ?");
             if (!$stmt) {
-                throw new Exception("Prepare failed: " . $conn->error);
+                $error_msg = "Prepare failed: " . $conn->error;
+                error_log("Admin login error: " . $error_msg);
+                throw new Exception($error_msg);
             }
             $stmt->bind_param("ss", $username, $username);
             if (!$stmt->execute()) {
-                throw new Exception("Execute failed: " . $stmt->error);
+                $error_msg = "Execute failed: " . $stmt->error;
+                error_log("Admin login error: " . $error_msg);
+                throw new Exception($error_msg);
             }
             $result = $stmt->get_result();
 
+            // Log number of rows found
+            error_log("Admin login query found " . $result->num_rows . " matching account(s)");
+
             if ($result->num_rows === 1) {
                 $admin = $result->fetch_assoc();
-                // Use password_verify for hashed passwords
-                if (password_verify($password, $admin['password'])) {
+                error_log("Admin account found - ID: " . $admin['id'] . ", Username: " . $admin['username'] . ", Email: " . $admin['email']);
+                
+                // Check if password is hashed (starts with $2y$ or $2a$ or $2b$)
+                $password_hash = $admin['password'];
+                $is_hashed = (strpos($password_hash, '$2y$') === 0 || strpos($password_hash, '$2a$') === 0 || strpos($password_hash, '$2b$') === 0);
+                
+                $password_valid = false;
+                if ($is_hashed) {
+                    // Use password_verify for hashed passwords
+                    $password_valid = password_verify($password, $password_hash);
+                    error_log("Password verification (hashed): " . ($password_valid ? "SUCCESS" : "FAILED"));
+                } else {
+                    // Plain text password comparison
+                    $password_valid = ($password === $password_hash);
+                    error_log("Password verification (plain text): " . ($password_valid ? "SUCCESS" : "FAILED"));
+                }
+                
+                if ($password_valid) {
                     $_SESSION['logged_in'] = true;
                     $_SESSION['username'] = $admin['username'];
                     $_SESSION['admin_username'] = $admin['username'];
@@ -49,15 +75,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['user_type'] = 'super_admin';
 
                     $stmt->close();
-                    $conn->close();
-
+                    error_log("Admin login SUCCESS - Redirecting to dashboard");
+                    
                     header("Location: admin_dashboard.php");
                     ob_end_flush();
                     exit();
+                } else {
+                    error_log("Admin login FAILED - Password mismatch");
                 }
+            } else if ($result->num_rows === 0) {
+                error_log("Admin login FAILED - No account found with username/email: " . $username);
+            } else {
+                error_log("Admin login ERROR - Multiple accounts found (should not happen): " . $result->num_rows);
             }
         } catch (Exception $e) {
             error_log("Login error (admin): " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             if (isset($stmt)) {
                 $stmt->close();
             }
@@ -70,6 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($stmt)) {
             $stmt->close();
         }
+        error_log("Admin login FAILED - Redirecting to login page with error");
         ob_clean();
         header("Location: admin_login.php?error=1");
         ob_end_flush();

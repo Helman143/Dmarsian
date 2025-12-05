@@ -21,8 +21,14 @@ ini_set('display_errors', 1);
                 <img src="Picture/Logo2.png" alt="Logo">
             </div>
             <h2>SUPER ADMIN LOGIN</h2>
-            <?php if (isset($_GET['error']) && $_GET['error'] == 1): ?>
-                <p class="error-message">Invalid username/email or password</p>
+            <?php if (isset($_GET['error'])): ?>
+                <?php if ($_GET['error'] == 1): ?>
+                    <p class="error-message">Invalid username/email or password</p>
+                <?php elseif ($_GET['error'] == 'db_connection_failed'): ?>
+                    <p class="error-message">Database connection failed. Please contact administrator.</p>
+                <?php else: ?>
+                    <p class="error-message">Login failed. Please try again.</p>
+                <?php endif; ?>
             <?php endif; ?>
             <form action="login_process.php" method="POST">
                 <input type="hidden" name="login_type" value="admin">
