@@ -2,9 +2,24 @@
 /**
  * Script to create a new admin account in admin_accounts table
  * This is a one-time use script - delete it after use for security
+ * 
+ * SECURITY: Add a secret key to prevent unauthorized access
+ * Usage: https://your-app.ondigitalocean.app/create_admin_account.php?key=YOUR_SECRET_KEY
  */
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// SECURITY: Set a secret key to prevent unauthorized access
+// Change this to a random string and delete the file after use!
+$SECRET_KEY = 'CHANGE_THIS_TO_A_RANDOM_STRING_12345';
+
+// Check for secret key
+$provided_key = $_GET['key'] ?? '';
+if ($provided_key !== $SECRET_KEY) {
+    http_response_code(403);
+    die('<!DOCTYPE html><html><head><title>Access Denied</title></head><body><h1>403 - Access Denied</h1><p>Invalid or missing security key.</p><p><small>This script requires a secret key parameter for security.</small></p></body></html>');
+}
+
 require_once 'db_connect.php';
 
 // Configuration
