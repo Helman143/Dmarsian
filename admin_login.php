@@ -45,6 +45,12 @@ ini_set('display_errors', 1);
             <div style="margin-top:12px;text-align:center">
                 <a href="forgot_admin_password.php" style="text-decoration:none;color:#1976d2">Forgot password?</a>
             </div>
+            <div style="margin-top:8px;text-align:center;font-size:12px">
+                <a href="create_new_admin.php" style="text-decoration:none;color:#28a745">➕ Create New Admin Account</a>
+            </div>
+            <div style="margin-top:8px;text-align:center;font-size:12px">
+                <a href="diagnose_admin_login.php" style="text-decoration:none;color:#888">🔧 Troubleshoot Login Issues</a>
+            </div>
         </div>
     </div>
 </body>
