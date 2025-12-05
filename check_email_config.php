@@ -1,4 +1,4 @@
-<?php
+@<?php
 /**
  * Email Configuration Checker
  * This script checks your email configuration and helps diagnose issues

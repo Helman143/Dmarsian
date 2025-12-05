@@ -63,13 +63,23 @@ function sendEmailViaSMTP2GO(array $payload): array {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30); // 30 second timeout
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 second connection timeout
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
+    $curlErrNo = curl_errno($ch);
+    $curlInfo = curl_getinfo($ch);
     curl_close($ch);
     
-    return ['http_code' => $httpCode, 'body' => $response, 'error' => $curlErr];
+    // Enhanced error logging for debugging
+    if ($curlErrNo !== 0) {
+        error_log("cURL Error #{$curlErrNo}: {$curlErr}");
+        error_log("cURL Info: " . json_encode($curlInfo, JSON_PRETTY_PRINT));
+    }
+    
+    return ['http_code' => $httpCode, 'body' => $response, 'error' => $curlErr, 'curl_errno' => $curlErrNo];
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -161,11 +171,20 @@ if ($stmt = $conn->prepare("INSERT INTO admin_password_resets (email, admin_id, 
 }
 
 // Validate SMTP2GO configuration before attempting to send
-$apiKey = defined('SMTP2GO_API_KEY') ? SMTP2GO_API_KEY : '';
-$senderEmail = defined('SMTP2GO_SENDER_EMAIL') ? SMTP2GO_SENDER_EMAIL : '';
+$apiKey = defined('SMTP2GO_API_KEY') ? SMTP2GO_API_KEY : getenv('SMTP2GO_API_KEY');
+$senderEmail = defined('SMTP2GO_SENDER_EMAIL') ? SMTP2GO_SENDER_EMAIL : getenv('SMTP2GO_SENDER_EMAIL');
 
-if (empty($apiKey) || $apiKey === '') {
+// Enhanced logging for debugging
+error_log("OTP Email Debug - Checking configuration for {$adminEmail}");
+error_log("SMTP2GO_API_KEY from constant: " . (defined('SMTP2GO_API_KEY') ? 'SET (length: ' . strlen(SMTP2GO_API_KEY) . ')' : 'NOT SET'));
+error_log("SMTP2GO_API_KEY from getenv(): " . (getenv('SMTP2GO_API_KEY') ? 'SET (length: ' . strlen(getenv('SMTP2GO_API_KEY')) . ')' : 'NOT SET'));
+error_log("SMTP2GO_SENDER_EMAIL from constant: " . (defined('SMTP2GO_SENDER_EMAIL') ? 'SET (' . SMTP2GO_SENDER_EMAIL . ')' : 'NOT SET'));
+error_log("SMTP2GO_SENDER_EMAIL from getenv(): " . (getenv('SMTP2GO_SENDER_EMAIL') ? 'SET (' . getenv('SMTP2GO_SENDER_EMAIL') . ')' : 'NOT SET'));
+
+if (empty($apiKey) || $apiKey === '' || $apiKey === 'your_smtp2go_api_key_here') {
     error_log("ERROR: SMTP2GO_API_KEY is not configured. Cannot send OTP email to {$adminEmail}");
+    error_log("DEBUG: apiKey value is: " . ($apiKey ?: 'empty string'));
+    error_log("DEBUG: Check Digital Ocean App Platform -> Settings -> App-Level Environment Variables -> SMTP2GO_API_KEY");
     // Still redirect to success page for security (avoid user enumeration)
     header('Location: forgot_admin_password.php?sent=1');
     exit();
@@ -174,6 +193,7 @@ if (empty($apiKey) || $apiKey === '') {
 if (empty($senderEmail) || $senderEmail === '' || $senderEmail === 'your_email@example.com') {
     error_log("ERROR: SMTP2GO_SENDER_EMAIL is not configured. Cannot send OTP email to {$adminEmail}");
     error_log("Current value: " . ($senderEmail ?: 'empty'));
+    error_log("DEBUG: Check Digital Ocean App Platform -> Settings -> App-Level Environment Variables -> SMTP2GO_SENDER_EMAIL");
     // Still redirect to success page for security (avoid user enumeration)
     header('Location: forgot_admin_password.php?sent=1');
     exit();
@@ -252,6 +272,20 @@ if ($emailResult['http_code'] >= 200 && $emailResult['http_code'] < 300) {
     if (!empty($emailResult['error'])) {
         $errorMessage = $emailResult['error'];
         error_log("cURL Error: " . $errorMessage);
+        if (isset($emailResult['curl_errno'])) {
+            error_log("cURL Error Number: " . $emailResult['curl_errno']);
+            // Common cURL error codes
+            $curlErrorCodes = [
+                6 => 'Could not resolve host (DNS issue)',
+                7 => 'Failed to connect to host (network/firewall issue)',
+                28 => 'Operation timeout (connection or read timeout)',
+                35 => 'SSL connect error (SSL/TLS handshake failed)',
+                60 => 'SSL certificate problem (certificate verification failed)'
+            ];
+            if (isset($curlErrorCodes[$emailResult['curl_errno']])) {
+                error_log("cURL Error Meaning: " . $curlErrorCodes[$emailResult['curl_errno']]);
+            }
+        }
     }
     
     // Try to parse response for more details
