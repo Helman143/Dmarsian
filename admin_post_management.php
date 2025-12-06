@@ -123,6 +123,7 @@ mysqli_close($conn);
                             <div class="post-image" style="background-image: url('<?php 
                                 // Check if image_path exists and is not empty (handle both NULL and empty string)
                                 $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
+                                $has_image = false;
                                 
                                 // Check if we have a valid image path
                                 if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
@@ -135,20 +136,24 @@ mysqli_close($conn);
                                         $file_path = substr($file_path, 1);
                                     }
                                     
-                                    if (!file_exists($file_path)) {
-                                        // File doesn't exist - use placeholder
-                                        $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
-                                    } else {
+                                    if (file_exists($file_path)) {
                                         // File exists - ensure path starts with / for absolute path (if not already a full URL)
                                         if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
                                             $img_path = '/' . ltrim($img_path, '/');
                                         }
+                                        $has_image = true;
+                                        echo htmlspecialchars($img_path);
                                     }
-                                } else {
-                                    $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
                                 }
-                                echo htmlspecialchars($img_path);
-                            ?>'); background-color: #2d2d2d;">
+                                
+                                // If no image, don't set background-image (will show placeholder text)
+                                if (!$has_image) {
+                                    echo "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E";
+                                }
+                            ?>'); background-color: #2d2d2d; background-size: cover; background-position: center;">
+                                <?php if (!$has_image): ?>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; text-align: center; pointer-events: none;">No Image</div>
+                                <?php endif; ?>
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
