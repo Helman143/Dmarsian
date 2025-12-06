@@ -33,6 +33,26 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+// Validate image paths - remove invalid ones
+foreach ($posts as &$post) {
+    if (!empty($post['image_path']) && trim($post['image_path']) !== '') {
+        $img_path = trim($post['image_path']);
+        $file_path = $img_path;
+        // Remove leading / for file system check if present
+        if (strpos($file_path, '/') === 0) {
+            $file_path = substr($file_path, 1);
+        }
+        // Check if file exists
+        if (!file_exists($file_path)) {
+            // File doesn't exist - set to null (will show placeholder)
+            $post['image_path'] = null;
+        }
+    } else {
+        $post['image_path'] = null;
+    }
+}
+unset($post); // Break reference
+
 mysqli_stmt_close($stmt);
 mysqli_close($conn);
 ?>
@@ -242,35 +262,60 @@ mysqli_close($conn);
         document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
     })();
     
-    // Fix broken background images
-    (function() {
+    // Fix broken background images - run immediately and on load
+    (function fixBrokenImages() {
         const placeholder = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
-        const postImages = document.querySelectorAll('.post-image');
         
-        postImages.forEach(function(imgElement) {
-            const style = window.getComputedStyle(imgElement);
-            const bgImage = style.backgroundImage;
+        function checkImages() {
+            const postImages = document.querySelectorAll('.post-image');
             
-            // Extract URL from background-image: url('...')
-            const urlMatch = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
-            if (!urlMatch || !urlMatch[1]) return;
-            
-            const imageUrl = urlMatch[1];
-            
-            // Skip if already a placeholder
-            if (imageUrl.includes('placeholder.com') || imageUrl.includes('Image+Not+Found')) return;
-            
-            // Test if image loads
-            const img = new Image();
-            img.onload = function() {
-                // Image loaded successfully, do nothing
-            };
-            img.onerror = function() {
-                // Image failed to load, replace with placeholder
-                imgElement.style.backgroundImage = `url('${placeholder}')`;
-            };
-            img.src = imageUrl;
-        });
+            postImages.forEach(function(imgElement) {
+                // Skip if already has placeholder
+                if (imgElement.dataset.checked) return;
+                imgElement.dataset.checked = 'true';
+                
+                const style = window.getComputedStyle(imgElement);
+                const bgImage = style.backgroundImage;
+                
+                // Extract URL from background-image: url('...')
+                const urlMatch = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+                if (!urlMatch || !urlMatch[1]) return;
+                
+                const imageUrl = urlMatch[1];
+                
+                // Skip if already a placeholder
+                if (imageUrl.includes('placeholder.com') || imageUrl.includes('Image+Not+Found')) return;
+                
+                // Test if image loads
+                const img = new Image();
+                img.onload = function() {
+                    // Image loaded successfully, do nothing
+                };
+                img.onerror = function() {
+                    // Image failed to load, replace with placeholder immediately
+                    imgElement.style.backgroundImage = `url('${placeholder}')`;
+                    console.log('Replaced broken image:', imageUrl);
+                };
+                // Set timeout to prevent hanging
+                setTimeout(function() {
+                    if (img.complete === false) {
+                        img.onerror();
+                    }
+                }, 3000);
+                img.src = imageUrl;
+            });
+        }
+        
+        // Run immediately
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkImages);
+        } else {
+            checkImages();
+        }
+        
+        // Also run after a short delay to catch any dynamically loaded images
+        setTimeout(checkImages, 100);
+        setTimeout(checkImages, 500);
     })();
     </script>
 </body>

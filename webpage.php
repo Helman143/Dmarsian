@@ -388,16 +388,21 @@ if (empty($heroVideoUrl)) {
         if (!track) return;
 
         const cardsHtml = posts.map((post) => {
-            let imageSrc = post.image_path ? post.image_path : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
+            // Use placeholder if image_path is null or empty
+            const placeholder = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
+            let imageSrc = (post.image_path && post.image_path.trim() !== '') 
+                ? post.image_path 
+                : placeholder;
+            
             // Ensure path starts with / for absolute path (if not already a full URL)
-            if (post.image_path && !imageSrc.match(/^(https?:\/\/|\/)/)) {
+            if (imageSrc !== placeholder && !imageSrc.match(/^(https?:\/\/|\/)/)) {
                 imageSrc = '/' + imageSrc.replace(/^\//, '');
             }
-            const placeholder = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
+            
             return (
                 `<article class="slide-card post-card">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='${placeholder}';" loading="lazy">`
+              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='${placeholder}';" loading="lazy" crossorigin="anonymous">`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
               +   `<div class="card-body">`
@@ -476,13 +481,26 @@ if (empty($heroVideoUrl)) {
     }
 
     // Fetch and render sliders
+    // Global error handler for images
+    window.addEventListener('error', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            const img = e.target;
+            if (!img.src.includes('placeholder.com')) {
+                img.src = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
+                img.onerror = null; // Prevent infinite loop
+            }
+        }
+    }, true); // Use capture phase
+
     fetch('get_posts.php?category=achievement')
         .then(res => res.json())
-        .then(posts => { renderSlider(posts, 'achievements-slider'); });
+        .then(posts => { renderSlider(posts, 'achievements-slider'); })
+        .catch(err => console.error('Error loading achievements:', err));
 
     fetch('get_posts.php?category=event')
         .then(res => res.json())
-        .then(posts => { renderSlider(posts, 'events-slider'); });
+        .then(posts => { renderSlider(posts, 'events-slider'); })
+        .catch(err => console.error('Error loading events:', err));
 
     // Post modal helpers
     function normalizePostDate(post) {
