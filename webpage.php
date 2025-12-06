@@ -396,7 +396,7 @@ if (empty($heroVideoUrl)) {
             return (
                 `<article class="slide-card post-card">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title}">`
+              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';">`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
               +   `<div class="card-body">`
@@ -522,6 +522,10 @@ if (empty($heroVideoUrl)) {
 
         img.src = getPostImageSrc(post) || 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=No+Image';
         img.alt = post.title || 'Post image';
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=Image+Not+Found';
+        };
         title.textContent = post.title || '';
         date.textContent = formatPostDate(normalizePostDate(post));
         desc.textContent = getPostDescription(post);

@@ -101,11 +101,12 @@ mysqli_close($conn);
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
-                            <div class="post-image" style="background-image: url('<?php 
+                            <div class="post-image">
+                                <?php 
                                 // Check if image_path exists and is not empty (handle both NULL and empty string)
                                 $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
                                 
-                                // Check if we have a valid image path
+                                // Determine image source
                                 if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                                     $img_path = trim($img_path_value);
                                     // Ensure path starts with / for absolute path (if not already a full URL)
@@ -121,8 +122,11 @@ mysqli_close($conn);
                                 } else {
                                     $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
                                 }
-                                echo htmlspecialchars($img_path);
-                            ?>'); background-color: #2d2d2d;">
+                                ?>
+                                <img src="<?php echo htmlspecialchars($img_path); ?>" 
+                                     alt="<?php echo htmlspecialchars($post['title']); ?>" 
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';"
+                                     style="width: 100%; height: 100%; object-fit: cover;">
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
