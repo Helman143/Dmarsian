@@ -388,21 +388,28 @@ if (empty($heroVideoUrl)) {
         if (!track) return;
 
         const cardsHtml = posts.map((post) => {
-            // Use placeholder if image_path is null or empty
-            const placeholder = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
-            let imageSrc = (post.image_path && post.image_path.trim() !== '') 
-                ? post.image_path 
-                : placeholder;
+            // Create SVG data URI placeholder that always works
+            const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
             
-            // Ensure path starts with / for absolute path (if not already a full URL)
-            if (imageSrc !== placeholder && !imageSrc.match(/^(https?:\/\/|\/)/)) {
-                imageSrc = '/' + imageSrc.replace(/^\//, '');
+            let imageSrc = placeholderSvg;
+            let hasImage = false;
+            
+            // Check if we have a valid image path
+            if (post.image_path && post.image_path.trim() !== '') {
+                // Ensure path starts with / for absolute path (if not already a full URL)
+                if (!post.image_path.match(/^(https?:\/\/|data:)/)) {
+                    imageSrc = '/' + post.image_path.replace(/^\//, '');
+                } else {
+                    imageSrc = post.image_path;
+                }
+                hasImage = true;
             }
             
             return (
                 `<article class="slide-card post-card">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='${placeholder}';" loading="lazy" crossorigin="anonymous">`
+              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='${placeholderSvg}'; this.style.backgroundColor='#2d2d2d';" loading="lazy" style="background-color: #2d2d2d;">`
+              +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
               +   `<div class="card-body">`
@@ -525,9 +532,14 @@ if (empty($heroVideoUrl)) {
         return post.long_description || post.description || post.details || '';
     }
     function getPostImageSrc(post) {
+        const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Crect fill='%232d2d2d' width='1200' height='800'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='32' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+        
         let imgSrc = post.image_path || post.image || post.cover || '';
+        if (!imgSrc || imgSrc.trim() === '') {
+            return placeholderSvg;
+        }
         // Ensure path starts with / for absolute path (if not already a full URL)
-        if (imgSrc && !imgSrc.match(/^(https?:\/\/|\/)/)) {
+        if (!imgSrc.match(/^(https?:\/\/|data:)/)) {
             imgSrc = '/' + imgSrc.replace(/^\//, '');
         }
         return imgSrc;
@@ -539,13 +551,15 @@ if (empty($heroVideoUrl)) {
         const date = document.getElementById('postModalDate');
         const desc = document.getElementById('postModalDesc');
 
-        const imgSrc = getPostImageSrc(post) || 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=No+Image';
+        const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Crect fill='%232d2d2d' width='1200' height='800'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='32' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+        const imgSrc = getPostImageSrc(post) || placeholderSvg;
         img.src = imgSrc;
         img.alt = post.title || 'Post image';
         // Add error handler to fallback to placeholder if image fails to load
         img.onerror = function() {
             this.onerror = null; // Prevent infinite loop
-            this.src = 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=Image+Not+Found';
+            this.src = placeholderSvg;
+            this.style.backgroundColor = '#2d2d2d';
         };
         title.textContent = post.title || '';
         date.textContent = formatPostDate(normalizePostDate(post));
