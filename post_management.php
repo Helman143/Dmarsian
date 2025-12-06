@@ -101,32 +101,35 @@ mysqli_close($conn);
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
-                            <div class="post-image">
-                                <?php 
+                            <div class="post-image" style="background-image: url('<?php 
                                 // Check if image_path exists and is not empty (handle both NULL and empty string)
                                 $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
                                 
-                                // Determine image source
+                                // Check if we have a valid image path
                                 if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                                     $img_path = trim($img_path_value);
-                                    // Ensure path starts with / for absolute path (if not already a full URL)
-                                    if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
-                                        $img_path = '/' . ltrim($img_path, '/');
+                                    
+                                    // Verify file exists BEFORE normalizing path (use original path format)
+                                    $file_path = $img_path;
+                                    // Remove leading / for file system check if present
+                                    if (strpos($file_path, '/') === 0) {
+                                        $file_path = substr($file_path, 1);
                                     }
-                                    // Verify file exists (remove leading / for file system check)
-                                    $file_path = ltrim($img_path, '/');
+                                    
                                     if (!file_exists($file_path)) {
                                         // File doesn't exist - use placeholder
                                         $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
+                                    } else {
+                                        // File exists - ensure path starts with / for absolute path (if not already a full URL)
+                                        if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
+                                            $img_path = '/' . ltrim($img_path, '/');
+                                        }
                                     }
                                 } else {
                                     $img_path = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image';
                                 }
-                                ?>
-                                <img src="<?php echo htmlspecialchars($img_path); ?>" 
-                                     alt="<?php echo htmlspecialchars($post['title']); ?>" 
-                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';"
-                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                echo htmlspecialchars($img_path);
+                            ?>'); background-color: #2d2d2d;">
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
@@ -237,6 +240,37 @@ mysqli_close($conn);
         dropdown.addEventListener('mouseenter', open);
         dropdown.addEventListener('mouseleave', close);
         document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
+    })();
+    
+    // Fix broken background images
+    (function() {
+        const placeholder = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
+        const postImages = document.querySelectorAll('.post-image');
+        
+        postImages.forEach(function(imgElement) {
+            const style = window.getComputedStyle(imgElement);
+            const bgImage = style.backgroundImage;
+            
+            // Extract URL from background-image: url('...')
+            const urlMatch = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+            if (!urlMatch || !urlMatch[1]) return;
+            
+            const imageUrl = urlMatch[1];
+            
+            // Skip if already a placeholder
+            if (imageUrl.includes('placeholder.com') || imageUrl.includes('Image+Not+Found')) return;
+            
+            // Test if image loads
+            const img = new Image();
+            img.onload = function() {
+                // Image loaded successfully, do nothing
+            };
+            img.onerror = function() {
+                // Image failed to load, replace with placeholder
+                imgElement.style.backgroundImage = `url('${placeholder}')`;
+            };
+            img.src = imageUrl;
+        });
     })();
     </script>
 </body>

@@ -288,16 +288,11 @@ nav a, .dropdown-toggle, .dropdown-content a {
 
 .post-image {
     height: 300px;
+    background-size: cover;
+    background-position: center 22%;
+    background-repeat: no-repeat;
     background-color: #2d2d2d;
     position: relative;
-    overflow: hidden;
-}
-
-.post-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
 }
 
 .post-tag {
@@ -481,10 +476,7 @@ nav a, .dropdown-toggle, .dropdown-content a {
     }
     .post-image {
         height: 220px;
-    }
-    
-    .post-image img {
-        object-fit: cover;
+        background-position: center 28%;
     }
 }
 

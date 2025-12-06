@@ -393,10 +393,11 @@ if (empty($heroVideoUrl)) {
             if (post.image_path && !imageSrc.match(/^(https?:\/\/|\/)/)) {
                 imageSrc = '/' + imageSrc.replace(/^\//, '');
             }
+            const placeholder = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
             return (
                 `<article class="slide-card post-card">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';">`
+              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='${placeholder}';" loading="lazy">`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
               +   `<div class="card-body">`
@@ -520,10 +521,12 @@ if (empty($heroVideoUrl)) {
         const date = document.getElementById('postModalDate');
         const desc = document.getElementById('postModalDesc');
 
-        img.src = getPostImageSrc(post) || 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=No+Image';
+        const imgSrc = getPostImageSrc(post) || 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=No+Image';
+        img.src = imgSrc;
         img.alt = post.title || 'Post image';
+        // Add error handler to fallback to placeholder if image fails to load
         img.onerror = function() {
-            this.onerror = null;
+            this.onerror = null; // Prevent infinite loop
             this.src = 'https://via.placeholder.com/1200x800.png/2d2d2d/ffffff?text=Image+Not+Found';
         };
         title.textContent = post.title || '';

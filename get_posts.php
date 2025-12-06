@@ -63,6 +63,26 @@ try {
     if ($posts === false) {
         $posts = [];
     }
+    
+    // Validate and fix image paths - check if files exist
+    foreach ($posts as &$post) {
+        if (!empty($post['image_path']) && trim($post['image_path']) !== '') {
+            $img_path = trim($post['image_path']);
+            // Check if file exists (use original path format)
+            $file_path = $img_path;
+            // Remove leading / for file system check if present
+            if (strpos($file_path, '/') === 0) {
+                $file_path = substr($file_path, 1);
+            }
+            if (!file_exists($file_path)) {
+                // File doesn't exist - set to null so client can use placeholder
+                $post['image_path'] = null;
+            }
+        } else {
+            $post['image_path'] = null;
+        }
+    }
+    unset($post); // Break reference
 
     mysqli_stmt_close($stmt);
     
