@@ -387,12 +387,38 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
                 $detailedError = json_encode($decoded['errors'], JSON_PRETTY_PRINT);
                 error_log('SMTP2GO API Error: ' . $err);
                 error_log('SMTP2GO Full Error Response: ' . $detailedError);
+            } elseif (isset($decoded['data']['error'])) {
+                // Check for error in data.error (common in SMTP2GO 403 responses)
+                $err = is_string($decoded['data']['error']) ? $decoded['data']['error'] : json_encode($decoded['data']['error']);
+                if (isset($decoded['data']['error_code'])) {
+                    $err .= ' (Error Code: ' . $decoded['data']['error_code'] . ')';
+                }
+                $detailedError = json_encode($decoded['data'], JSON_PRETTY_PRINT);
+                error_log('SMTP2GO API Error: ' . $err);
+                error_log('SMTP2GO Full Error Response: ' . $detailedError);
             } elseif (isset($decoded['error'])) {
                 $err = is_string($decoded['error']) ? $decoded['error'] : json_encode($decoded['error']);
                 error_log('SMTP2GO API Error: ' . $err);
             } else {
-                $err = 'HTTP ' . $resp['http_code'] . ' - Check SMTP2GO configuration';
-                $detailedError = 'Response body: ' . substr($resp['body'], 0, 500);
+                // For HTTP 401/403, provide more specific error message
+                if ($resp['http_code'] == 401 || $resp['http_code'] == 403) {
+                    $err = 'HTTP ' . $resp['http_code'] . ' - Unauthorized: API key is invalid, expired, or disabled';
+                    if ($resp['body']) {
+                        $bodyPreview = substr($resp['body'], 0, 200);
+                        $detailedError = 'Response: ' . $bodyPreview;
+                        // Try to extract error message from response
+                        $bodyDecoded = json_decode($resp['body'], true);
+                        if ($bodyDecoded && isset($bodyDecoded['data']['error'])) {
+                            $err = $bodyDecoded['data']['error'];
+                            if (isset($bodyDecoded['data']['error_code'])) {
+                                $err .= ' (Code: ' . $bodyDecoded['data']['error_code'] . ')';
+                            }
+                        }
+                    }
+                } else {
+                    $err = 'HTTP ' . $resp['http_code'] . ' - Check SMTP2GO configuration';
+                }
+                $detailedError = $detailedError ?? ('Response body: ' . substr($resp['body'], 0, 500));
                 error_log('SMTP2GO HTTP Error: ' . $resp['http_code']);
                 error_log('SMTP2GO Response: ' . substr($resp['body'], 0, 500));
             }
