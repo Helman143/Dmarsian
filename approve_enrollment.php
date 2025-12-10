@@ -152,7 +152,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         $log_stmt->execute();
         $log_stmt->close();
 
-        echo json_encode(['status' => 'success', 'message' => 'Enrollment approved and student added!']);
+        // Return the newly created student data for immediate display
+        echo json_encode([
+            'status' => 'success', 
+            'message' => 'Enrollment approved and student added!',
+            'student' => [
+                'id' => $new_id,
+                'jeja_no' => $jeja_no,
+                'date_enrolled' => $date_enrolled,
+                'full_name' => $enrollment['full_name'],
+                'phone' => $enrollment['phone']
+            ]
+        ]);
     } else {
         $error_msg = $stmt->error;
         echo json_encode(['status' => 'error', 'message' => 'Failed to add student: ' . $error_msg]);

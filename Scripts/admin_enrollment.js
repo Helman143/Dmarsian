@@ -133,8 +133,39 @@ function approveEnrollment(id) {
             } else {
                 alert(result.message);
             }
+            
+            // If student data is returned, add it immediately to the table
+            if (result.status === 'success' && result.student) {
+                // Add the new student to the approved enrollments table immediately
+                const student = result.student;
+                const tbody = document.getElementById('approvedTableBody');
+                if (tbody) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${student.id || ''}</td>
+                        <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
+                        <td>${student.date_enrolled || ''}</td>
+                        <td>${student.full_name || ''}</td>
+                        <td>${student.phone || ''}</td>
+                    `;
+                    // Insert at the top of the table
+                    tbody.insertBefore(row, tbody.firstChild);
+                    // Also add to the approvedEnrollments array
+                    approvedEnrollments.unshift({
+                        id: student.id,
+                        jeja_no: student.jeja_no,
+                        date_enrolled: student.date_enrolled,
+                        full_name: student.full_name,
+                        phone: student.phone
+                    });
+                }
+            }
+            
             loadPendingEnrollments();
-            loadApprovedEnrollments();
+            // Small delay to ensure database is updated, then refresh
+            setTimeout(() => {
+                loadApprovedEnrollments();
+            }, 500);
             // Also update discount tables in payment.php if present
             if (typeof fetchStudentsForDiscountTables === 'function') {
                 fetchStudentsForDiscountTables();
