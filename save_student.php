@@ -234,11 +234,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Student updated successfully";
     } else {
         // Insert new student without jeja_no
+        // Set date_enrolled to today's date for new students
+        date_default_timezone_set('Asia/Manila');
+        $date_enrolled = date('Y-m-d');
+        
         if ($hasClassColumn && $hasGenderColumn) {
             $sql = "INSERT INTO students (
                     full_name, address, phone, email, school, 
                     parent_name, parent_phone, parent_email, 
-                    belt_rank, discount, schedule, class, gender, status
+                    belt_rank, discount, schedule, class, gender, status, date_enrolled
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sssssssssdsssss",
+                $full_name,
+                $address,
+                $phone,
+                $email,
+                $school,
+                $parent_name,
+                $parent_phone,
+                $parent_email,
+                $belt_rank,
+                $discount,
+                $schedule,
+                $class,
+                $gender,
+                $status,
+                $date_enrolled
+            );
+        } elseif ($hasClassColumn && !$hasGenderColumn) {
+            $sql = "INSERT INTO students (
+                    full_name, address, phone, email, school, 
+                    parent_name, parent_phone, parent_email, 
+                    belt_rank, discount, schedule, class, status, date_enrolled
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssssssssdssss",
@@ -254,36 +282,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $discount,
                 $schedule,
                 $class,
-                $gender,
-                $status
-            );
-        } elseif ($hasClassColumn && !$hasGenderColumn) {
-            $sql = "INSERT INTO students (
-                    full_name, address, phone, email, school, 
-                    parent_name, parent_phone, parent_email, 
-                    belt_rank, discount, schedule, class, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sssssssssdsss",
-                $full_name,
-                $address,
-                $phone,
-                $email,
-                $school,
-                $parent_name,
-                $parent_phone,
-                $parent_email,
-                $belt_rank,
-                $discount,
-                $schedule,
-                $class,
-                $status
+                $status,
+                $date_enrolled
             );
         } elseif (!$hasClassColumn && $hasGenderColumn) {
             $sql = "INSERT INTO students (
                     full_name, address, phone, email, school, 
                     parent_name, parent_phone, parent_email, 
-                    belt_rank, discount, schedule, gender, status
+                    belt_rank, discount, schedule, gender, status, date_enrolled
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sssssssssdssss",
+                $full_name,
+                $address,
+                $phone,
+                $email,
+                $school,
+                $parent_name,
+                $parent_phone,
+                $parent_email,
+                $belt_rank,
+                $discount,
+                $schedule,
+                $gender,
+                $status,
+                $date_enrolled
+            );
+        } else {
+            $sql = "INSERT INTO students (
+                    full_name, address, phone, email, school, 
+                    parent_name, parent_phone, parent_email, 
+                    belt_rank, discount, schedule, status, date_enrolled
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssssssssdsss",
@@ -298,29 +327,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $belt_rank,
                 $discount,
                 $schedule,
-                $gender,
-                $status
-            );
-        } else {
-            $sql = "INSERT INTO students (
-                    full_name, address, phone, email, school, 
-                    parent_name, parent_phone, parent_email, 
-                    belt_rank, discount, schedule, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sssssssssdss",
-                $full_name,
-                $address,
-                $phone,
-                $email,
-                $school,
-                $parent_name,
-                $parent_phone,
-                $parent_email,
-                $belt_rank,
-                $discount,
-                $schedule,
-                $status
+                $status,
+                $date_enrolled
             );
         }
         

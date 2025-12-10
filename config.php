@@ -112,6 +112,10 @@ if (!empty($unresolved)) {
                 } elseif ($errno == 1049) {
                     error_log("DATABASE NOT FOUND - Check DB_NAME environment variable");
                 }
+            
+
+
+
                 
                 $conn = false;
             } else {

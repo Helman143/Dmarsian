@@ -15,25 +15,37 @@ try {
     $today = date('Y-m-d');
     $startOfWeek = date('Y-m-d', strtotime('monday this week'));
 
-    // Today's Enrollees
-    $sql_today_enrollees = "SELECT COUNT(*) AS count FROM students WHERE DATE(date_enrolled) = '$today'";
-    $res_today_enrollees = $conn->query($sql_today_enrollees);
+    // Today's Enrollees - using prepared statement for security
+    $stmt_today = $conn->prepare("SELECT COUNT(*) AS count FROM students WHERE DATE(date_enrolled) = ?");
+    $stmt_today->bind_param("s", $today);
+    $stmt_today->execute();
+    $res_today_enrollees = $stmt_today->get_result();
     $todayEnrollees = $res_today_enrollees ? (int)$res_today_enrollees->fetch_assoc()['count'] : 0;
+    $stmt_today->close();
 
-    // Weekly Enrollees
-    $sql_weekly_enrollees = "SELECT COUNT(*) AS count FROM students WHERE DATE(date_enrolled) >= '$startOfWeek' AND DATE(date_enrolled) <= '$today'";
-    $res_weekly_enrollees = $conn->query($sql_weekly_enrollees);
+    // Weekly Enrollees - using prepared statement for security
+    $stmt_weekly = $conn->prepare("SELECT COUNT(*) AS count FROM students WHERE DATE(date_enrolled) >= ? AND DATE(date_enrolled) <= ?");
+    $stmt_weekly->bind_param("ss", $startOfWeek, $today);
+    $stmt_weekly->execute();
+    $res_weekly_enrollees = $stmt_weekly->get_result();
     $weeklyEnrollees = $res_weekly_enrollees ? (int)$res_weekly_enrollees->fetch_assoc()['count'] : 0;
+    $stmt_weekly->close();
 
-    // Today's Collected Amount
-    $sql_today_collected = "SELECT SUM(amount_paid) AS total FROM payments WHERE DATE(date_paid) = '$today'";
-    $res_today_collected = $conn->query($sql_today_collected);
+    // Today's Collected Amount - using prepared statement for security
+    $stmt_today_collected = $conn->prepare("SELECT SUM(amount_paid) AS total FROM payments WHERE DATE(date_paid) = ?");
+    $stmt_today_collected->bind_param("s", $today);
+    $stmt_today_collected->execute();
+    $res_today_collected = $stmt_today_collected->get_result();
     $todayCollected = $res_today_collected ? (float)$res_today_collected->fetch_assoc()['total'] : 0.00;
+    $stmt_today_collected->close();
 
-    // Weekly Collected Amount
-    $sql_weekly_collected = "SELECT SUM(amount_paid) AS total FROM payments WHERE DATE(date_paid) >= '$startOfWeek' AND DATE(date_paid) <= '$today'";
-    $res_weekly_collected = $conn->query($sql_weekly_collected);
+    // Weekly Collected Amount - using prepared statement for security
+    $stmt_weekly_collected = $conn->prepare("SELECT SUM(amount_paid) AS total FROM payments WHERE DATE(date_paid) >= ? AND DATE(date_paid) <= ?");
+    $stmt_weekly_collected->bind_param("ss", $startOfWeek, $today);
+    $stmt_weekly_collected->execute();
+    $res_weekly_collected = $stmt_weekly_collected->get_result();
     $weeklyCollected = $res_weekly_collected ? (float)$res_weekly_collected->fetch_assoc()['total'] : 0.00;
+    $stmt_weekly_collected->close();
 
     // Get latest status per student from payments (by highest id)
     $sql = "

@@ -141,3 +141,7 @@ If you prefer to create the account via SQL:
 - Check database connection: App → Database Component → Connection Details
 - Review error logs in the app dashboard
 
+
+
+
+

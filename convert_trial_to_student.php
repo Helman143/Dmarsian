@@ -41,12 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     
+    // Set timezone to Asia/Manila for consistency
+    date_default_timezone_set('Asia/Manila');
+    
     // Insert into students table (jeja_no will be set after insert)
     // Use temporary jeja_no since it's NOT NULL, then update with actual value
     $temp_jeja_no = 'TEMP-' . time() . '-' . rand(1000, 9999);
-    $sql = "INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, ?, CURDATE(), 'Active')";
+    $date_enrolled = date('Y-m-d');
+    $sql = "INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, ?, ?, 'Active')";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('sssssssssss',
+    $stmt->bind_param('ssssssssssss',
         $temp_jeja_no,
         $student_name,
         $address,
@@ -57,7 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $parent_phone,
         $parent_email,
         $belt_rank,
-        $schedule
+        $schedule,
+        $date_enrolled
     );
     if ($stmt->execute()) {
         $new_id = $conn->insert_id;

@@ -84,3 +84,7 @@ Already set for video:
 
 **Note:** Keep `uploads/` in `.gitignore` after implementing Spaces - only commit initial images for deployment.
 
+
+
+
+

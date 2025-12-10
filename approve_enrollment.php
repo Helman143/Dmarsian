@@ -94,6 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         $discount = 0.00;   
     }
     
+    // Set timezone to Asia/Manila for consistency
+    date_default_timezone_set('Asia/Manila');
+    
     // Generate jeja_no (STD No.) - use a temporary value first since it's NOT NULL
     $temp_jeja_no = 'TEMP-' . time() . '-' . rand(1000, 9999);
     $date_enrolled = date('Y-m-d');
