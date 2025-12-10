@@ -110,12 +110,25 @@ function approveEnrollment(id) {
         .then(response => response.json())
         .then(result => {
             if (typeof Swal !== 'undefined') {
+                let icon = 'info';
+                let title = 'Info';
+                if (result.status === 'success') {
+                    icon = 'success';
+                    title = 'Success!';
+                } else if (result.status === 'error') {
+                    icon = 'error';
+                    title = 'Error';
+                } else if (result.status === 'info') {
+                    icon = 'info';
+                    title = 'Information';
+                }
+                
                 Swal.fire({
-                    icon: result.status === 'success' ? 'success' : 'error',
-                    title: result.status === 'success' ? 'Success!' : 'Error',
+                    icon: icon,
+                    title: title,
                     text: result.message,
-                    timer: 2000,
-                    showConfirmButton: false
+                    timer: result.status === 'success' ? 2000 : 3000,
+                    showConfirmButton: result.status === 'error' || result.status === 'info'
                 });
             } else {
                 alert(result.message);
