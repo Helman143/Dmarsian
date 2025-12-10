@@ -21,7 +21,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+Pro:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Styles/typography.css">
     <style>
-        /* Enrollment page font scaling (admin) */
+        /* Enrollment page font scaling */
         body { font-size: 1.2rem; }
         h2 { font-size: 1.8rem; }
         h3 { font-size: 1.4rem; }
@@ -84,7 +84,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                             </tr>
                         </thead>
                         <tbody id="pendingTableBody">
-                            <!-- Pending enrollments will be populated by JavaScript -->
+                          
                         </tbody>
                     </table>
                 </div>
