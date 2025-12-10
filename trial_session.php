@@ -233,7 +233,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         alert('Converted to student successfully!');
                         location.reload();
                     } else {
-                        alert('Error: ' + data.message);
+                        let errorMsg = data.message || 'Unknown error occurred';
+                        if (data.mysql_error) {
+                            errorMsg += '\n\nDatabase Error: ' + data.mysql_error;
+                        }
+                        alert('Error: ' + errorMsg);
                     }
                 })
                 .catch(err => alert('Request failed: ' + err));
