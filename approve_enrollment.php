@@ -81,9 +81,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
     // Set discount based on school
     $school = $enrollment['school'];
-    if (strcasecmp($school, 'SCC') === 0 || strcasecmp($school, 'Saint Columban College') === 0) {
+    if (strcasecmp($school, 'SCC-Junior High School') === 0 || 
+        strcasecmp($school, 'SCC - Junior High School') === 0 ||
+        strcasecmp($school, 'Saint Columban College-Junior High School') === 0 ||
+        strcasecmp($school, 'Saint Columban College - Junior High School') === 0 ||
+        strcasecmp($school, 'SCC Junior High School') === 0 ||
+        strcasecmp($school, 'Saint Columban College Junior High School') === 0) {
         $discount = 500.00;
-    } elseif (strcasecmp($school, 'ZSSAT') === 0) {
+    } elseif (strcasecmp($school, 'ZSSAT') === 0 || strcasecmp($school, 'Zamboanga School of Science and Technology') === 0) {
         $discount = 1000.00;
     } else {
         $discount = 0.00;   
