@@ -1,0 +1,696 @@
+:root {
+    --sidebar-width: 250px;
+    --emerald-1: #00ff6a;
+    --emerald-2: #00cc55;
+    --emerald-dark: #001a0d;
+    --emerald-mid: #004d26;
+    --glass-dark: rgba(0, 20, 10, 0.6);
+    --glass-card: rgba(255, 255, 255, 0.05);
+    --text-main: #ffffff;
+    --text-sub: #8ee8b6;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--emerald-dark);
+    background-image:
+        radial-gradient(ellipse at center, var(--emerald-mid) 0%, var(--emerald-dark) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px);
+    color: var(--text-main);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Circuit / hex texture */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(30deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(60deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(120deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px);
+    background-size: 200px 200px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure the entire left column behind the sidebar is black on desktop */
+@media (min-width: 768px) {
+    body::before {
+        width: var(--sidebar-width);
+        background: transparent;
+        mix-blend-mode: screen;
+    }
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Match Bootstrap wrapper used in dashboard.php */
+.container-fluid {
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    --bs-offcanvas-width: var(--sidebar-width);
+    --bs-offcanvas-bg: var(--glass-dark);
+    width: var(--sidebar-width);
+    background: var(--glass-dark);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    border-right: 1px solid rgba(0, 255, 106, 0.25);
+    box-shadow: 12px 0 30px rgba(0, 255, 85, 0.15);
+    position: relative;
+}
+.sidebar .dropdown-content { background-color: var(--glass-dark); }
+.sidebar, .sidebar * { box-shadow: none !important; }
+
+/* Mobile topbar styles - ensure all accents use site primary green */
+.mobile-topbar {
+    background: #111;
+}
+.mobile-topbar .btn {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+.mobile-topbar .btn i { color: var(--primary-color); }
+.mobile-topbar .text-success { color: var(--primary-color) !important; }
+
+/* Using Bootstrap's offcanvas backdrop; remove custom backdrop */
+
+.logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.logo::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--emerald-1), transparent);
+    box-shadow: 0 0 10px rgba(0, 255, 106, 0.7);
+}
+
+.logo-img {
+    width: 110px;
+    height: auto;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 12px rgba(0, 255, 106, 0.6));
+}
+
+.logo h2 {
+    color: var(--emerald-1);
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Navigation Styles */
+nav {
+    padding: 10px 0;
+}
+
+/* Ensure nav spans the full sidebar width so hover backgrounds align */
+.sidebar nav {
+    width: 100%;
+}
+
+nav a {
+    color: var(--text-main);
+    text-decoration: none;
+    padding: 12px 20px;
+    display: block;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+/* Hover + active: glowing pill */
+nav a {
+    border-radius: 10px;
+}
+nav a:hover {
+    background-color: rgba(0, 255, 106, 0.1);
+    color: var(--emerald-1);
+    box-shadow: 0 0 12px rgba(0, 255, 106, 0.35);
+}
+nav a:hover i { color: var(--emerald-1); }
+nav a.active {
+    background-color: rgba(0, 255, 106, 0.15) !important;
+    color: var(--emerald-1) !important;
+    box-shadow: 0 0 16px rgba(0, 255, 106, 0.45);
+    border: 1px solid rgba(0, 255, 106, 0.35);
+}
+
+nav a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+/* Dropdown Styles */
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    border: none;
+    background: none;
+}
+
+.dropdown-toggle:hover {
+    background-color: rgba(0, 255, 0, 0.1);
+    color: var(--primary-color);
+}
+
+.dropdown-toggle .arrow {
+    margin-left: auto;
+    transition: transform 0.3s;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-toggle .arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-content {
+    display: none;
+    background: rgba(0, 0, 0, 0.95);
+    border-left: 2px solid #0f0;
+    width: 100%;
+}
+
+/* Allow click-to-open on mobile: toggled by JS */
+.dropdown.open .dropdown-content {
+    display: block;
+}
+
+/* Show dropdown content on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 20px 12px 50px !important;
+    font-size: 14px;
+    position: relative;
+    transition: all 0.3s ease;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    width: 100%;
+}
+
+.dropdown-content a i {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.dropdown-content a:hover {
+    background: rgba(0, 255, 0, 0.1);
+    color: #0f0;
+    padding-left: 55px !important;
+}
+
+/* Ensure proper containment */
+nav a, .dropdown-toggle, .dropdown-content a {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    border: none;
+}
+
+/* Logout Styles */
+.logout-container {
+    margin-top: auto;
+    padding: 20px;
+    border-top: 1px solid rgba(0, 255, 0, 0.1);
+    text-align: center;
+}
+
+.logout {
+    color: #ff3333;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.logout i {
+    font-size: 18px;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-header {
+    margin-bottom: 30px;
+}
+
+.welcome-header h1 {
+    color: var(--text-main);
+    font-size: 2rem;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(0, 255, 106, 0.35);
+}
+
+.welcome-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Stats Cards */
+.stats-container {
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 106, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 106, 0.4);
+    border-color: var(--emerald-1);
+    transform: translateY(-5px);
+}
+
+.stat-header {
+    color: var(--emerald-1);
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-value {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Watermark icons per stat card */
+.stats-container .stat-card::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    bottom: -14px;
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 80px;
+    color: #ffffff;
+    opacity: 0.08;
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+.stats-container .stat-card:nth-child(1)::after { content: "\f234"; } /* user-plus */
+.stats-container .stat-card:nth-child(2)::after { content: "\f0c0"; } /* users */
+.stats-container .stat-card:nth-child(3)::after { content: "\f53d"; } /* peso sign */
+.stats-container .stat-card:nth-child(4)::after { content: "\f155"; } /* dollar sign as alt */
+
+/* Charts Section */
+.charts-section {
+    margin-bottom: 30px;
+}
+
+.chart-container, .dues-container {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 106, 0.25);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-container h3, .dues-container h3 {
+    color: var(--emerald-1);
+    margin: 0 0 20px 0;
+    font-size: 1.2rem;
+}
+
+.chart-wrapper {
+    height: 250px;
+    position: relative;
+}
+
+.filter-container {
+    margin-top: 15px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-container label {
+    color: var(--primary-color);
+}
+
+.filter-container input[type="date"] {
+    background-color: #222;
+    border: 1px solid var(--primary-color);
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+/* Dues Table */
+.dues-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dues-table th {
+    background: rgba(0, 255, 106, 0.15);
+    color: var(--emerald-1);
+    text-align: left;
+    padding: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 255, 106, 0.25);
+}
+
+.dues-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dues-table tr:hover {
+    background-color: rgba(0, 255, 106, 0.05);
+}
+
+.dues-table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Badges for status/balance */
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #0a0a0a;
+}
+.badge-success { background: #00ff6a; }
+.badge-warning { background: #ffaa00; color: #1a1a1a; }
+.badge-danger  { background: #ff4d4d; color: #0a0a0a; }
+
+/* Table container shell */
+.dues-container {
+    background: rgba(0, 20, 10, 0.6);
+    border: 1px solid rgba(0, 255, 106, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Send reminders button */
+#sendAllRemindersBtn {
+    background: linear-gradient(180deg, #1aff1a 0%, #00cc00 50%, #00b300 100%);
+    border: none;
+    color: #000;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    /* responsive sizing */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1vw, 10px);
+    padding: clamp(6px, 1.2vw, 10px) clamp(10px, 2vw, 14px);
+    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    line-height: 1.1;
+    box-shadow:
+        0 0 20px rgba(0, 255, 0, 0.5),
+        0 4px 12px rgba(0, 255, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    border-radius: clamp(8px, 1.2vw, 10px);
+    transition: all 0.2s ease;
+}
+
+/* Paper plane icon inside the button */
+#sendAllRemindersBtn i.fas.fa-paper-plane {
+    font-size: 1.05em;
+    line-height: 1;
+}
+#sendAllRemindersBtn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 30px rgba(0, 255, 0, 0.65),
+        0 6px 16px rgba(0, 255, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+#sendAllRemindersBtn:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+}
+
+@media (max-width: 767.98px) {
+    /* Offcanvas handles positioning on mobile; main content should occupy full width */
+    .main-content {
+        margin-left: 0;
+    }
+    .logo {
+        padding: 10px 0;
+        text-align: center;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .logo-img {
+        width: 100px;
+        height: auto;
+    }
+    /* Hide tiny chevron arrow in Enrollment Report on mobile */
+    .dropdown-toggle .arrow {
+        display: none;
+    }
+}
+@media (min-width: 768px) {
+    /* Desktop: fixed sidebar and spaced main content */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        height: 100%;
+        min-height: 100vh;
+        z-index: 1000;
+    }
+    .main-content {
+        margin-left: var(--sidebar-width);
+        /* Constrain content width on large screens for better readability */
+        max-width: 1200px;
+    }
+    /* Spacing between boxes (match picture 1) */
+    .stats-container.row,
+    .charts-section.row {
+        --bs-gutter-x: 3rem;
+        --bs-gutter-y: 2.5rem;
+    }
+    .stats-container { margin-bottom: 2rem; }
+    .charts-section { margin-top: 2rem; }
+    /* Force desktop sidebar container to dark grey */
+    .sidebar { background: #202020; }
+
+    /* Desktop: remove green hover background; highlight text/icons only */
+    .sidebar nav a:hover,
+    .sidebar .dropdown-toggle:hover,
+    .sidebar .dropdown-content a:hover {
+        background-color: transparent !important;
+        color: var(--primary-color) !important;
+    }
+    .sidebar nav a:hover i,
+    .sidebar .dropdown-toggle:hover i,
+    .sidebar .dropdown-content a:hover i,
+    .sidebar .dropdown-toggle:hover .arrow {
+        color: var(--primary-color) !important;
+    }
+
+    /* Desktop: add breathing room between logo image and text */
+    .sidebar .logo {
+        gap: 16px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .sidebar .logo-img {
+        width: 56px;
+        height: auto;
+    }
+
+    /* Create visible gaps by drawing borders inside the padding */
+    .stat-card,
+    .chart-container,
+    .dues-container {
+        position: relative;
+        border: none;
+        background: transparent !important; /* desktop transparent bg */
+        overflow: hidden;
+    }
+    .stat-card::before,
+    .chart-container::before,
+    .dues-container::before {
+        content: "";
+        position: absolute;
+        inset: 12px; /* inner offset creates clear separation */
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        background: transparent; /* only show ring, no fill */
+        pointer-events: none;
+    }
+}
+
+/* Sidebar dropdown panel background */
+.sidebar .dropdown-content {
+    background: #202020 !important;
+}
+
+/* Ensure individual dropdown links are transparent by default */
+.sidebar .dropdown-content a {
+    background: transparent;
+}
+
+/* Explicitly keep Dashboard link background transparent */
+nav a[href="dashboard.php"] {
+    background: transparent !important;
+}
+
+/* Make Enrollment and Trial Session list items transparent (redundant safety) */
+.dropdown-content a[href="enrollment.php"],
+.dropdown-content a[href="trial_session.php"] {
+    background: transparent !important;
+}
+
+/* ------------------------------
+   Responsive sizing (fluid)
+   ------------------------------ */
+.main-content {
+    padding: clamp(12px, 2.4vw, 20px);
+}
+
+.welcome-header {
+    margin-bottom: clamp(16px, 2.6vw, 30px);
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.welcome-header h1 {
+    font-size: clamp(1.25rem, 3.2vw, 2rem);
+}
+
+.stat-card {
+    padding: clamp(14px, 2.2vw, 20px);
+    border-radius: clamp(10px, 1.6vw, 12px);
+}
+.stat-header {
+    font-size: clamp(0.82rem, 1.2vw, 0.875rem);
+    margin-bottom: clamp(8px, 1.2vw, 10px);
+    gap: clamp(8px, 1.2vw, 10px);
+}
+.stat-value {
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+}
+
+.stats-container .stat-card::after {
+    font-size: clamp(56px, 10vw, 80px);
+}
+
+.chart-container,
+.dues-container {
+    padding: clamp(14px, 2.2vw, 20px);
+    border-radius: clamp(10px, 1.6vw, 12px);
+}
+
+.chart-container h3,
+.dues-container h3 {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    margin-bottom: clamp(12px, 2vw, 20px);
+}
+
+.chart-wrapper {
+    height: clamp(200px, 35vw, 280px);
+}
+
+.filter-container {
+    gap: clamp(10px, 1.8vw, 15px);
+}
+.filter-container input[type="date"] {
+    padding: clamp(4px, 1vw, 6px);
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+}
+
+.dues-table th,
+.dues-table td {
+    padding: clamp(8px, 1.6vw, 12px);
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+}
+
+.badge-pill {
+    font-size: clamp(0.72rem, 1vw, 0.75rem);
+    padding: clamp(3px, 0.8vw, 4px) clamp(8px, 1.4vw, 10px);
+}

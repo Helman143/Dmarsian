@@ -1,0 +1,322 @@
+/* Payment Form Section */
+.payment-form-section {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+}
+
+.payment-form-section h2 {
+    color: #0f0;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    color: #fff;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px 12px;
+    border: 1px solid #0f0;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.form-group select option {
+    background: #000;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-save {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: #0f0;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-save:hover {
+    background: #00cc00;
+    transform: translateY(-2px);
+}
+
+/* Payment Records Section */
+.payment-records-section {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+}
+
+.records-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.records-header h3 {
+    color: #0f0;
+    font-size: 1.3rem;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Search Container Styles */
+.search-container {
+    position: relative;
+    width: 180px;
+    min-width: 150px;
+    flex-shrink: 1;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 8px 35px 8px 15px;
+    border: 1px solid #0f0;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.search-container input:focus {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.search-container input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0f0;
+    font-size: 14px;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.payment-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.payment-table th,
+.payment-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.payment-table th {
+    background: rgba(0, 255, 0, 0.1);
+    color: #0f0;
+    font-weight: normal;
+}
+
+.payment-table tbody tr:hover {
+    background: rgba(0, 255, 0, 0.05);
+}
+
+/* Status Colors */
+.status-paid {
+    color: #0f0;
+}
+
+.status-pending {
+    color: #ffd700;
+}
+
+.status-overdue {
+    color: #ff3333;
+}
+
+/* Responsive Design */
+@media (max-width: 767.98px) {
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .payment-form-section,
+    .payment-records-section {
+        margin: 10px;
+    }
+
+    .records-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .search-container {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+/* Active menu item background to black */
+.sidebar nav a.active,
+.sidebar .dropdown-content a.active {
+    background-color: transparent !important;
+    color: #0f0 !important;
+}
+
+/* Add medium breakpoint for better scaling */
+@media (max-width: 1024px) and (min-width: 768px) {
+    .search-container {
+        width: 150px;
+    }
+}
+
+/* ------------------------------
+   Responsive sizing (fluid)
+   ------------------------------ */
+.payment-form-section,
+.payment-records-section {
+    padding: clamp(14px, 2.2vw, 20px);
+    border-radius: clamp(8px, 1.2vw, 12px);
+}
+
+.payment-form-section h2 {
+    font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+    margin-bottom: clamp(12px, 2vw, 20px);
+}
+
+.form-row {
+    gap: clamp(12px, 2vw, 20px);
+}
+
+.form-group label {
+    font-size: clamp(0.82rem, 1.15vw, 0.9rem);
+}
+
+.form-group input,
+.form-group select {
+    font-size: clamp(0.85rem, 1.15vw, 0.95rem);
+    padding: clamp(8px, 1.4vw, 10px) clamp(10px, 1.8vw, 12px);
+    border-radius: clamp(6px, 1vw, 8px);
+}
+
+.form-actions {
+    margin-top: clamp(12px, 2vw, 20px);
+}
+
+.btn-save {
+    font-size: clamp(0.85rem, 1.15vw, 0.95rem);
+    padding: clamp(8px, 1.4vw, 10px) clamp(14px, 2.2vw, 20px);
+    border-radius: clamp(6px, 1vw, 10px);
+    gap: clamp(6px, 1vw, 10px);
+}
+.btn-save i { font-size: 1.05em; line-height: 1; }
+
+.records-header {
+    gap: clamp(12px, 2vw, 20px);
+    margin-bottom: clamp(12px, 2vw, 20px);
+    flex-wrap: wrap;
+}
+
+.records-header h3 {
+    font-size: clamp(1rem, 2vw, 1.3rem);
+}
+
+.search-container {
+    width: clamp(180px, 22vw, 240px);
+    min-width: clamp(150px, 18vw, 200px);
+}
+.search-container input {
+    font-size: clamp(0.85rem, 1.15vw, 0.95rem);
+    padding: clamp(8px, 1.4vw, 10px) clamp(34px, 4vw, 35px) clamp(8px, 1.4vw, 10px) clamp(12px, 2vw, 15px);
+}
+.search-icon {
+    font-size: clamp(0.85rem, 1.15vw, 0.95rem);
+}
+
+.payment-table th,
+.payment-table td {
+    padding: clamp(8px, 1.6vw, 12px);
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+}
+
+/* No major changes needed. If you want to highlight the discount field, you can add this: */
+#discount[readonly] {
+    background: rgba(0, 255, 0, 0.05);
+    color: #0f0;
+    font-weight: bold;
+} 
+
+/* Unify sidebar background and offcanvas background color */
+.sidebar {
+    --bs-offcanvas-bg: #202020;
+    background-color: #202020;
+    font-family: "Crimson Text", "Inter", "Source Serif Pro", "Playfair Display", serif;
+}
+
+/* Ensure dropdown panel matches sidebar */
+.sidebar .dropdown-content { background-color: #202020; }
+
+/* Sidebar links transparent so the #202020 sidebar shows through */
+.sidebar nav a,
+.sidebar .dropdown-toggle,
+.sidebar .dropdown-content a { background-color: transparent; }
+
+/* Ensure sidebar descendants inherit sidebar font */
+.sidebar nav a,
+.sidebar .dropdown-toggle,
+.sidebar .dropdown-content a,
+.sidebar .logo h2,
+.sidebar .logout,
+.sidebar .logout span { font-family: inherit; }

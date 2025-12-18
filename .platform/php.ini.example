@@ -1,0 +1,79 @@
+; PHP Configuration for DigitalOcean App Platform
+; Copy this file to .platform/php.ini or .user.ini in root directory
+; App Platform will use these settings
+
+; ============================================
+; File Upload Settings
+; ============================================
+upload_max_filesize = 10M
+post_max_size = 10M
+max_file_uploads = 20
+
+; ============================================
+; Execution Settings
+; ============================================
+max_execution_time = 300
+max_input_time = 300
+memory_limit = 256M
+
+; ============================================
+; Timezone
+; ============================================
+date.timezone = "Asia/Manila"
+
+; ============================================
+; Error Reporting (Production)
+; ============================================
+display_errors = Off
+display_startup_errors = Off
+log_errors = On
+error_log = /tmp/php_errors.log
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+
+; ============================================
+; Session Settings
+; ============================================
+session.gc_maxlifetime = 7200
+session.cookie_lifetime = 0
+session.cookie_httponly = 1
+session.cookie_secure = 1  ; Enable for HTTPS only
+session.use_strict_mode = 1
+session.cookie_samesite = "Strict"
+session.save_path = /tmp
+
+; ============================================
+; Security Settings
+; ============================================
+expose_php = Off
+allow_url_fopen = On
+allow_url_include = Off
+
+; ============================================
+; Output Buffering
+; ============================================
+output_buffering = 4096
+implicit_flush = Off
+
+; ============================================
+; Character Encoding
+; ============================================
+default_charset = "UTF-8"
+
+; ============================================
+; Resource Limits
+; ============================================
+max_input_vars = 1000
+max_input_nesting_level = 64
+
+; ============================================
+; Opcache (if available)
+; ============================================
+; opcache.enable = 1
+; opcache.memory_consumption = 128
+; opcache.interned_strings_buffer = 8
+; opcache.max_accelerated_files = 10000
+; opcache.revalidate_freq = 2
+; opcache.fast_shutdown = 1
+
+
+
