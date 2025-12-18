@@ -28,15 +28,6 @@ if (empty($heroVideoUrl)) {
     <!-- Updated typography: Orbitron/Teko for headings, Montserrat for body -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Teko:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    /* Mobile top navigation customization */
-    @media (max-width: 767.98px) {
-        .mobile-topnav { background-color: #202020 !important; }
-        .mobile-topnav .nav-link, .mobile-topnav .navbar-brand { transition: color .2s ease; }
-        .mobile-topnav .nav-link:hover, .mobile-topnav .navbar-brand:hover { color: #00ff00 !important; }
-        .mobile-topnav .navbar-toggler { border-color: #00ff00; }
-        .mobile-topnav .navbar-toggler:hover, .mobile-topnav .navbar-toggler:focus { box-shadow: 0 0 0 .125rem rgba(0, 255, 0, .5); }
-    }
-
     /* Post details modal */
     .postmodal-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: transparent; z-index: 1050; }
     .postmodal-overlay.open { display: flex; }
@@ -71,28 +62,41 @@ if (empty($heroVideoUrl)) {
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark navbar-expand-md sticky-top d-md-none mobile-topnav">
-        <div class="container">
+    <!-- MOBILE COMMAND STRIP (Offcanvas Shutter) -->
+    <nav class="navbar mobile-command fixed-top d-md-none" aria-label="Mobile navigation">
+        <div class="container-fluid px-3">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#home">
                 <img src="Picture/Logo2.png" alt="Logo" width="28" height="28" class="d-inline-block">
-                D'MARSIANS
+                D'MARSIANS TAEKWONDO GYM
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMainNav" aria-controls="mobileMainNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+
+            <button id="mobileMenuToggle" class="neon-burger" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas"
+                    aria-controls="mobileOffcanvas" aria-label="Open menu">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
             </button>
-            <div class="collapse navbar-collapse" id="mobileMainNav">
-                <ul class="navbar-nav ms-auto mb-2 mb-md-0">
-                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#offers">Offer</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#schedule">Schedule</a></li>
-                    <li class="nav-item"><a class="nav-link" href="archive.php">Archive</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contacts">Contacts</a></li>
-                </ul>
-                <a class="btn btn-success ms-md-3 mt-2 mt-md-0" href="#register">Register Now</a>
-            </div>
         </div>
     </nav>
+
+    <div class="offcanvas offcanvas-end offcanvas-holo d-md-none" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="mobileOffcanvasLabel">MENU</h5>
+            <button type="button" class="btn-close holo-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <nav class="offcanvas-nav" aria-label="Mobile menu links">
+                <a class="offcanvas-link" href="#home">HOME</a>
+                <a class="offcanvas-link" href="#about">ABOUT</a>
+                <a class="offcanvas-link" href="#offers">OFFER</a>
+                <a class="offcanvas-link" href="#schedule">SCHEDULE</a>
+                <a class="offcanvas-link" href="archive.php">ARCHIVE</a>
+                <a class="offcanvas-link" href="#contacts">CONTACTS</a>
+                <a class="offcanvas-cta" href="#register">REGISTER NOW</a>
+            </nav>
+        </div>
+    </div>
     <!-- HEADER & HERO SECTION -->
     <header class="main-header glassy-nav">
         <div class="logo-section d-flex align-items-center gap-2 flex-wrap">
@@ -111,7 +115,7 @@ if (empty($heroVideoUrl)) {
         </nav>
         <a href="#register" class="register-btn d-none d-md-inline-block">REGISTER NOW!</a>
     </header>
-    <section id="home" class="hero">
+    <section id="home" class="hero hero-boot boot-start">
         <!-- Ambient light orb -->
         <div class="ambient-light-orb"></div>
         <!-- Grid pattern overlay -->
@@ -167,37 +171,63 @@ if (empty($heroVideoUrl)) {
     </section>
 
     <!-- INSTRUCTOR SECTION -->
-    <section id="instructor" class="instructor-section container">
-        <h2 class="section-title">MEET THE MASTER</h2>
-        <div class="instructor-profile">
-            <div class="instructor-card">
-                <div class="instructor-img-wrapper">
-                    <img src="Picture/sir-mars.png" alt="Instructor Mars" class="instructor-photo img-fluid">
-                </div>
-                <div class="instructor-info">
-                    <div class="instructor-header">
-                        <h3 class="instructor-title">
-                            Marcelino <span class="mars-name">MARS</span> P. Maglinao Jr.
-                        </h3>
-                        <div class="rank-badge">
-                            <span class="badge-text">HEAD COACH | 3RD DAN</span>
+    <section id="instructor" class="instructor-section">
+        <div class="container">
+            <h2 class="section-title">MEET THE MASTER</h2>
+            <div class="instructor-profile">
+                <div class="instructor-card instructor-holo" data-holo>
+                    <div class="instructor-flash" aria-hidden="true"></div>
+
+                    <div class="row align-items-center g-4 instructor-row">
+                        <!-- Left: Image (col-lg-5) -->
+                        <div class="col-12 col-lg-5 d-flex justify-content-center justify-content-lg-start">
+                            <div class="instructor-img-wrapper instructor-photo-frame">
+                                <img src="Picture/sir-mars.png" alt="Head Coach Mars" class="instructor-photo img-fluid">
+                            </div>
                         </div>
-                    </div>
-                    <p class="instructor-bio">
-                        Head Coach Mars, a certified Taekwondo 3rd Dan Black Belt with 23 years of experience, dedicated to empowering students through discipline and strength.
-                    </p>
-                    <div class="instructor-stats">
-                        <div class="stat-counter">
-                            <div class="stat-number" data-target="23">0</div>
-                            <div class="stat-label">Years Exp.</div>
-                        </div>
-                        <div class="stat-counter">
-                            <div class="stat-number" data-target="3">0</div>
-                            <div class="stat-label">Dan Rank</div>
-                        </div>
-                        <div class="stat-counter">
-                            <div class="stat-number" data-target="100">0</div>
-                            <div class="stat-label">Students</div>
+
+                        <!-- Right: Glass Panel (col-lg-7) -->
+                        <div class="col-12 col-lg-7">
+                            <div class="instructor-info instructor-panel text-center text-lg-start">
+                                <div class="mars-signature" aria-hidden="true">Mars</div>
+
+                                <div class="instructor-header">
+                                    <h3 class="instructor-title">
+                                        <span class="instructor-first">Marcelino</span>
+                                        <span class="mars-name">MARS</span>
+                                        <span class="instructor-rest">P. Maglinao Jr.</span>
+                                    </h3>
+                                    <div class="rank-badge">
+                                        <span class="badge-text">HEAD COACH | 3RD DAN</span>
+                                    </div>
+                                </div>
+
+                                <p class="instructor-bio">
+                                    Certified Taekwondo 3rd Dan Black Belt with 23 years of experience — building discipline, confidence, and champions on and off the mat.
+                                </p>
+
+                                <!-- Stats Row (nested grid) -->
+                                <div class="row g-0 instructor-stats-grid">
+                                    <div class="col-4 stat-col stat-col-divider">
+                                        <div class="stat-counter">
+                                            <div class="stat-number" data-target="23">0</div>
+                                            <div class="stat-label">Years Exp.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 stat-col stat-col-divider">
+                                        <div class="stat-counter">
+                                            <div class="stat-number" data-target="3">0</div>
+                                            <div class="stat-label">Dan Rank</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 stat-col">
+                                        <div class="stat-counter">
+                                            <div class="stat-number" data-target="5">0</div>
+                                            <div class="stat-label">Black Belts</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -291,8 +321,8 @@ if (empty($heroVideoUrl)) {
                     <div class="stat-card h-100" id="schedule" data-icon="🗓">
                         <h3><span class="icon" style="color:#00D01D;">&#128197;</span> Rank's Schedule</h3>
                         <ul>
-                            <li>Beginner: Tuesday, Thursday, & Friday<br>5:00 PM - 6:00 PM</li>
-                            <li>Intermediate: Monday, Wednesday, & Friday<br>5:00 PM - 6:00 PM</li>
+                            <li><span class="stat-label">Beginner:</span> Tuesday, Thursday, &amp; Friday<br>5:00 PM - 6:00 PM</li>
+                            <li><span class="stat-label">Intermediate:</span> Monday, Wednesday, &amp; Friday<br>5:00 PM - 6:00 PM</li>
                         </ul>
                     </div>
                 </div>
@@ -300,9 +330,9 @@ if (empty($heroVideoUrl)) {
                     <div class="stat-card h-100" data-icon="💰">
                         <h3><span class="icon">&#128181;</span> Membership Price</h3>
                         <ul>
-                            <li>Enrollment Fee: 700.00</li>
-                            <li>Monthly Fee: 700.00</li>
-                            <li>Trial Session: 150.00</li>
+                            <li><span class="stat-label">Enrollment Fee:</span> 700.00</li>
+                            <li><span class="stat-label">Monthly Fee:</span> 700.00</li>
+                            <li><span class="stat-label">Trial Session:</span> 150.00</li>
                         </ul>
                     </div>
                 </div>
@@ -310,8 +340,8 @@ if (empty($heroVideoUrl)) {
                     <div class="stat-card h-100" data-icon="⏰">
                         <h3><span class="icon">&#128337;</span> Opening Hours</h3>
                         <ul>
-                            <li>Monday - Friday: 6:30 AM - 9:00 AM</li>
-                            <li>Saturday: 5:30 PM - 9:00 PM</li>
+                            <li><span class="stat-label">Monday - Friday:</span> 6:30 AM - 9:00 AM</li>
+                            <li><span class="stat-label">Saturday:</span> 5:30 PM - 9:00 PM</li>
                         </ul>
                     </div>
                 </div>
@@ -410,39 +440,73 @@ if (empty($heroVideoUrl)) {
 
     <!-- CONTACTS, MAP, FOOTER -->
     <section id="contacts" class="footer-section container-fluid">
-        <div class="footer-map-bg"></div>
-        <div class="footer-contact-bar">
-            <div class="footer-contact-info">
-                <div>
-                    <span><i class="fa-solid fa-phone me-2"></i>CALL US</span><br>
-                    <strong>0938-172-1987</strong>
-                </div>
-                <div>
-                    <span><i class="fa-solid fa-location-dot me-2"></i>2nd floor Power Motors Fronting</span>
-                    <strong>Imperial Appliance Rizal Avenue Pagadian City</strong>
-                </div>
-                <div>
-                    <span><i class="fa-regular fa-clock me-2"></i>OPENING HOURS</span><br>
-                    <strong>MON-SAT: 8AM - 9PM</strong>
-                </div>
-            </div>
+        <div class="footer-map-bg">
+            <img class="footer-map-img" src="Picture/3.png" alt="Map showing D'Marsians Taekwondo location">
         </div>
-        <div class="footer-bg">
-            <div class="footer-content container">
-                <img src="Picture/Logo2.png" alt="Footer Logo" class="footer-logo img-fluid">
-                <p>Thank you for visiting D'Marsians Taekwondo Team! We are committed to providing high-quality martial arts training for all ages, fostering discipline, confidence, and physical fitness in a safe and supportive environment. Join us and be part of our growing Taekwondo family!</p>
-                <p class="footer-address">
-                    <span><i class="fa-solid fa-location-dot me-2"></i>2nd floor Power Motors Fronting Imperial Appliance Rizal Avenue Pagadian City</span><br>
-                    <span><i class="fa-solid fa-phone me-2"></i>8-172-1987</span><br>
-                    <span><i class="fa-solid fa-envelope me-2"></i>dmarsians.taekwondo@gmail.com</span><br>
-                    <span><i class="fa-brands fa-facebook me-2"></i>D' Marsians Taekwondo Gym</span>
-                </p>
-                <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap my-3">
-                    <img src="Picture/SCC_NEW_LOGO 1.png" alt="SCC logo" class="img-fluid" style="height:64px">
-                    <img src="Picture/Diskartech.png" alt="Diskartech logo" class="img-fluid" style="height:64px">
-                    <img src="Picture/ccs.png" alt="CCS logo" class="img-fluid" style="height:64px">
+        <div class="footer-contact-bar">
+            <div class="container footer-console">
+                <div class="row gy-5">
+                    <!-- Column 1: Brand Identity -->
+                    <div class="col-12 col-md-4 text-center text-md-start">
+                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 mb-3">
+                            <img src="Picture/Logo2.png" alt="D'Marsians logo" class="footer-console-logo img-fluid">
+                            <div>
+                                <div class="footer-console-title">D'Marsians</div>
+                                <div class="footer-console-subtitle">Taekwondo Gym</div>
+                            </div>
+                        </div>
+                        <p class="footer-console-mission text-white-50 mb-0">
+                            Thank you for visiting D'Marsians Taekwondo Team!
+                        </p>
+                    </div>
+
+                    <!-- Column 2: Contact Data -->
+                    <div class="col-12 col-md-4 text-center">
+                        <h4 class="footer-console-heading mb-3">CONTACT</h4>
+                        <div class="d-flex align-items-center justify-content-center gap-3 mb-3 footer-console-row">
+                            <i class="fa-solid fa-phone footer-console-icon"></i>
+                            <span class="footer-console-value">0938-172-1987</span>
+                        </div>
+                        <div class="d-flex align-items-start justify-content-center gap-3 mb-3 footer-console-row">
+                            <i class="fa-solid fa-location-dot footer-console-icon mt-1"></i>
+                            <span class="footer-console-value">
+                                2nd floor Power Motors Fronting<br>
+                                Imperial Appliance Rizal Avenue Pagadian City
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-3 footer-console-row">
+                            <i class="fa-regular fa-clock footer-console-icon"></i>
+                            <span class="footer-console-value">MON-SAT: 8AM - 9PM</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Badges & Socials -->
+                    <div class="col-12 col-md-4 text-center text-md-end">
+                        <h4 class="footer-console-heading mb-3">CONNECT</h4>
+                        <div class="footer-social justify-content-center justify-content-md-end mb-3">
+                            <a class="social-btn" href="tel:+639381721987" aria-label="Call us">
+                                <i class="fa-solid fa-phone"></i>
+                            </a>
+                            <a class="social-btn" href="mailto:dmarsians.taekwondo@gmail.com" aria-label="Email us">
+                                <i class="fa-solid fa-envelope"></i>
+                            </a>
+                            <a class="social-btn" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                        </div>
+
+                        <div class="footer-badges justify-content-center justify-content-md-end gap-3">
+                            <img src="Picture/SCC_NEW_LOGO 1.png" alt="SCC logo" class="footer-badge img-fluid">
+                            <img src="Picture/Diskartech.png" alt="Diskartech logo" class="footer-badge img-fluid">
+                            <img src="Picture/ccs.png" alt="CCS logo" class="footer-badge img-fluid">
+                        </div>
+                    </div>
                 </div>
-                <p class="copyright">&copy; 2024 D'MARSIANS TAEKWONDO GYM. All rights reserved.</p>
+
+                <hr class="footer-console-divider my-4">
+                <div class="text-center footer-console-copy">
+                    &copy; 2025 D'Marsians Taekwondo Gym. All rights reserved.
+                </div>
             </div>
         </div>
     </section>
@@ -880,47 +944,7 @@ if (empty($heroVideoUrl)) {
         }
     });
 
-    // Animated Counter for Instructor Stats
-    function animateCounter(element, target, duration = 2000) {
-        let start = 0;
-        const increment = target / (duration / 16);
-        const timer = setInterval(() => {
-            start += increment;
-            if (start >= target) {
-                element.textContent = target + (target === 100 ? '+' : '');
-                clearInterval(timer);
-            } else {
-                element.textContent = Math.floor(start) + (target === 100 ? '+' : '');
-            }
-        }, 16);
-    }
-
-    // Intersection Observer for Stats Animation
-    function initStatsAnimation() {
-        const statsSection = document.getElementById('instructor');
-        if (!statsSection) return;
-
-        const statNumbers = statsSection.querySelectorAll('.stat-number');
-        if (statNumbers.length === 0) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statNumber = entry.target;
-                    const target = parseInt(statNumber.getAttribute('data-target'));
-                    if (!statNumber.classList.contains('animated')) {
-                        statNumber.classList.add('animated');
-                        animateCounter(statNumber, target);
-                    }
-                }
-            });
-        }, { threshold: 0.5 });
-
-        statNumbers.forEach(stat => observer.observe(stat));
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
-        initStatsAnimation();
         const form = document.getElementById('registerForm');
         if (form) {
             form.addEventListener('submit', function (e) {
