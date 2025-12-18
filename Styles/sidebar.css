@@ -1,7 +1,7 @@
 :root {
-	--sidebar-width: 250px;
-	--sidebar-bg: #202020;
-	--primary-color: #0f0;
+	--sidebar-width: 260px;
+	--sidebar-bg: rgba(0, 20, 10, 0.85);
+	--primary-color: #00ff6a;
 	--text: #fff;
 }
 
@@ -11,7 +11,18 @@
 	background: var(--sidebar-bg);
 	color: var(--text);
 	min-height: 100vh;
-	padding: 20px 10px;
+	padding: 30px 20px 60px 20px; /* breathing room bottom */
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	backdrop-filter: blur(15px);
+	-webkit-backdrop-filter: blur(15px);
+	border-right: 1px solid rgba(0, 255, 106, 0.2);
+	box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	position: fixed;
+	top: 0;
+	left: 0;
 }
 
 .sidebar .logo h2 {
@@ -20,23 +31,40 @@
 	line-height: 1.1;
 }
 
+.sidebar .logo {
+	border-bottom: 1px solid rgba(0, 255, 106, 0.2);
+	padding-bottom: 16px;
+	margin-bottom: 20px;
+}
+
 .sidebar nav a,
 .sidebar .dropdown-toggle,
 .sidebar .dropdown-content a {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	color: var(--text);
+	color: rgba(255,255,255,0.7);
 	text-decoration: none;
-	padding: 12px 12px;
-	border-radius: 6px;
+	padding: 15px 20px;
+	border-radius: 12px;
 	background: transparent;
+	transition: all 0.3s ease;
+	font-weight: 500;
 }
+
+.sidebar nav a:hover {
+	background: rgba(0, 255, 106, 0.1);
+	color: #ffffff;
+	transform: translateX(5px);
+}
+.sidebar nav a:hover i { color: #ffffff; }
 
 .sidebar nav a.active,
 .sidebar .dropdown-content a.active {
+	background: linear-gradient(90deg, rgba(0, 255, 106, 0.2) 0%, transparent 100%) !important;
 	color: var(--primary-color) !important;
-	background: transparent !important;
+	border-left: 3px solid var(--primary-color);
+	box-shadow: 0 0 20px rgba(0, 255, 106, 0.1);
 }
 
 .sidebar .dropdown { position: relative; }
@@ -50,8 +78,15 @@
 
 .sidebar .dropdown:hover .dropdown-content { display: block; }
 
-.sidebar .logout-container { margin-top: auto; padding: 10px 12px; }
+.sidebar .logout-container { margin-top: auto; padding: 10px 12px; margin-bottom: 40px; }
 .sidebar .logout { color: var(--text); display: flex; align-items: center; gap: 10px; }
+
+/* Submenu indentation and hierarchy */
+.sidebar .dropdown-content a {
+	padding-left: 26px;
+	font-size: 13px;
+	border-left: 2px solid rgba(0, 255, 106, 0.3);
+}
 
 @media (max-width: 768px) {
 	.logo h2,

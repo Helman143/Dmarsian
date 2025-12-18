@@ -25,7 +25,8 @@ if (empty($heroVideoUrl)) {
     <link rel="stylesheet" href="Styles/webpage.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700;800&family=Source+Serif+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <!-- Updated typography: Orbitron/Teko for headings, Montserrat for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Teko:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
     /* Mobile top navigation customization */
     @media (max-width: 767.98px) {
@@ -93,11 +94,11 @@ if (empty($heroVideoUrl)) {
         </div>
     </nav>
     <!-- HEADER & HERO SECTION -->
-    <header class="main-header">
+    <header class="main-header glassy-nav">
         <div class="logo-section d-flex align-items-center gap-2 flex-wrap">
             <img src="Picture/Logo2.png" alt="Logo" class="logo img-fluid">
             <div class="gym-title">
-                <h1>D'MARSIANS<br>TAEKWONDO GYM</h1>
+                <h1 class="brand-glitch">D'MARSIANS<br>TAEKWONDO GYM</h1>
             </div>
         </div>
         <nav class="main-nav d-none d-md-flex flex-wrap gap-2 justify-content-center">
@@ -111,14 +112,35 @@ if (empty($heroVideoUrl)) {
         <a href="#register" class="register-btn d-none d-md-inline-block">REGISTER NOW!</a>
     </header>
     <section id="home" class="hero">
-        <video class="hero-video" aria-hidden="true" autoplay muted loop playsinline preload="auto">
-            <source src="<?php echo htmlspecialchars($heroVideoUrl); ?>" type="video/mp4">
-        </video>
-        <div class="hero-overlay"></div>
+        <!-- Ambient light orb -->
+        <div class="ambient-light-orb"></div>
+        <!-- Grid pattern overlay -->
+        <div class="grid-pattern-overlay"></div>
+        
+        <!-- Holographic Monitor Frame -->
+        <div class="video-frame-container">
+            <div class="video-frame">
+                <video class="hero-video" aria-hidden="true" autoplay muted loop playsinline preload="auto">
+                    <source src="<?php echo htmlspecialchars($heroVideoUrl); ?>" type="video/mp4">
+                </video>
+            </div>
+            <!-- Floating Logo -->
+            <img src="Picture/Logo2.png" alt="D'Marsians Logo" class="floating-logo">
+        </div>
+        
+        <!-- Hero Content Below Video -->
         <div class="hero-content">
-            <h2>D'MARSIANS<br>TAEKWONDO GYM</h2>
-            <p>Empowering Students Through Discipline & Strength</p>
-            <a href="#register" class="hero-register-btn">REGISTER NOW!</a>
+            <h3 class="sub-glitch">EMPOWERING STUDENTS THROUGH</h3>
+            <h2 class="main-glitch" data-text="DISCIPLINE & STRENGTH">DISCIPLINE & STRENGTH</h2>
+            <p class="hero-desc">Train with the best. Build confidence, respect, and physical power in a state-of-the-art environment.</p>
+            <div class="cta-wrapper">
+                <a href="#register" class="btn-reactor hero-btn">REGISTER NOW</a>
+            </div>
+        </div>
+        <div class="stats-ticker">
+            <div class="stat-item"><span>200+</span> STUDENTS</div>
+            <div class="stat-item"><span>10+</span> YEARS EXP</div>
+            <div class="stat-item"><span>5</span> BLACK BELT COACHES</div>
         </div>
     </section>
 
@@ -146,21 +168,37 @@ if (empty($heroVideoUrl)) {
 
     <!-- INSTRUCTOR SECTION -->
     <section id="instructor" class="instructor-section container">
-        <h2 class="section-title">MEET OUR INSTRUCTOR</h2>
+        <h2 class="section-title">MEET THE MASTER</h2>
         <div class="instructor-profile">
-            <div class="row align-items-center justify-content-center gy-4">
-                <div class="col-12 col-md-4 d-flex justify-content-center">
-                    <img src="Picture/1.png" alt="Instructor" class="instructor-photo img-fluid">
+            <div class="instructor-card">
+                <div class="instructor-img-wrapper">
+                    <img src="Picture/sir-mars.png" alt="Instructor Mars" class="instructor-photo img-fluid">
                 </div>
-                <div class="col-12 col-md-7 text-center text-md-start">
-                    <div class="instructor-info">
-                        <h3>
-                            Mr. Marcelino <span class="highlight">"Mars"</span> Pescadera Maglinao Jr.
+                <div class="instructor-info">
+                    <div class="instructor-header">
+                        <h3 class="instructor-title">
+                            Marcelino <span class="mars-name">MARS</span> P. Maglinao Jr.
                         </h3>
-                        <p>
-                            Head Coach Mars, a certified Taekwondo <span class="rank-highlight">3rd Dan Black Belt</span><br>
-                            with 23 years of experience
-                        </p>
+                        <div class="rank-badge">
+                            <span class="badge-text">HEAD COACH | 3RD DAN</span>
+                        </div>
+                    </div>
+                    <p class="instructor-bio">
+                        Head Coach Mars, a certified Taekwondo 3rd Dan Black Belt with 23 years of experience, dedicated to empowering students through discipline and strength.
+                    </p>
+                    <div class="instructor-stats">
+                        <div class="stat-counter">
+                            <div class="stat-number" data-target="23">0</div>
+                            <div class="stat-label">Years Exp.</div>
+                        </div>
+                        <div class="stat-counter">
+                            <div class="stat-number" data-target="3">0</div>
+                            <div class="stat-label">Dan Rank</div>
+                        </div>
+                        <div class="stat-counter">
+                            <div class="stat-number" data-target="100">0</div>
+                            <div class="stat-label">Students</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -168,55 +206,63 @@ if (empty($heroVideoUrl)) {
     </section>
 
     <!-- WHAT WE OFFER -->
-    <section id="offers" class="offers-section container">
-        <h2>WHAT WE OFFER</h2>
-        <div class="offers-list row g-3 justify-content-center">
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="offer-card">
-                    <img src="Picture/9.png" alt="Offer 1" class="img-fluid">
-                    <h3>Beginner to Advanced Taekwondo Training</h3>
-                    <span class="offer-accent"></span>
-                    <div class="offer-desc">Comprehensive classes for all skill levels, from new students to advanced practitioners.</div>
+    <section id="offers" class="offers-section">
+        <div class="container">
+            <h2>WHAT WE OFFER</h2>
+            <div class="offers-list row g-3 justify-content-center">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="offer-card">
+                        <img src="Picture/9.png" alt="Offer 1" class="img-fluid">
+                        <div class="offer-text-wrapper">
+                            <h3>Beginner to Advanced Taekwondo Training</h3>
+                            <div class="offer-desc">Comprehensive classes for all skill levels, from new students to advanced practitioners.</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="offer-card">
-                    <img src="Picture/10.png" alt="Offer 2" class="img-fluid">
-                    <h3>Self-Defense Techniques</h3>
-                    <span class="offer-accent"></span>
-                    <div class="offer-desc">Practical self-defense skills for real-life situations, taught by experienced instructors.</div>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="offer-card">
+                        <img src="Picture/10.png" alt="Offer 2" class="img-fluid">
+                        <div class="offer-text-wrapper">
+                            <h3>Self-Defense Techniques</h3>
+                            <div class="offer-desc">Practical self-defense skills for real-life situations, taught by experienced instructors.</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="offer-card">
-                    <img src="Picture/11.png" alt="Offer 3" class="img-fluid">
-                    <h3>Belt Promotion & Certification</h3>
-                    <span class="offer-accent"></span>
-                    <div class="offer-desc">Official belt testing and certification to recognize your progress and achievements.</div>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="offer-card">
+                        <img src="Picture/11.png" alt="Offer 3" class="img-fluid">
+                        <div class="offer-text-wrapper">
+                            <h3>Belt Promotion & Certification</h3>
+                            <div class="offer-desc">Official belt testing and certification to recognize your progress and achievements.</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="offer-card">
-                    <img src="Picture/6.png" alt="Offer 4" class="img-fluid">
-                    <h3>Physical Fitness & Conditioning</h3>
-                    <span class="offer-accent"></span>
-                    <div class="offer-desc">Improve strength, flexibility, and endurance through dynamic martial arts workouts.</div>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="offer-card">
+                        <img src="Picture/6.png" alt="Offer 4" class="img-fluid">
+                        <div class="offer-text-wrapper">
+                            <h3>Physical Fitness & Conditioning</h3>
+                            <div class="offer-desc">Improve strength, flexibility, and endurance through dynamic martial arts workouts.</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="offer-card">
-                    <img src="Picture/7.png" alt="Offer 5" class="img-fluid">
-                    <h3>Sparring (Kyorugi)</h3>
-                    <span class="offer-accent"></span>
-                    <div class="offer-desc">Competitive and non-contact Taekwondo sparring to develop agility and strategy.</div>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="offer-card">
+                        <img src="Picture/7.png" alt="Offer 5" class="img-fluid">
+                        <div class="offer-text-wrapper">
+                            <h3>Sparring (Kyorugi)</h3>
+                            <div class="offer-desc">Competitive and non-contact Taekwondo sparring to develop agility and strategy.</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="offer-card">
-                    <img src="Picture/8.png" alt="Offer 6" class="img-fluid">
-                    <h3>Patterns (Poomsae)</h3>
-                    <span class="offer-accent"></span>
-                    <div class="offer-desc">A series of choreographed movements to develop focus, discipline, and technique.</div>
+                <div class="col-12 col-sm-6 col-md-4">
+                    <div class="offer-card">
+                        <img src="Picture/8.png" alt="Offer 6" class="img-fluid">
+                        <div class="offer-text-wrapper">
+                            <h3>Patterns (Poomsae)</h3>
+                            <div class="offer-desc">A series of choreographed movements to develop focus, discipline, and technique.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -232,18 +278,18 @@ if (empty($heroVideoUrl)) {
                     </div>
                     <div class="col-12 col-md-8">
                         <div class="about-text text-center text-md-start">
-                            <h2 class="section-title">ABOUT US</h2>
-                            <p>
-                            At D’Marsians Taekwondo, we don’t just teach kicks and forms — we build discipline, respect, and confidence in every student. Our program focuses on guiding students toward excellence both on and off the mat. We provide a safe, supportive environment where every child can grow stronger, sharper, and more self-assured
-                            </p>
+                        <h2 class="section-title">ABOUT US</h2>
+                        <p>
+                        At D’Marsians Taekwondo, we don’t just teach kicks and forms — we build <span class="highlight-green">discipline</span>, <span class="highlight-green">respect</span>, and <span class="highlight-green">confidence</span> in every student. Our program focuses on guiding students toward excellence both on and off the mat. We provide a safe, supportive environment where every child can grow stronger, sharper, and more self-assured.
+                        </p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="about-stats row g-3 mt-3">
                 <div class="col-12 col-sm-6 col-md-4">
-                    <div class="stat-card h-100" id="schedule">
-                        <h3><span class="icon">&#128197;</span> Rank's Schedule</h3>
+                    <div class="stat-card h-100" id="schedule" data-icon="🗓">
+                        <h3><span class="icon" style="color:#00D01D;">&#128197;</span> Rank's Schedule</h3>
                         <ul>
                             <li>Beginner: Tuesday, Thursday, & Friday<br>5:00 PM - 6:00 PM</li>
                             <li>Intermediate: Monday, Wednesday, & Friday<br>5:00 PM - 6:00 PM</li>
@@ -251,7 +297,7 @@ if (empty($heroVideoUrl)) {
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
-                    <div class="stat-card h-100">
+                    <div class="stat-card h-100" data-icon="💰">
                         <h3><span class="icon">&#128181;</span> Membership Price</h3>
                         <ul>
                             <li>Enrollment Fee: 700.00</li>
@@ -261,7 +307,7 @@ if (empty($heroVideoUrl)) {
                     </div>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
-                    <div class="stat-card h-100">
+                    <div class="stat-card h-100" data-icon="⏰">
                         <h3><span class="icon">&#128337;</span> Opening Hours</h3>
                         <ul>
                             <li>Monday - Friday: 6:30 AM - 9:00 AM</li>
@@ -274,40 +320,92 @@ if (empty($heroVideoUrl)) {
     </section>
 
     <!-- REGISTRATION FORM -->
-    <section id="register" class="register-section container">
-        <h2>REGISTER NOW</h2>
-        <p class="register-note">Parent/Guardians must pre-enroll their child(ren) by filling in the registration form below.</p>
-        <form class="register-form" id="registerForm" action="save_student.php" method="post">
-            <input class="w-100" type="text" name="student_name" placeholder="Student's Full Name" required>
-            <input class="w-100" type="text" name="address" placeholder="Address" required>
-            <input class="w-100" type="text" name="parent_name" placeholder="Parent's Full Name" required>
-            <input class="w-100" type="text" name="phone" placeholder="Phone Number" required>
-            <input class="w-100" type="email" name="email" placeholder="Email" required>
-            <input class="w-100" type="text" name="parent_phone" placeholder="Parent's Phone Number" required>
-            <input class="w-100" type="text" name="school" placeholder="School" required>
-            <select class="w-100" name="class" required style="background: rgba(20, 111, 20, 0.14); color: #fff; border-radius: 6px; border: 1.5px solid #fff; padding: 12px 16px; font-size: 1rem; box-shadow: none;">
-                <option value="" disabled selected>Class</option>
-                <option value="Poomsae">Poomsae</option>
-                <option value="Kyorugi">Kyorugi</option>
-            </select>
-            <input class="w-100" type="email" name="parent_email" placeholder="Parent's Email" required>
-            <select class="w-100" name="belt_rank" required style="background: rgba(20, 111, 20, 0.14); color: #fff; border-radius: 6px; border: 1.5px solid #fff; padding: 12px 16px; font-size: 1rem; box-shadow: none;">
-                <option value="" disabled selected>Belt Rank</option>
-                <option value="White">White</option>
-                <option value="Yellow">Yellow</option>
-                <option value="Green">Green</option>
-                <option value="Blue">Blue</option>
-                <option value="Red">Red</option>
-                <option value="Black">Black</option>
-            </select>
-            <select class="w-100" name="enroll_type" required style="background: rgba(20, 111, 20, 0.14); color: #fff; border-radius: 6px; border: 1.5px solid #fff; padding: 12px 16px; font-size: 1rem; box-shadow: none;">
-                <option value="" disabled selected>Enroll or Trial Session</option>
-                <option value="Enroll">Enroll</option>
-                <option value="Trial Session">Trial Session</option>
-            </select>
-            <button class="w-100" type="submit">SUBMIT</button>
-        </form>
-        <p class="register-disclaimer">*Notice: After submitting the form, please wait for a confirmation email from D'Marsians Taekwondo Gym to verify your successful registration.</p>
+    <section id="register" class="register-section">
+        <div class="container">
+            <div class="register-console">
+                <h2 class="section-title">JOIN THE TEAM</h2>
+                <p class="register-subtitle">Begin your journey to discipline &amp; strength.</p>
+                <form class="register-form" id="registerForm" action="save_student.php" method="post">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <input type="text" name="student_name" placeholder=" " required>
+                            <label>Student's Full Name</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="parent_name" placeholder=" " required>
+                            <label>Parent's Full Name</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <input type="text" name="address" placeholder=" " required>
+                            <label>Address</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" name="school" placeholder=" " required>
+                            <label>School</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <input type="tel" name="phone" placeholder=" " required>
+                            <label>Phone Number</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" name="email" placeholder=" " required>
+                            <label>Email Address</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <input type="text" name="parent_phone" placeholder=" " required>
+                            <label>Parent's Phone Number</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" name="parent_email" placeholder=" " required>
+                            <label>Parent's Email</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <select name="class" required>
+                                <option value="" disabled selected>Select Class</option>
+                                <option value="Poomsae">Poomsae</option>
+                                <option value="Kyorugi">Kyorugi</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <select name="belt_rank" required>
+                                <option value="" disabled selected>Select Belt Rank</option>
+                                <option value="White">White</option>
+                                <option value="Yellow">Yellow</option>
+                                <option value="Green">Green</option>
+                                <option value="Blue">Blue</option>
+                                <option value="Red">Red</option>
+                                <option value="Black">Black</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <select name="enroll_type" required>
+                                <option value="" disabled selected>Enroll or Trial Session</option>
+                                <option value="Enroll">Enroll</option>
+                                <option value="Trial Session">Trial Session</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <span></span>
+                        </div>
+                    </div>
+                    <button class="submit-btn" type="submit">
+                        CONFIRM REGISTRATION
+                        <span class="btn-shine"></span>
+                    </button>
+                </form>
+                <p class="register-disclaimer">*Notice: After submitting the form, please wait for a confirmation email from D'Marsians Taekwondo Gym to verify your successful registration.</p>
+            </div>
+        </div>
     </section>
 
     <!-- CONTACTS, MAP, FOOTER -->
@@ -478,13 +576,63 @@ if (empty($heroVideoUrl)) {
             track.scrollBy({ left: direction * step, behavior: 'smooth' });
         }
 
-        prevBtn.addEventListener('click', () => scrollByStep(-1));
-        nextBtn.addEventListener('click', () => scrollByStep(1));
-        track.addEventListener('scroll', updateButtons, { passive: true });
+        // Don't use scroll-based navigation for achievements or events (both use infinite carousel)
+        if (sliderId !== 'achievements-slider' && sliderId !== 'events-slider') {
+            // Function to update active card based on scroll position (for events only)
+            function updateActiveCard() {
+                const cards = Array.from(track.querySelectorAll('.slide-card'));
+                if (cards.length === 0) return;
+                
+                const trackRect = track.getBoundingClientRect();
+                const trackCenter = trackRect.left + trackRect.width / 2;
+                
+                let activeCard = null;
+                let minDistance = Infinity;
+                
+                cards.forEach(card => {
+                    const cardRect = card.getBoundingClientRect();
+                    const cardCenter = cardRect.left + cardRect.width / 2;
+                    const distance = Math.abs(cardCenter - trackCenter);
+                    
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        activeCard = card;
+                    }
+                });
+                
+                // Remove active class from all cards
+                cards.forEach(card => card.classList.remove('active'));
+                
+                // Add active class to the center card
+                if (activeCard) {
+                    activeCard.classList.add('active');
+                }
+            }
 
-        // Initialize state after layout
-        requestAnimationFrame(updateButtons);
-        window.addEventListener('resize', () => requestAnimationFrame(updateButtons));
+            prevBtn.addEventListener('click', () => scrollByStep(-1));
+            nextBtn.addEventListener('click', () => scrollByStep(1));
+            track.addEventListener('scroll', () => {
+                updateButtons();
+                updateActiveCard();
+            }, { passive: true });
+
+            // Initialize state after layout
+            requestAnimationFrame(() => {
+                updateButtons();
+                updateActiveCard();
+            });
+            window.addEventListener('resize', () => {
+                requestAnimationFrame(() => {
+                    updateButtons();
+                    updateActiveCard();
+                });
+            });
+        } else {
+            // For achievements and events, don't attach scroll listeners - infinite carousel will handle it
+            // Just ensure buttons are enabled
+            prevBtn.disabled = false;
+            nextBtn.disabled = false;
+        }
     }
 
     // Fetch and render sliders
@@ -499,14 +647,145 @@ if (empty($heroVideoUrl)) {
         }
     }, true); // Use capture phase
 
+    // Infinite Loop Coverflow Carousel for Achievements and Events
+    function initCoverflowCarousel(sliderId) {
+        const slider = document.getElementById(sliderId);
+        if (!slider) return;
+        
+        const track = slider.querySelector('.slider-track');
+        if (!track) return;
+        
+        // Wait for cards to be rendered
+        const checkCards = setInterval(() => {
+            const cards = Array.from(track.querySelectorAll('.slide-card'));
+            if (cards.length > 0) {
+                clearInterval(checkCards);
+                setupCoverflowCarousel(slider, track, cards);
+            }
+        }, 100);
+        
+        // Stop checking after 5 seconds
+        setTimeout(() => clearInterval(checkCards), 5000);
+    }
+    
+    function setupCoverflowCarousel(slider, track, cards) {
+        const nextBtn = slider.querySelector('.arrow-btn.next');
+        const prevBtn = slider.querySelector('.arrow-btn.prev');
+        
+        if (!nextBtn || !prevBtn || cards.length === 0) {
+            console.error('Coverflow carousel setup failed: buttons or cards not found');
+            return;
+        }
+        
+        // Check if already initialized
+        if (slider.dataset.coverflowInitialized === 'true') {
+            return;
+        }
+        
+        // Mark as initialized
+        slider.dataset.coverflowInitialized = 'true';
+        
+        // Ensure buttons are enabled
+        nextBtn.disabled = false;
+        prevBtn.disabled = false;
+        nextBtn.style.pointerEvents = 'auto';
+        prevBtn.style.pointerEvents = 'auto';
+        
+        let currentIndex = 0;
+        
+        // Function to update the carousel based on current index
+        function updateCarousel() {
+            const total = cards.length;
+            if (total === 0) return;
+            
+            // Remove all state classes first
+            cards.forEach(card => {
+                card.classList.remove('active', 'prev', 'next', 'hidden');
+                card.style.zIndex = '0';
+            });
+            
+            // Calculate indexes for infinite loop
+            const prevIndex = (currentIndex - 1 + total) % total;
+            const nextIndex = (currentIndex + 1) % total;
+            
+            // Assign the center item (active)
+            cards[currentIndex].classList.add('active');
+            cards[currentIndex].style.zIndex = '10';
+            
+            // Assign the left item (previous)
+            cards[prevIndex].classList.add('prev');
+            cards[prevIndex].style.zIndex = '5';
+            
+            // Assign the right item (next)
+            cards[nextIndex].classList.add('next');
+            cards[nextIndex].style.zIndex = '5';
+            
+            // Hide all others
+            cards.forEach((card, index) => {
+                if (index !== currentIndex && index !== prevIndex && index !== nextIndex) {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Remove any existing listeners by cloning buttons
+        const nextBtnClone = nextBtn.cloneNode(true);
+        const prevBtnClone = prevBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(nextBtnClone, nextBtn);
+        prevBtn.parentNode.replaceChild(prevBtnClone, prevBtn);
+        
+        // Get fresh references
+        const newNextBtn = slider.querySelector('.arrow-btn.next');
+        const newPrevBtn = slider.querySelector('.arrow-btn.prev');
+        
+        // Ensure they're enabled
+        newNextBtn.disabled = false;
+        newPrevBtn.disabled = false;
+        
+        // Event listener for next button
+        newNextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (cards.length > 0) {
+                currentIndex = (currentIndex + 1) % cards.length;
+                updateCarousel();
+            }
+        }, { once: false });
+        
+        // Event listener for previous button
+        newPrevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (cards.length > 0) {
+                currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+                updateCarousel();
+            }
+        }, { once: false });
+        
+        // Initialize the carousel on load
+        updateCarousel();
+        
+        console.log('Coverflow carousel initialized with', cards.length, 'cards');
+    }
+
     fetch('get_posts.php?category=achievement')
         .then(res => res.json())
-        .then(posts => { renderSlider(posts, 'achievements-slider'); })
+        .then(posts => { 
+            renderSlider(posts, 'achievements-slider');
+            // Initialize coverflow carousel after rendering
+            setTimeout(() => initCoverflowCarousel('achievements-slider'), 500);
+        })
         .catch(err => console.error('Error loading achievements:', err));
 
     fetch('get_posts.php?category=event')
         .then(res => res.json())
-        .then(posts => { renderSlider(posts, 'events-slider'); })
+        .then(posts => { 
+            renderSlider(posts, 'events-slider');
+            // Initialize coverflow carousel after rendering
+            setTimeout(() => {
+                initCoverflowCarousel('events-slider');
+            }, 800);
+        })
         .catch(err => console.error('Error loading events:', err));
 
     // Post modal helpers
@@ -601,7 +880,47 @@ if (empty($heroVideoUrl)) {
         }
     });
 
+    // Animated Counter for Instructor Stats
+    function animateCounter(element, target, duration = 2000) {
+        let start = 0;
+        const increment = target / (duration / 16);
+        const timer = setInterval(() => {
+            start += increment;
+            if (start >= target) {
+                element.textContent = target + (target === 100 ? '+' : '');
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(start) + (target === 100 ? '+' : '');
+            }
+        }, 16);
+    }
+
+    // Intersection Observer for Stats Animation
+    function initStatsAnimation() {
+        const statsSection = document.getElementById('instructor');
+        if (!statsSection) return;
+
+        const statNumbers = statsSection.querySelectorAll('.stat-number');
+        if (statNumbers.length === 0) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumber = entry.target;
+                    const target = parseInt(statNumber.getAttribute('data-target'));
+                    if (!statNumber.classList.contains('animated')) {
+                        statNumber.classList.add('animated');
+                        animateCounter(statNumber, target);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        statNumbers.forEach(stat => observer.observe(stat));
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        initStatsAnimation();
         const form = document.getElementById('registerForm');
         if (form) {
             form.addEventListener('submit', function (e) {

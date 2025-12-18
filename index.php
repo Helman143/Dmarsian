@@ -23,11 +23,11 @@ ini_set('display_errors', 1);
             <form action="login_process.php" method="POST">
                 <input type="hidden" name="login_type" value="user">
                 <div class="input-group">
-                    <input id="username" type="text" name="username" required>
+                    <input id="username" type="text" name="username" placeholder=" " required>
                     <label>Username or Email</label>
                 </div>
                 <div class="input-group">
-                    <input id="password" type="password" name="password" required>
+                    <input id="password" type="password" name="password" placeholder=" " required>
                     <label>Password</label>
                 </div>
                 <button type="submit" class="login-btn">LOGIN</button>

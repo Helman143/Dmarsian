@@ -7,6 +7,11 @@ async function fetchAndDisplayPayments() {
     const tbody = document.getElementById('transactionTableBody');
     tbody.innerHTML = '';
     payments.forEach(payment => {
+        const status = String(payment.status || '').toLowerCase();
+        let badgeClass = 'badge-active';
+        if (status.includes('pending')) badgeClass = 'badge-pending';
+        if (status.includes('fail') || status.includes('cancel') || status.includes('overdue')) badgeClass = 'badge-danger';
+
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${payment.id}</td>
@@ -17,7 +22,7 @@ async function fetchAndDisplayPayments() {
             <td>${payment.payment_type}</td>
             <td>${payment.discount}</td>
             <td>₱${(parseFloat(payment.amount_paid) - parseFloat(payment.discount || 0)).toLocaleString()}</td>
-            <td>${payment.status}</td>
+            <td><span class="badge ${badgeClass}">${payment.status}</span></td>
         `;
         tbody.appendChild(row);
     });
@@ -85,6 +90,10 @@ function updateCollectionChart(payments) {
 
     if (collectionChart) collectionChart.destroy();
     const ctx = document.getElementById('collectionTrendChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(0, 255, 106, 0.35)');
+    gradient.addColorStop(1, 'rgba(0, 255, 106, 0)');
+
     collectionChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -92,15 +101,30 @@ function updateCollectionChart(payments) {
             datasets: [{
                 label: 'Collection',
                 data: data,
-                borderColor: '#0f0',
-                backgroundColor: 'rgba(0,255,0,0.1)',
+                borderColor: '#00ff6a',
+                borderWidth: 2,
+                backgroundColor: gradient,
                 fill: true,
-                tension: 0.3
+                tension: 0.35,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                pointBackgroundColor: '#00ff6a',
+                pointBorderColor: '#00ff6a'
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } }
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    ticks: { color: '#8ee8b6' },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                },
+                y: {
+                    ticks: { color: '#8ee8b6' },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                }
+            }
         }
     });
 }

@@ -1,33 +1,50 @@
 :root {
     --sidebar-width: 250px;
-    --primary-color: #0f0;
-    --dark-bg: #000;
-    --card-bg: rgba(0, 0, 0, 0.7);
+    --emerald-1: #00ff6a;
+    --emerald-2: #00cc55;
+    --emerald-dark: #001a0d;
+    --emerald-mid: #004d26;
+    --glass-dark: rgba(0, 20, 10, 0.6);
+    --glass-card: rgba(255, 255, 255, 0.05);
+    --text-main: #ffffff;
+    --text-sub: #8ee8b6;
 }
 
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #111;
-    background-image: 
-        linear-gradient(45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%);
-    color: #fff;
+    background: var(--emerald-dark);
+    background-image:
+        radial-gradient(ellipse at center, var(--emerald-mid) 0%, var(--emerald-dark) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px);
+    color: var(--text-main);
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Circuit / hex texture */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(30deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(60deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(120deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px);
+    background-size: 200px 200px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
 }
 
 /* Ensure the entire left column behind the sidebar is black on desktop */
 @media (min-width: 769px) {
     body::before {
-        content: "";
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
         width: var(--sidebar-width);
-        background: #202020;
-        pointer-events: none;
-        z-index: 0;
+        background: transparent;
+        mix-blend-mode: screen;
     }
 }
 
@@ -49,21 +66,22 @@ html, body {
 
 /* Sidebar Styles */
 .sidebar {
-    /* Bootstrap Offcanvas uses this CSS var for width */
     --bs-offcanvas-width: var(--sidebar-width);
-    --bs-offcanvas-bg: #202020;
+    --bs-offcanvas-bg: var(--glass-dark);
     width: var(--sidebar-width);
-    background: #202020; /* container background dark grey */
-    color: #fff;
+    background: var(--glass-dark);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden; /* prevent any child from visually spilling over */
+    overflow: hidden;
+    border-right: 1px solid rgba(0, 255, 106, 0.25);
+    box-shadow: 12px 0 30px rgba(0, 255, 85, 0.15);
+    position: relative;
 }
-/* Ensure inner areas stay black as well */
-/* Keep logo and dropdown panel dark grey, but let nav list be transparent */
-.sidebar .dropdown-content { background-color: #202020; }
-/* Remove any elevation that might show non-black edges */
+.sidebar .dropdown-content { background-color: var(--glass-dark); }
 .sidebar, .sidebar * { box-shadow: none !important; }
 
 /* Mobile topbar styles - ensure all accents use site primary green */
@@ -86,20 +104,36 @@ html, body {
     justify-content: center;
     width: 100%;
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.logo::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--emerald-1), transparent);
+    box-shadow: 0 0 10px rgba(0, 255, 106, 0.7);
 }
 
 .logo-img {
-    width: 100px;
+    width: 110px;
     height: auto;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 12px rgba(0, 255, 106, 0.6));
 }
 
 .logo h2 {
-    color: var(--primary-color);
+    color: var(--emerald-1);
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Navigation Styles */
@@ -113,7 +147,7 @@ nav {
 }
 
 nav a {
-    color: #fff;
+    color: var(--text-main);
     text-decoration: none;
     padding: 12px 20px;
     display: block;
@@ -121,16 +155,21 @@ nav a {
     font-size: 14px;
 }
 
-/* Hover: green background, readable dark text */
-nav a:hover {
-    background-color: #0f0;
-    color: #000;
+/* Hover + active: glowing pill */
+nav a {
+    border-radius: 10px;
 }
-nav a:hover i { color: #000; }
-/* Active: stay black background with green text */
+nav a:hover {
+    background-color: rgba(0, 255, 106, 0.1);
+    color: var(--emerald-1);
+    box-shadow: 0 0 12px rgba(0, 255, 106, 0.35);
+}
+nav a:hover i { color: var(--emerald-1); }
 nav a.active {
-    background-color: transparent;
-    color: var(--primary-color);
+    background-color: rgba(0, 255, 106, 0.15) !important;
+    color: var(--emerald-1) !important;
+    box-shadow: 0 0 16px rgba(0, 255, 106, 0.45);
+    border: 1px solid rgba(0, 255, 106, 0.35);
 }
 
 nav a i {
@@ -251,6 +290,8 @@ nav a, .dropdown-toggle, .dropdown-content a {
     flex: 1;
     margin-left: var(--sidebar-width);
     padding: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .welcome-header {
@@ -258,9 +299,10 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 
 .welcome-header h1 {
-    color: #fff;
+    color: var(--text-main);
     font-size: 2rem;
     margin: 0;
+    text-shadow: 0 0 10px rgba(0, 255, 106, 0.35);
 }
 
 .welcome-header {
@@ -275,14 +317,25 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 
 .stat-card {
-    background-color: var(--dark-bg);
-    border: 1px solid var(--primary-color);
-    border-radius: 8px;
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 106, 0.3);
+    border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 106, 0.4);
+    border-color: var(--emerald-1);
+    transform: translateY(-5px);
 }
 
 .stat-header {
-    color: var(--primary-color);
+    color: var(--emerald-1);
     font-size: 14px;
     margin-bottom: 10px;
     display: flex;
@@ -291,9 +344,30 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 
 .stat-value {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #fff;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Watermark icons per stat card */
+.stats-container .stat-card::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    bottom: -14px;
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 80px;
+    color: #ffffff;
+    opacity: 0.08;
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+.stats-container .stat-card:nth-child(1)::after { content: "\f234"; } /* user-plus */
+.stats-container .stat-card:nth-child(2)::after { content: "\f0c0"; } /* users */
+.stats-container .stat-card:nth-child(3)::after { content: "\f53d"; } /* peso sign */
+.stats-container .stat-card:nth-child(4)::after { content: "\f155"; } /* dollar sign as alt */
 }
 
 /* Charts Section */
@@ -302,14 +376,18 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 
 .chart-container, .dues-container {
-    background-color: var(--dark-bg);
-    border: 1px solid var(--primary-color);
-    border-radius: 8px;
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 106, 0.25);
+    border-radius: 12px;
     padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
 }
 
 .chart-container h3, .dues-container h3 {
-    color: var(--primary-color);
+    color: var(--emerald-1);
     margin: 0 0 20px 0;
     font-size: 1.2rem;
 }
@@ -346,20 +424,74 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 
 .dues-table th {
-    color: var(--primary-color);
+    background: rgba(0, 255, 106, 0.15);
+    color: var(--emerald-1);
     text-align: left;
     padding: 12px;
-    font-weight: normal;
-    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(0, 255, 106, 0.25);
 }
 
 .dues-table td {
     padding: 12px;
-    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dues-table tr:hover {
-    background-color: rgba(0, 255, 0, 0.05);
+    background-color: rgba(0, 255, 106, 0.05);
+}
+
+.dues-table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Badges for status/balance */
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #0a0a0a;
+}
+.badge-success { background: #00ff6a; }
+.badge-warning { background: #ffaa00; color: #1a1a1a; }
+.badge-danger  { background: #ff4d4d; color: #0a0a0a; }
+
+/* Table container shell */
+.dues-container {
+    background: rgba(0, 20, 10, 0.6);
+    border: 1px solid rgba(0, 255, 106, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Send reminders button */
+#sendAllRemindersBtn {
+    background: linear-gradient(180deg, #1aff1a 0%, #00cc00 50%, #00b300 100%);
+    border: none;
+    color: #000;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow:
+        0 0 20px rgba(0, 255, 0, 0.5),
+        0 4px 12px rgba(0, 255, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+#sendAllRemindersBtn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 30px rgba(0, 255, 0, 0.65),
+        0 6px 16px rgba(0, 255, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+#sendAllRemindersBtn:active {
+    transform: translateY(0);
 }
 
 /* Responsive Design */

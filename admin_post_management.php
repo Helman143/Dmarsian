@@ -120,7 +120,7 @@ mysqli_close($conn);
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
-                            <div class="post-image" style="background-image: url('<?php 
+                            <div class="post-image <?php echo $has_image ? '' : 'no-image'; ?>" style="background-image: url('<?php 
                                 // Check if image_path exists and is not empty (handle both NULL and empty string)
                                 $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
                                 $has_image = false;
@@ -151,9 +151,6 @@ mysqli_close($conn);
                                     echo "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E";
                                 }
                             ?>'); background-color: #2d2d2d; background-size: cover; background-position: center;">
-                                <?php if (!$has_image): ?>
-                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; text-align: center; pointer-events: none;">No Image</div>
-                                <?php endif; ?>
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">

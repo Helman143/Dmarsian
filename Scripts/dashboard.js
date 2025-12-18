@@ -54,30 +54,32 @@ fetch('get_dashboard_stats.php')
                     window.studentOverviewChart.update();
                 } else {
                     window.studentOverviewChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: ["Today's Enrollees", "Weekly Enrollees"],
                             datasets: [{
                                 data: [data.todayEnrollees, data.weeklyEnrollees],
                                 backgroundColor: [
-                                    '#5DD62C',
-                                    'rgba(93, 214, 44, 0.3)'
+                                    '#00ff6a',
+                                    'rgba(0, 255, 106, 0.25)'
                                 ],
                                 borderColor: [
-                                    '#5DD62C',
-                                    '#5DD62C'
+                                    '#00ff6a',
+                                    '#00ff6a'
                                 ],
-                                borderWidth: 1
+                                borderWidth: 2,
+                                hoverOffset: 8
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '60%',
                             plugins: {
                                 legend: {
                                     position: 'bottom',
                                     labels: {
-                                        color: '#5DD62C',
+                                        color: '#00ff6a',
                                         font: { size: 12 },
                                         padding: 20
                                     }
@@ -109,24 +111,26 @@ fetch('get_dashboard_stats.php')
                     window.activeInactiveChart.update();
                 } else {
                     window.activeInactiveChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: ['Active', 'Inactive'],
                             datasets: [{
                                 data: [chartActive, chartInactive],
-                                backgroundColor: ['#5DD62C', '#fff'],
-                                borderColor: ['#5DD62C', '#fff'],
-                                borderWidth: 1
+                                backgroundColor: ['#00ff6a', 'rgba(255,255,255,0.2)'],
+                                borderColor: ['#00ff6a', 'rgba(255,255,255,0.4)'],
+                                borderWidth: 2,
+                                hoverOffset: 8
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '60%',
                             plugins: {
                                 legend: {
                                     position: 'top',
                                     labels: {
-                                        color: '#fff',
+                                        color: '#e9ffee',
                                         padding: 10,
                                     }
                                 },
@@ -193,24 +197,26 @@ function fetchAndRenderPaymentsChart() {
                 const ctx = paymentsCanvas.getContext('2d');
                 if (paymentsChart) paymentsChart.destroy();
                 paymentsChart = new Chart(ctx, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: ['Collected', 'Uncollected'],
                         datasets: [{
                             data: [collected, uncollected],
-                            backgroundColor: ['#5DD62C', 'rgba(93, 214, 44, 0.3)'],
-                            borderColor: ['#5DD62C', '#5DD62C'],
-                            borderWidth: 1
+                            backgroundColor: ['#00ff6a', '#ff4d4d'],
+                            borderColor: ['#00ff6a', '#ff4d4d'],
+                            borderWidth: 2,
+                            hoverOffset: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '60%',
                         plugins: {
                             legend: {
                                 position: 'top',
                                 labels: {
-                                    color: '#fff',
+                                    color: '#e9ffee',
                                     padding: 10,
                                 }
                             },

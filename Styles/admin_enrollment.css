@@ -1,63 +1,92 @@
 :root {
-    --sidebar-width: 250px;
-    --primary-color: #0f0;
-    --dark-bg: #000;
-    --card-bg: rgba(0, 0, 0, 0.7);
+    --sidebar-width: 260px;
+    --emerald-1: #00ff6a;
+    --emerald-2: #00cc55;
+    --emerald-dark: #001a0d;
+    --emerald-mid: #004d26;
+    --glass-dark: rgba(0, 20, 10, 0.6);
+    --glass-card: rgba(255, 255, 255, 0.05);
+    --text-main: #ffffff;
+    --text-sub: #9cd9ae;
 }
 
 /* Main Content Styles */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #111;
+    background: var(--emerald-dark);
     background-image: 
-        linear-gradient(45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%);
-    color: #fff;
+        radial-gradient(ellipse at center, var(--emerald-mid) 0%, var(--emerald-dark) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px);
+    color: var(--text-main);
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Circuit overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(30deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(60deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(120deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px);
+    background-size: 200px 200px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .main-content {
-    padding: 20px;
+    padding: 24px;
     margin-left: var(--sidebar-width);
     height: calc(100vh - 40px);
     overflow-y: auto;
     background: transparent;
     max-width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 .main-content h2 {
-    color: var(--primary-color);
+    color: var(--text-main);
     margin-bottom: 20px;
     font-size: 2rem;
     font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 106, 0.35);
 }
 
 /* Enrollment Section Styles */
 .enrollment-section {
-    background: var(--card-bg);
-    border: 1px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 10px;
+    background: var(--glass-dark);
+    border: 1px solid rgba(0, 255, 106, 0.2);
+    border-radius: 12px;
+    padding: 20px;
     margin-bottom: 20px;
     width: 100%;
     box-sizing: border-box;
     overflow-x: visible;
     min-width: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    gap: 20px;
+    margin-bottom: 15px;
+    gap: 16px;
     width: 100%;
     flex-wrap: wrap;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
 }
 
 .section-header h3 {
-    color: var(--primary-color);
+    color: var(--text-main);
     font-size: 1.3rem;
     margin: 0;
     white-space: nowrap;
@@ -67,25 +96,30 @@ body {
 /* Search Container Styles */
 .search-container {
     position: relative;
-    width: 120px;
-    flex-shrink: 0;
+    width: 200px;
+    min-width: 170px;
+    flex-shrink: 1;
 }
 
 .search-container input {
     width: 100%;
-    padding: 8px 30px 8px 10px;
-    border: 1px solid var(--primary-color);
-    border-radius: 20px;
+    height: 40px;
+    padding: 10px 40px 10px 14px;
+    border: 1px solid rgba(0, 255, 106, 0.4);
+    border-radius: 14px;
     background: rgba(0, 0, 0, 0.5);
     color: #fff;
-    font-size: 13px;
+    font-size: 14px;
     outline: none;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-sizing: border-box;
+    font-family: 'Courier New', monospace;
 }
 
 .search-container input:focus {
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+    border-color: var(--emerald-1);
+    box-shadow: 0 0 15px rgba(0, 255, 106, 0.3), inset 0 0 10px rgba(0, 255, 106, 0.1);
+    background: #000;
 }
 
 .search-container input::placeholder {
@@ -94,11 +128,13 @@ body {
 
 .search-icon {
     position: absolute;
-    right: 10px;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--primary-color);
-    font-size: 12px;
+    color: var(--emerald-1);
+    font-size: 14px;
+    pointer-events: none;
+    filter: drop-shadow(0 0 5px rgba(0, 255, 106, 0.6));
 }
 
 /* Table Container Styles */
@@ -107,8 +143,9 @@ body {
     overflow-x: auto; /* enable horizontal scroll on narrow screens */
     -webkit-overflow-scrolling: touch;
     margin-top: 10px;
-    border: 1px solid rgba(0, 255, 0, 0.2);
-    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 106, 0.2);
+    border-radius: 10px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .enrollment-table {
@@ -121,28 +158,41 @@ body {
 
 .enrollment-table th,
 .enrollment-table td {
-    padding: 4px 6px;
+    padding: 8px 10px;
     text-align: left;
-    border: 1px solid rgba(0, 255, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     color: #fff;
-    font-size: 12px;
+    font-size: 13px;
     white-space: normal;
     overflow-wrap: break-word;
     word-break: break-word;
-    max-width: 120px;
+    max-width: 160px;
+}
+
+.enrollment-section:first-of-type .enrollment-table th {
+    background: rgba(255, 170, 0, 0.15);
+    color: #ffaa00;
+}
+
+.enrollment-section:last-of-type .enrollment-table th {
+    background: rgba(0, 255, 106, 0.1);
+    color: var(--emerald-1);
 }
 
 .enrollment-table th {
-    background: rgba(0, 255, 0, 0.1);
-    color: var(--primary-color);
-    font-weight: normal;
+    font-weight: 700;
     position: sticky;
     top: 0;
     z-index: 1;
+    letter-spacing: 0.3px;
+}
+
+.enrollment-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .enrollment-table tbody tr:hover {
-    background: rgba(0, 255, 0, 0.05);
+    background: rgba(0, 255, 106, 0.05);
 }
 
 /* Remove fixed/percentage widths for columns */
@@ -154,39 +204,47 @@ body {
 /* Action Buttons */
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
-.btn-approve {
-    padding: 6px 12px;
-    background: var(--primary-color);
-    color: #000;
+.btn-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    white-space: nowrap; /* keep label on one line */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    line-height: 1.1;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin: 0 2px;
+    font-size: 14px;
 }
 
-.btn-approve i { margin-right: 6px; }
-
+.btn-approve {
+    background: rgba(0, 255, 106, 0.2);
+    color: #00ff6a;
+    border: 1px solid #00ff6a;
+}
 .btn-approve:hover {
-    background: #00cc00;
-    transform: translateY(-2px);
+    background: #00ff6a;
+    color: #000;
+    box-shadow: 0 0 10px #00ff6a;
 }
 
-.status-pending {
-    color: #ffd700;
+.btn-reject {
+    background: rgba(255, 50, 50, 0.2);
+    color: #ff3333;
+    border: 1px solid #ff3333;
+}
+.btn-reject:hover {
+    background: #ff3333;
+    color: #fff;
+    box-shadow: 0 0 10px #ff3333;
 }
 
-.status-approved {
-    color: var(--primary-color);
-}
+.status-pending { color: #ffaa00; }
+.status-approved { color: var(--emerald-1); }
 
 /* Scrollbar Styles */
 ::-webkit-scrollbar {

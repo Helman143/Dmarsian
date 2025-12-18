@@ -1,5 +1,6 @@
 <?php // Usage: $active = 'dashboard'|'student'|'collection'|'payment'|'posts'|'enroll'|'trial'; ?>
 <div class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel" role="navigation" aria-label="Main Sidebar">
+  <span id="sidebarLabel" class="visually-hidden">Main Sidebar</span>
   <div class="logo d-flex align-items-center gap-2">
     <img src="Picture/Logo2.png" alt="D'MARSIANS Logo" class="logo-img img-fluid" style="max-width:56px;height:auto;">
     <h2 class="m-0">D'MARSIANS<br>TAEKWONDO<br>SYSTEM</h2>

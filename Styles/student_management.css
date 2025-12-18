@@ -1,40 +1,56 @@
 /* Main Content Header */
+:root {
+    --emerald-1: #00ff6a;
+    --emerald-2: #00cc55;
+    --emerald-dark: #001a0d;
+    --emerald-mid: #004d26;
+    --glass-dark: rgba(0, 20, 10, 0.6);
+    --glass-card: rgba(255, 255, 255, 0.05);
+    --text-main: #ffffff;
+    --text-sub: #8ee8b6;
+}
+
 .main-content {
-    background: #111;
+    background: var(--emerald-dark);
     background-image: 
-        linear-gradient(45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(0, 255, 0, 0.1) 25%, transparent 25%);
-    padding: 20px 0 20px 20px;
+        radial-gradient(ellipse at center, var(--emerald-mid) 0%, var(--emerald-dark) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px);
+    position: relative;
+    overflow-x: hidden;
+    padding: 24px;
 }
 
 .page-title {
-    color: #fff;
+    color: var(--text-main);
     font-size: 24px;
-    padding: 10px 20px;
+    padding: 12px 16px;
     margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(0, 255, 106, 0.35);
 }
 
 /* Form Container */
 .student-form-container {
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid #0f0;
-    border-radius: 5px;
-    padding: 10px;
+    background: var(--glass-card);
+    border: 1px solid rgba(0, 255, 106, 0.3);
+    border-radius: 12px;
+    padding: 16px;
     margin-bottom: 20px;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
-    max-width: 900px;
-    margin-left: 20px;
-    margin-right: 20px;
+    box-shadow: 0 8px 24px rgba(0, 255, 85, 0.15);
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
     width: calc(100% - 40px);
+    backdrop-filter: blur(10px);
 }
 
 /* Form Layout */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 18px 20px;
     margin-bottom: 10px;
-    max-width: 850px;
+    max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -46,21 +62,35 @@
 
 .form-group label {
     display: block;
-    color: #fff;
-    margin-bottom: 3px;
+    color: var(--text-main);
+    margin-bottom: 4px;
     font-size: 13px;
+    letter-spacing: 0.2px;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
     max-width: 100%;
-    padding: 4px 8px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #0f0;
-    border-radius: 3px;
-    color: #000;
-    font-size: 13px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 106, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    backdrop-filter: blur(5px);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    background: rgba(0, 50, 20, 0.5);
+    border-color: var(--emerald-1);
+    box-shadow: 0 0 15px rgba(0, 255, 106, 0.2);
+    outline: none;
+}
+
+::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 /* Special Fields */
@@ -92,22 +122,29 @@
 .form-actions {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
 }
 
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 3px;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    border-radius: 8px;
     font-size: 12px;
     cursor: pointer;
-    transition: all 0.2s;
-    min-width: 80px;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .btn i {
@@ -115,45 +152,60 @@
 }
 
 .btn-save {
-    background: #0f0;
+    border-color: #00ff6a;
+    color: #00ff6a;
+}
+.btn-save:hover {
+    background: #00ff6a;
     color: #000;
+    box-shadow: 0 0 20px #00ff6a;
 }
 
 .btn-update {
-    background: #00a0fc;
-    color: #fff;
+    border-color: #00e5ff;
+    color: #00e5ff;
+}
+.btn-update:hover {
+    background: #00e5ff;
+    color: #000;
+    box-shadow: 0 0 20px #00e5ff;
 }
 
 .btn-clear {
-    background: #ff3333;
+    border-color: #ff3366;
+    color: #ff3366;
+}
+.btn-clear:hover {
+    background: #ff3366;
     color: #fff;
+    box-shadow: 0 0 20px #ff3366;
 }
 
 .btn-export {
-    background: #ffc107;
-    color: #000;
+    border-color: #ffaa00;
+    color: #ffaa00;
 }
-
-.btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+.btn-export:hover {
+    background: #ffaa00;
+    color: #000;
+    box-shadow: 0 0 20px #ffaa00;
 }
 
 /* Table Container */
 .table-container {
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid #0f0;
-    border-radius: 5px;
+    background: rgba(0, 20, 10, 0.8);
+    border: 1px solid rgba(0, 255, 106, 0.2);
+    border-radius: 12px;
     padding: 15px;
     margin-top: 30px;
-    margin-left: 20px;
-    margin-right: 20px;
-    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px;
     width: calc(100% - 40px);
     overflow-x: auto;
-    /* Enable smooth scrolling */
     -webkit-overflow-scrolling: touch;
-    position: relative; /* allow toolbar to pin to top-right */
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .student-table {
@@ -165,27 +217,32 @@
 
 .student-table th,
 .student-table td {
-    padding: 8px 12px;
+    padding: 10px 12px;
     text-align: left;
-    border: 1px solid rgba(0, 255, 0, 0.2);
-    white-space: nowrap; /* Prevents text wrapping */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
 }
 
 .student-table th {
-    background: rgba(0, 255, 0, 0.1);
-    color: #0f0;
-    font-weight: normal;
+    background: rgba(0, 255, 106, 0.15);
+    color: var(--emerald-1);
+    font-weight: 700;
     position: sticky;
     top: 0;
     z-index: 1;
+    letter-spacing: 0.5px;
 }
 
 .student-table td {
     color: #fff;
 }
 
+.student-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
 .student-table tbody tr:hover {
-    background: rgba(0, 255, 0, 0.05);
+    background: rgba(0, 255, 106, 0.05);
 }
 
 /* Status Colors */
@@ -436,58 +493,53 @@ nav a, .dropdown-toggle, .dropdown-content a {
 	/* Hide mobile-only elements on desktop when Bootstrap CSS isn't loaded */
 	.d-md-none { display: none !important; }
     /* create space so absolute toolbar doesn't overlap table header */
-    .table-container { padding-top: 56px; }
+    .table-container { padding-top: 78px; }
 } 
 
-/* Table toolbar (desktop search pinned to top-right of table container) */
+/* Search HUD dock */
 .table-toolbar {
     position: absolute;
-    top: 14px;
-    left: auto;            /* pin to opposite corner */
-    right: 12px !important; /* pin to top-right */
-    display: flex;          /* ensure proper horizontal layout without Bootstrap */
+    top: 16px;
+    right: 12px;
+    display: flex;
     align-items: center;
     justify-content: flex-end;
-    background: transparent;
-    border-bottom: none;
-    margin: 0;
-    padding: 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(0, 255, 106, 0.2);
+    padding: 10px 16px;
+    border-radius: 12px 12px 0 0;
     z-index: 2;
+    gap: 10px;
 }
 
-/* Prevent Bootstrap's input-group width:100% from stretching the search field */
-.table-toolbar .input-group {
-    width: 260px !important;
-    max-width: 260px !important;
-}
-
-.table-container .input-group-text {
-    background: #fff;
-}
-
-/* Search bar styling copied from Payments page */
 .table-toolbar .search-container {
 	position: relative;
-	width: 180px;
-	min-width: 150px;
+	width: 190px;
+	min-width: 160px;
 	flex-shrink: 1;
 }
 
 .table-toolbar .search-container input {
 	width: 100%;
-	padding: 8px 35px 8px 15px;
-	border: 1px solid #0f0;
-	border-radius: 20px;
+	height: 42px;
+	line-height: 1.4;
+	padding: 10px 42px 10px 50px;
+	border: 1px solid rgba(0, 255, 106, 0.4);
+	border-radius: 14px;
 	background: rgba(0, 0, 0, 0.5);
 	color: #fff;
 	font-size: 14px;
 	outline: none;
-	transition: all 0.3s ease;
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 	box-sizing: border-box;
+	font-family: 'Courier New', monospace;
 }
 
 .table-toolbar .search-container input:focus {
-	box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+	width: 220px;
+	border-color: var(--emerald-1);
+	box-shadow: 0 0 15px rgba(0, 255, 106, 0.3), inset 0 0 10px rgba(0, 255, 106, 0.1);
+	background: #000;
 }
 
 .table-toolbar .search-container input::placeholder {
@@ -496,19 +548,36 @@ nav a, .dropdown-toggle, .dropdown-content a {
 
 .table-toolbar .search-icon {
 	position: absolute;
-	right: 12px;
+	left: 18px;
 	top: 50%;
 	transform: translateY(-50%);
-	color: #0f0;
+	color: var(--emerald-1);
 	font-size: 14px;
 	pointer-events: none;
+	filter: drop-shadow(0 0 5px rgba(0, 255, 106, 0.6));
 }
 
-/* Hard override in case another stylesheet forces white inputs */
+/* Hard override */
 #studentsDesktopToolbar .search-container #studentSearchBox {
 	background: rgba(0, 0, 0, 0.5) !important;
-	border: 1px solid #0f0 !important;
-	border-radius: 20px !important;
+	border: 1px solid rgba(0, 255, 106, 0.4) !important;
+	border-radius: 14px !important;
 	color: #fff !important;
-	padding: 8px 35px 8px 15px !important;
+	padding: 10px 40px 10px 16px !important;
+}
+
+/* Custom "Hacker" Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+    background: #004d26;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #00ff6a;
 }
