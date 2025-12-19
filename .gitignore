@@ -15,8 +15,9 @@ composer.phar
 composer-setup.php
 
 # Large folders - user uploads and media files (should not be in version control)
-# uploads/ - user uploads/media (keep out of git)
-uploads/
+# NOTE: uploads/ temporarily REMOVED from gitignore to deploy existing images to production
+# TODO: Implement DigitalOcean Spaces for persistent image storage, then re-add uploads/ to gitignore
+# uploads/ - user uploads/media (TEMPORARILY ENABLED - remove after implementing Spaces)
 # Video/ - large videos (keep out of git)
 Video/
 # Local binaries/tools
