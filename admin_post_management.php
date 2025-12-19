@@ -2,15 +2,29 @@
 require_once 'post_operations.php';
 
 // Detect base path for subdirectory installations (e.g., /Dmarsian/)
+// On production (DigitalOcean), app is at root, so base path should be empty
 function getBasePath() {
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    // Check if we're on DigitalOcean App Platform (production)
+    $isProduction = getenv('APP_ENV') === 'production' || 
+                    getenv('APP_ENV') === 'prod' || 
+                    strpos($_SERVER['HTTP_HOST'] ?? '', 'ondigitalocean.app') !== false ||
+                    strpos($_SERVER['SERVER_NAME'] ?? '', 'ondigitalocean.app') !== false;
     
-    // Extract directory from script name (e.g., /Dmarsian/admin_post_management.php -> /Dmarsian)
-    $scriptDir = dirname($scriptName);
-    if ($scriptDir === '/' || $scriptDir === '\\') {
+    // On production, always use root (no base path)
+    if ($isProduction) {
         return '';
     }
+    
+    // On localhost, detect subdirectory if present
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $scriptDir = dirname($scriptName);
+    
+    // If script is at root, no base path needed
+    if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
+        return '';
+    }
+    
+    // Return the directory path (e.g., /Dmarsian)
     return rtrim($scriptDir, '/\\');
 }
 
@@ -165,7 +179,12 @@ mysqli_close($conn);
                                 if (!preg_match('/^(https?:\/\/|data:)/', $img_path)) {
                                     // Use base path if in subdirectory, otherwise use root-relative path
                                     $clean_path = ltrim($img_path, '/');
-                                    $final_img_path = $basePath . '/' . $clean_path;
+                                    // Ensure we have a leading slash
+                                    if ($basePath === '') {
+                                        $final_img_path = '/' . $clean_path;
+                                    } else {
+                                        $final_img_path = $basePath . '/' . $clean_path;
+                                    }
                                 } else {
                                     $final_img_path = $img_path;
                                 }

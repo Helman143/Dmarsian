@@ -544,7 +544,17 @@ if (empty($heroVideoUrl)) {
     <script src="Scripts/webpage.js"></script>
     <script>
     // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
+    // On production (DigitalOcean), app is at root, so base path should be empty
     const basePath = (function() {
+        // Check if we're on DigitalOcean App Platform (production)
+        const isProduction = window.location.hostname.includes('ondigitalocean.app');
+        
+        // On production, always use root (no base path)
+        if (isProduction) {
+            return '';
+        }
+        
+        // On localhost, detect subdirectory if present
         // Method 1: Try to detect from current page path
         const path = window.location.pathname;
         const pathParts = path.split('/').filter(p => p && p !== 'index.php' && p !== 'webpage.php');
@@ -588,7 +598,12 @@ if (empty($heroVideoUrl)) {
                 if (!post.image_path.match(/^(https?:\/\/|data:)/)) {
                     // Use base path if detected, otherwise use root-relative path
                     const cleanPath = post.image_path.replace(/^\//, '');
-                    imageSrc = (basePath || '') + '/' + cleanPath;
+                    // Ensure we have a leading slash
+                    if (basePath === '') {
+                        imageSrc = '/' + cleanPath;
+                    } else {
+                        imageSrc = basePath + '/' + cleanPath;
+                    }
                 } else {
                     imageSrc = post.image_path;
                 }

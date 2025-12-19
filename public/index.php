@@ -147,6 +147,7 @@ if (file_exists($filePath) && is_file($filePath)) {
         'jpg' => 'image/jpeg',
         'jpeg' => 'image/jpeg',
         'gif' => 'image/gif',
+        'jfif' => 'image/jpeg',
         'svg' => 'image/svg+xml',
         'json' => 'application/json',
         'txt' => 'text/plain',

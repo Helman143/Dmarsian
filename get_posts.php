@@ -74,10 +74,16 @@ try {
             if (strpos($file_path, '/') === 0) {
                 $file_path = substr($file_path, 1);
             }
-            if (!file_exists($file_path)) {
+            
+            // Use absolute path based on script directory for reliable file existence check
+            $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
+            
+            // Check if file exists using both absolute and relative paths
+            if (!file_exists($absolute_path) && !file_exists($file_path)) {
                 // File doesn't exist - set to null so client can use placeholder
                 $post['image_path'] = null;
             }
+            // If file exists, keep the original path (don't modify it)
         } else {
             $post['image_path'] = null;
         }
