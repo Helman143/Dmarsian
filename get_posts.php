@@ -65,6 +65,26 @@ try {
     }
     
     // Validate and fix image paths - check if files exist
+    // #region agent log
+    $log_file = __DIR__ . '/.cursor/debug.log';
+    $isProduction = strpos($_SERVER['HTTP_HOST'] ?? '', 'ondigitalocean.app') !== false;
+    $log_entry = json_encode([
+        'id' => 'log_' . time() . '_' . uniqid(),
+        'timestamp' => round(microtime(true) * 1000),
+        'location' => 'get_posts.php:67',
+        'message' => 'Starting image path validation',
+        'data' => [
+            'isProduction' => $isProduction,
+            'http_host' => $_SERVER['HTTP_HOST'] ?? 'unknown',
+            'script_dir' => __DIR__,
+            'post_count' => count($posts),
+            'hypothesisId' => 'H'
+        ],
+        'sessionId' => 'debug-session',
+        'runId' => 'run4'
+    ]) . "\n";
+    @file_put_contents($log_file, $log_entry, FILE_APPEND);
+    // #endregion
     foreach ($posts as &$post) {
         if (!empty($post['image_path']) && trim($post['image_path']) !== '') {
             $img_path = trim($post['image_path']);
@@ -78,10 +98,66 @@ try {
             // Use absolute path based on script directory for reliable file existence check
             $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
             
+            // #region agent log
+            $relative_exists = file_exists($file_path);
+            $absolute_exists = file_exists($absolute_path);
+            $log_entry = json_encode([
+                'id' => 'log_' . time() . '_' . uniqid(),
+                'timestamp' => round(microtime(true) * 1000),
+                'location' => 'get_posts.php:95',
+                'message' => 'File existence check',
+                'data' => [
+                    'post_id' => $post['id'],
+                    'original_image_path' => $post['image_path'],
+                    'file_path_relative' => $file_path,
+                    'file_path_absolute' => $absolute_path,
+                    'exists_relative' => $relative_exists,
+                    'exists_absolute' => $absolute_exists,
+                    'hypothesisId' => 'H'
+                ],
+                'sessionId' => 'debug-session',
+                'runId' => 'run4'
+            ]) . "\n";
+            @file_put_contents($log_file, $log_entry, FILE_APPEND);
+            // #endregion
+            
             // Check if file exists using both absolute and relative paths
             if (!file_exists($absolute_path) && !file_exists($file_path)) {
+                // #region agent log
+                $log_entry = json_encode([
+                    'id' => 'log_' . time() . '_' . uniqid(),
+                    'timestamp' => round(microtime(true) * 1000),
+                    'location' => 'get_posts.php:120',
+                    'message' => 'File not found - setting to null',
+                    'data' => [
+                        'post_id' => $post['id'],
+                        'checked_paths' => [$file_path, $absolute_path],
+                        'hypothesisId' => 'H'
+                    ],
+                    'sessionId' => 'debug-session',
+                    'runId' => 'run4'
+                ]) . "\n";
+                @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                // #endregion
                 // File doesn't exist - set to null so client can use placeholder
                 $post['image_path'] = null;
+            } else {
+                // #region agent log
+                $log_entry = json_encode([
+                    'id' => 'log_' . time() . '_' . uniqid(),
+                    'timestamp' => round(microtime(true) * 1000),
+                    'location' => 'get_posts.php:135',
+                    'message' => 'File found - keeping path',
+                    'data' => [
+                        'post_id' => $post['id'],
+                        'final_image_path' => $post['image_path'],
+                        'hypothesisId' => 'H'
+                    ],
+                    'sessionId' => 'debug-session',
+                    'runId' => 'run4'
+                ]) . "\n";
+                @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                // #endregion
             }
             // If file exists, keep the original path (don't modify it)
         } else {

@@ -549,8 +549,15 @@ if (empty($heroVideoUrl)) {
         // Check if we're on DigitalOcean App Platform (production)
         const isProduction = window.location.hostname.includes('ondigitalocean.app');
         
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePath',message:'Base path detection',data:{isProduction:isProduction,hostname:window.location.hostname,pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
+        
         // On production, always use root (no base path)
         if (isProduction) {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathProd',message:'Production detected - using empty basePath',data:{basePath:''},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+            // #endregion
             return '';
         }
         
@@ -562,6 +569,9 @@ if (empty($heroVideoUrl)) {
         // If we're in a subdirectory (e.g., /Dmarsian/webpage.php), extract it
         if (pathParts.length > 0) {
             const potentialBase = '/' + pathParts[0];
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathLocal',message:'Localhost subdirectory detected',data:{basePath:potentialBase},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+            // #endregion
             return potentialBase;
         }
         
@@ -576,8 +586,15 @@ if (empty($heroVideoUrl)) {
             }
         }
         
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathEmpty',message:'No base path detected - using empty',data:{basePath:''},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
         return '';
     })();
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathFinal',message:'Final base path',data:{basePath:basePath},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+    // #endregion
     
     function renderSlider(posts, sliderId) {
         const slider = document.getElementById(sliderId);
@@ -594,6 +611,9 @@ if (empty($heroVideoUrl)) {
             
             // Check if we have a valid image path
             if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
+                // #region agent log
+                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:imageProcessing',message:'Processing image path',data:{post_id:post.id,original_path:post.image_path,basePath:basePath},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+                // #endregion
                 // Ensure path starts with / for absolute path (if not already a full URL)
                 if (!post.image_path.match(/^(https?:\/\/|data:)/)) {
                     // Use base path if detected, otherwise use root-relative path
@@ -604,10 +624,17 @@ if (empty($heroVideoUrl)) {
                     } else {
                         imageSrc = basePath + '/' + cleanPath;
                     }
+                    // #region agent log
+                    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:imagePathConstructed',message:'Image path constructed',data:{post_id:post.id,final_imageSrc:imageSrc,hasImage:true},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+                    // #endregion
                 } else {
                     imageSrc = post.image_path;
                 }
                 hasImage = true;
+            } else {
+                // #region agent log
+                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:noImagePath',message:'No image path in post',data:{post_id:post.id,image_path:post.image_path},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
+                // #endregion
             }
             
             return (

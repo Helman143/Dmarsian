@@ -30,6 +30,25 @@ function getBasePath() {
 
 $basePath = getBasePath();
 
+// #region agent log
+$log_file = __DIR__ . '/.cursor/debug.log';
+$log_entry = json_encode([
+    'id' => 'log_' . time() . '_' . uniqid(),
+    'timestamp' => round(microtime(true) * 1000),
+    'location' => 'post_management.php:30',
+    'message' => 'Base path detection',
+    'data' => [
+        'basePath' => $basePath,
+        'http_host' => $_SERVER['HTTP_HOST'] ?? 'unknown',
+        'script_name' => $_SERVER['SCRIPT_NAME'] ?? 'unknown',
+        'hypothesisId' => 'H'
+    ],
+    'sessionId' => 'debug-session',
+    'runId' => 'run4'
+]) . "\n";
+@file_put_contents($log_file, $log_entry, FILE_APPEND);
+// #endregion
+
 // Fetch posts for display
 $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
@@ -185,10 +204,47 @@ mysqli_close($conn);
                                     } else {
                                         $final_img_path = $basePath . '/' . $clean_path;
                                     }
+                                    // #region agent log
+                                    $log_entry = json_encode([
+                                        'id' => 'log_' . time() . '_' . uniqid(),
+                                        'timestamp' => round(microtime(true) * 1000),
+                                        'location' => 'post_management.php:190',
+                                        'message' => 'Image path constructed',
+                                        'data' => [
+                                            'post_id' => $post['id'],
+                                            'original_path' => $img_path,
+                                            'basePath' => $basePath,
+                                            'final_img_path' => $final_img_path,
+                                            'has_image' => true,
+                                            'hypothesisId' => 'H'
+                                        ],
+                                        'sessionId' => 'debug-session',
+                                        'runId' => 'run4'
+                                    ]) . "\n";
+                                    @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                    // #endregion
                                 } else {
                                     $final_img_path = $img_path;
                                 }
                                 $has_image = true;
+                            } else {
+                                // #region agent log
+                                $log_entry = json_encode([
+                                    'id' => 'log_' . time() . '_' . uniqid(),
+                                    'timestamp' => round(microtime(true) * 1000),
+                                    'location' => 'post_management.php:210',
+                                    'message' => 'File not found in rendering',
+                                    'data' => [
+                                        'post_id' => $post['id'],
+                                        'checked_paths' => [$file_path, $absolute_path],
+                                        'has_image' => false,
+                                        'hypothesisId' => 'H'
+                                    ],
+                                    'sessionId' => 'debug-session',
+                                    'runId' => 'run4'
+                                ]) . "\n";
+                                @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                // #endregion
                             }
                         }
                         
