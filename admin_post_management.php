@@ -1,6 +1,21 @@
 <?php
 require_once 'post_operations.php';
 
+// Detect base path for subdirectory installations (e.g., /Dmarsian/)
+function getBasePath() {
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    
+    // Extract directory from script name (e.g., /Dmarsian/admin_post_management.php -> /Dmarsian)
+    $scriptDir = dirname($scriptName);
+    if ($scriptDir === '/' || $scriptDir === '\\') {
+        return '';
+    }
+    return rtrim($scriptDir, '/\\');
+}
+
+$basePath = getBasePath();
+
 // Fetch posts for display
 $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
@@ -42,11 +57,16 @@ foreach ($posts as &$post) {
         if (strpos($file_path, '/') === 0) {
             $file_path = substr($file_path, 1);
         }
-        // Check if file exists
-        if (!file_exists($file_path)) {
+        
+        // Use absolute path based on script directory for reliable file existence check
+        $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
+        
+        // Check if file exists using both absolute and relative paths
+        if (!file_exists($absolute_path) && !file_exists($file_path)) {
             // File doesn't exist - set to null (will show placeholder)
             $post['image_path'] = null;
         }
+        // If file exists, keep the original path (don't modify it)
     } else {
         $post['image_path'] = null;
     }
@@ -120,38 +140,47 @@ mysqli_close($conn);
                     </div>
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
+                        <?php
+                        // Initialize $has_image before using it
+                        $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
+                        $has_image = false;
+                        $final_img_path = '';
+                        
+                        // Check if we have a valid image path
+                        if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
+                            $img_path = trim($img_path_value);
+                            
+                            // Verify file exists - use absolute path for reliability
+                            $file_path = $img_path;
+                            // Remove leading / for file system check if present
+                            if (strpos($file_path, '/') === 0) {
+                                $file_path = substr($file_path, 1);
+                            }
+                            
+                            // Use absolute path based on script directory
+                            $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
+                            
+                            if (file_exists($absolute_path) || file_exists($file_path)) {
+                                // File exists - ensure path starts with / for web URL (if not already a full URL)
+                                if (!preg_match('/^(https?:\/\/|data:)/', $img_path)) {
+                                    // Use base path if in subdirectory, otherwise use root-relative path
+                                    $clean_path = ltrim($img_path, '/');
+                                    $final_img_path = $basePath . '/' . $clean_path;
+                                } else {
+                                    $final_img_path = $img_path;
+                                }
+                                $has_image = true;
+                            }
+                        }
+                        
+                        // If no image, use placeholder
+                        if (!$has_image) {
+                            $final_img_path = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E";
+                        }
+                        ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
-                            <div class="post-image <?php echo $has_image ? '' : 'no-image'; ?>" style="background-image: url('<?php 
-                                // Check if image_path exists and is not empty (handle both NULL and empty string)
-                                $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
-                                $has_image = false;
-                                
-                                // Check if we have a valid image path
-                                if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
-                                    $img_path = trim($img_path_value);
-                                    
-                                    // Verify file exists BEFORE normalizing path (use original path format)
-                                    $file_path = $img_path;
-                                    // Remove leading / for file system check if present
-                                    if (strpos($file_path, '/') === 0) {
-                                        $file_path = substr($file_path, 1);
-                                    }
-                                    
-                                    if (file_exists($file_path)) {
-                                        // File exists - ensure path starts with / for absolute path (if not already a full URL)
-                                        if (!preg_match('/^(https?:\/\/|\/)/', $img_path)) {
-                                            $img_path = '/' . ltrim($img_path, '/');
-                                        }
-                                        $has_image = true;
-                                        echo htmlspecialchars($img_path);
-                                    }
-                                }
-                                
-                                // If no image, don't set background-image (will show placeholder text)
-                                if (!$has_image) {
-                                    echo "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E";
-                                }
-                            ?>'); background-color: #2d2d2d; background-size: cover; background-position: center;">
+                            <div class="post-image <?php echo $has_image ? '' : 'no-image'; ?>" style="background-image: url('<?php echo htmlspecialchars($final_img_path); ?> 
+'); background-color: #2d2d2d; background-size: cover; background-position: center;">
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">

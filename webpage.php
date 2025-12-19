@@ -543,6 +543,32 @@ if (empty($heroVideoUrl)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="Scripts/webpage.js"></script>
     <script>
+    // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
+    const basePath = (function() {
+        // Method 1: Try to detect from current page path
+        const path = window.location.pathname;
+        const pathParts = path.split('/').filter(p => p && p !== 'index.php' && p !== 'webpage.php');
+        
+        // If we're in a subdirectory (e.g., /Dmarsian/webpage.php), extract it
+        if (pathParts.length > 0) {
+            const potentialBase = '/' + pathParts[0];
+            return potentialBase;
+        }
+        
+        // Method 2: Try to detect from script src
+        const scripts = document.getElementsByTagName('script');
+        for (let script of scripts) {
+            if (script.src && script.src.includes(window.location.hostname)) {
+                const match = script.src.match(/^(https?:\/\/[^\/]+)(\/[^\/]+)/);
+                if (match && match[2] && match[2] !== '/') {
+                    return match[2];
+                }
+            }
+        }
+        
+        return '';
+    })();
+    
     function renderSlider(posts, sliderId) {
         const slider = document.getElementById(sliderId);
         if (!slider) return;
@@ -557,10 +583,12 @@ if (empty($heroVideoUrl)) {
             let hasImage = false;
             
             // Check if we have a valid image path
-            if (post.image_path && post.image_path.trim() !== '') {
+            if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
                 // Ensure path starts with / for absolute path (if not already a full URL)
                 if (!post.image_path.match(/^(https?:\/\/|data:)/)) {
-                    imageSrc = '/' + post.image_path.replace(/^\//, '');
+                    // Use base path if detected, otherwise use root-relative path
+                    const cleanPath = post.image_path.replace(/^\//, '');
+                    imageSrc = (basePath || '') + '/' + cleanPath;
                 } else {
                     imageSrc = post.image_path;
                 }
@@ -883,7 +911,9 @@ if (empty($heroVideoUrl)) {
         }
         // Ensure path starts with / for absolute path (if not already a full URL)
         if (!imgSrc.match(/^(https?:\/\/|data:)/)) {
-            imgSrc = '/' + imgSrc.replace(/^\//, '');
+            // Use base path if detected, otherwise use root-relative path
+            const cleanPath = imgSrc.replace(/^\//, '');
+            imgSrc = (typeof basePath !== 'undefined' ? basePath : '') + '/' + cleanPath;
         }
         return imgSrc;
     }
