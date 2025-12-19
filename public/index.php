@@ -166,7 +166,7 @@ if (file_exists($filePath) && is_file($filePath)) {
     header('Content-Type: ' . $mimeType);
     
     // Set cache headers for static files
-    if (in_array($extension, ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2', 'ttf', 'eot'])) {
+    if (in_array($extension, ['css', 'js', 'png', 'jpg', 'jpeg', 'jfif', 'gif', 'svg', 'woff', 'woff2', 'ttf', 'eot'])) {
         header('Cache-Control: public, max-age=31536000');
     }
     
