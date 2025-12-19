@@ -1,6 +1,7 @@
 <?php
 require_once 'db_connect.php';
 require_once 'auth_helpers.php';
+require_once 'spaces_helper.php';
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,29 +41,22 @@ function createPost() {
     $upload_error = '';
     
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/posts/';
-        if (!file_exists($upload_dir)) {
-            if (!mkdir($upload_dir, 0777, true)) {
-                $upload_error = 'Failed to create upload directory';
-            }
-        }
+        $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'jfif'];
         
-        if (empty($upload_error)) {
-            $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'jfif'];
+        if (in_array($file_extension, $allowed_extensions)) {
+            $file_name = uniqid() . '.' . $file_extension;
             
-            if (in_array($file_extension, $allowed_extensions)) {
-                $file_name = uniqid() . '.' . $file_extension;
-                $upload_path = $upload_dir . $file_name;
-                
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-                    $image_path = $upload_path;
-                } else {
-                    $upload_error = 'Failed to move uploaded file';
-                }
+            // Upload to Spaces (or local fallback)
+            $uploadResult = uploadImageToSpaces($_FILES['image']['tmp_name'], $file_name, 'posts');
+            
+            if ($uploadResult['success']) {
+                $image_path = $uploadResult['path'];
             } else {
-                $upload_error = 'Invalid file type. Allowed: ' . implode(', ', $allowed_extensions);
+                $upload_error = $uploadResult['error'] ?? 'Failed to upload image';
             }
+        } else {
+            $upload_error = 'Invalid file type. Allowed: ' . implode(', ', $allowed_extensions);
         }
     } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
         // File upload error (but not "no file" error)
@@ -80,13 +74,6 @@ function createPost() {
     // If there was an upload error and an image was attempted, fail the operation
     if (!empty($upload_error) && isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
         echo json_encode(['success' => false, 'message' => 'Image upload failed: ' . $upload_error]);
-        mysqli_close($conn);
-        return;
-    }
-    
-    // Verify uploaded file exists if image_path is set
-    if ($image_path !== null && !file_exists($image_path)) {
-        echo json_encode(['success' => false, 'message' => 'Uploaded file not found. Please try again.']);
         mysqli_close($conn);
         return;
     }
@@ -117,9 +104,9 @@ function createPost() {
         }
         echo json_encode(['success' => true, 'message' => $message, 'image_path' => $image_path]);
     } else {
-        // If database insert fails, delete the uploaded file if it exists
-        if ($image_path !== null && file_exists($image_path)) {
-            @unlink($image_path);
+        // If database insert fails, delete the uploaded file
+        if ($image_path !== null) {
+            deleteImageFromSpaces($image_path);
         }
         echo json_encode(['success' => false, 'message' => 'Error creating post: ' . mysqli_error($conn)]);
     }
@@ -138,38 +125,47 @@ function updatePost() {
     $post_date = mysqli_real_escape_string($conn, $_POST['post_date']);
     $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] == '1';
     
+    // Get old image path for deletion
+    $old_image_path = null;
+    $getOldImage = mysqli_prepare($conn, "SELECT image_path FROM posts WHERE id = ?");
+    mysqli_stmt_bind_param($getOldImage, "i", $id);
+    mysqli_stmt_execute($getOldImage);
+    $oldImageResult = mysqli_stmt_get_result($getOldImage);
+    if ($oldImageRow = mysqli_fetch_assoc($oldImageResult)) {
+        $old_image_path = $oldImageRow['image_path'];
+    }
+    mysqli_stmt_close($getOldImage);
+    
     // Handle image upload or removal
     $image_path = null;
     $update_image = false;
     
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         // New image uploaded
-        $upload_dir = 'uploads/posts/';
-        if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-        
-        $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
         $file_name = uniqid() . '.' . $file_extension;
-        $upload_path = $upload_dir . $file_name;
         
-        if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-            // Verify file actually exists after upload
-            if (file_exists($upload_path)) {
-                $image_path = $upload_path;
-                $update_image = true;
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Uploaded file not found. Please try again.']);
-                mysqli_close($conn);
-                return;
+        // Upload to Spaces (or local fallback)
+        $uploadResult = uploadImageToSpaces($_FILES['image']['tmp_name'], $file_name, 'posts');
+        
+        if ($uploadResult['success']) {
+            $image_path = $uploadResult['path'];
+            $update_image = true;
+            
+            // Delete old image if exists
+            if ($old_image_path) {
+                deleteImageFromSpaces($old_image_path);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to move uploaded file. Please check permissions.']);
+            echo json_encode(['success' => false, 'message' => 'Failed to upload image: ' . ($uploadResult['error'] ?? 'Unknown error')]);
             mysqli_close($conn);
             return;
         }
     } elseif ($remove_image) {
-        // Image should be removed - set to NULL in database
+        // Image should be removed
+        if ($old_image_path) {
+            deleteImageFromSpaces($old_image_path);
+        }
         $image_path = null;
         $update_image = true;
     }
