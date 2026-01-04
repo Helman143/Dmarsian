@@ -45,6 +45,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <div class="main-content">
             <div class="collection-header">
                 <h1>Collection</h1>
+                <!-- Deployment: 2025-01-27 -->
             </div>
 
             <!-- Collection Stats -->

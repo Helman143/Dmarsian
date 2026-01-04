@@ -21,6 +21,7 @@ ini_set('display_errors', 1);
                 <img src="Picture/Logo2.png" alt="Logo">
             </div>
             <h2>SUPER ADMIN LOGIN</h2>
+            <!-- Deployment: 2025-01-27 -->
             <?php if (isset($_GET['error'])): ?>
                 <?php if ($_GET['error'] == 1): ?>
                     <p class="error-message">Invalid username/email or password</p>
@@ -33,11 +34,11 @@ ini_set('display_errors', 1);
             <form action="login_process.php" method="POST">
                 <input type="hidden" name="login_type" value="admin">
                 <div class="input-group">
-                    <input id="username" type="text" name="username" required>
+                    <input id="username" type="text" name="username" placeholder=" " required>
                     <label>Username or Email</label>
                 </div>
                 <div class="input-group">
-                    <input id="password" type="password" name="password" required>
+                    <input id="password" type="password" name="password" placeholder=" " required>
                     <label>Password</label>
                     <button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false">
                         <span class="eye eye-open" aria-hidden="true">
@@ -54,14 +55,10 @@ ini_set('display_errors', 1);
                 </div>
                 <button type="submit" class="login-btn">LOGIN</button>
             </form>
-            <div style="margin-top:12px;text-align:center">
-                <a href="forgot_admin_password.php" style="text-decoration:none;color:#1976d2">Forgot password?</a>
-            </div>
-            <div style="margin-top:8px;text-align:center;font-size:12px">
-                <a href="create_new_admin.php" style="text-decoration:none;color:#28a745">➕ Create New Admin Account</a>
-            </div>
-            <div style="margin-top:8px;text-align:center;font-size:12px">
-                <a href="diagnose_admin_login.php" style="text-decoration:none;color:#888">🔧 Troubleshoot Login Issues</a>
+            <div class="admin-links">
+                <a href="forgot_admin_password.php">Forgot password?</a>
+                <a href="create_new_admin.php">➕ Create New Admin Account</a>
+                <a href="diagnose_admin_login.php">🔧 Troubleshoot Login Issues</a>
             </div>
         </div>
     </div>
