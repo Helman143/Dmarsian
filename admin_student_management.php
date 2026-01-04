@@ -65,21 +65,21 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                             </div>
                             
                             <div class="form-group">
+                                <label>Gender</label>
+                                <select name="gender" required>
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
                                 <label>School</label>
                                 <select name="school" required>
                                     <option value="">Select</option>
                                     <option value="SCC">SCC</option>
                                     <option value="ZSSAT">ZSSAT</option>
                                     <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Gender</label>
-                                <select name="gender" required>
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
                                 </select>
                             </div>
                             
@@ -158,20 +158,16 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                     <!-- Action Buttons -->
                     <div class="form-actions">
                         <button type="submit" class="btn btn-save">
-                            <i class="fas fa-save"></i>
-                            <span>SAVE</span>
+                            <span class="btn-content"><i class="fas fa-save"></i><span>SAVE</span></span>
                         </button>       
                         <button type="submit" class="btn btn-update">
-                            <i class="fas fa-sync-alt"></i>
-                            <span>UPDATE</span>
+                            <span class="btn-content"><i class="fas fa-sync-alt"></i><span>UPDATE</span></span>
                         </button>
                         <button type="reset" class="btn btn-clear">
-                            <i class="fas fa-eraser"></i>
-                            <span>CLEAR</span>
+                            <span class="btn-content"><i class="fas fa-eraser"></i><span>CLEAR</span></span>
                         </button>
                         <button type="button" class="btn btn-export">
-                            <i class="fas fa-file-export"></i>
-                            <span>EXPORT</span>
+                            <span class="btn-content"><i class="fas fa-file-export"></i><span>EXPORT</span></span>
                         </button>
                     </div>
                 </form>
@@ -192,7 +188,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             <!-- Mobile card list (visible on xs/sm only) -->
             <div id="adminStudentCardList" class="student-card-list d-md-none"></div>
  
-            <div class="table-container table-responsive d-none d-md-block">
+            <div class="table-container table-responsive enrollees-card">
                 <div id="adminStudentsDesktopToolbar" class="d-none d-md-flex justify-content-end align-items-center gap-2 table-toolbar">
                     <div class="search-container">
                         <input type="text" id="adminStudentSearchBox" placeholder="Search students...">
@@ -494,15 +490,21 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     // Load students when the page loads
     document.addEventListener('DOMContentLoaded', loadStudents);
 
-    // Desktop search: filter by STD No., Name, Phone, Email, or Status (admin)
+    // Desktop search: filter by STD No., Name, Gender, or Status
     function applyAdminDesktopSearch(term) {
         const searchTerm = (term || '').toLowerCase();
         const tbody = document.getElementById('studentTableBody');
         if (!tbody) return;
         const rows = tbody.querySelectorAll('tr');
         rows.forEach(tr => {
-            const text = tr.textContent.toLowerCase();
-            tr.style.display = !searchTerm || text.includes(searchTerm) ? '' : 'none';
+            const cells = tr.querySelectorAll('td');
+            const stdNo = (cells[0]?.textContent || '').toLowerCase();
+            const name = (cells[2]?.textContent || '').toLowerCase();
+            const gender = (cells[6]?.textContent || '').toLowerCase();
+            const statusCell = tr.querySelector('td[class^="status-"]');
+            const status = (statusCell?.textContent || '').toLowerCase();
+            const matches = !searchTerm || [stdNo, name, gender, status].some(v => v.includes(searchTerm));
+            tr.style.display = matches ? '' : 'none';
         });
     }
 
