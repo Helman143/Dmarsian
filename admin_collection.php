@@ -13,20 +13,19 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <title>D'MARSIANS Taekwondo System - Admin Collection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="Styles/admin_collection.css">
+    <link rel="stylesheet" href="Styles/sidebar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+Pro:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Styles/typography.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .transaction-table table th:first-child,
         .transaction-table table td:first-child {
             display: none;
         }
     </style>
-    <!-- Keep sidebar.css last so it can override page-specific sidebar/logo styles -->
-    <link rel="stylesheet" href="Styles/sidebar.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -109,7 +108,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-    // Mobile-safe dropdown: avoid touch+click double-trigger
+    // Mobile-safe dropdown: avoid touch+click double-trigger, mirror admin_payment sidebar
     (function(){
         const dropdown = document.querySelector('.sidebar .dropdown');
         const toggle = dropdown ? dropdown.querySelector('.dropdown-toggle') : null;
