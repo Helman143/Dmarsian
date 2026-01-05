@@ -602,7 +602,7 @@ if (empty($heroVideoUrl)) {
         const track = slider.querySelector('[data-slider-track]');
         if (!track) return;
 
-        const cardsHtml = posts.map((post) => {
+        const cardsHtml = posts.map((post, index) => {
             // Create SVG data URI placeholder that always works
             const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
             
@@ -611,9 +611,6 @@ if (empty($heroVideoUrl)) {
             
             // Check if we have a valid image path
             if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
-                // #region agent log
-                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:imageProcessing',message:'Processing image path',data:{post_id:post.id,original_path:post.image_path,basePath:basePath},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-                // #endregion
                 // Ensure path starts with / for absolute path (if not already a full URL)
                 if (!post.image_path.match(/^(https?:\/\/|data:)/)) {
                     // Use base path if detected, otherwise use root-relative path
@@ -624,35 +621,53 @@ if (empty($heroVideoUrl)) {
                     } else {
                         imageSrc = basePath + '/' + cleanPath;
                     }
-                    // #region agent log
-                    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:imagePathConstructed',message:'Image path constructed',data:{post_id:post.id,final_imageSrc:imageSrc,hasImage:true},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-                    // #endregion
                 } else {
                     imageSrc = post.image_path;
                 }
                 hasImage = true;
+            }
+            
+            // Determine initial slider class based on index (for 3D Coverflow effect)
+            // First card: active, Second card: next, Others: hidden
+            let sliderClass = '';
+            if (index === 0) {
+                sliderClass = 'active';
+            } else if (index === 1) {
+                sliderClass = 'next';
             } else {
-                // #region agent log
-                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:noImagePath',message:'No image path in post',data:{post_id:post.id,image_path:post.image_path},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-                // #endregion
+                sliderClass = 'hidden';
             }
             
             return (
-                `<article class="slide-card post-card">`
+                `<article class="slide-card post-card ${sliderClass}">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title}" onerror="this.onerror=null; this.src='${placeholderSvg}'; this.style.backgroundColor='#2d2d2d';" loading="lazy" style="background-color: #2d2d2d;">`
+              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="this.onerror=null; this.src='${placeholderSvg}'; this.style.backgroundColor='#2d2d2d';" loading="lazy" style="background-color: #2d2d2d;">`
               +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
               +   `<div class="card-body">`
-              +     `<h5 class="card-title">${post.title}</h5>`
-              +     `<p class="card-text small mb-0">${post.description ?? ''}</p>`
+              +     `<h5 class="card-title">${post.title || 'Untitled'}</h5>`
+              +     `<p class="card-text small mb-0">${post.description || ''}</p>`
               +     `<button type="button" class="see-more">See more</button>`
               +   `</div>`
               + `</article>`
             );
         }).join('');
         track.innerHTML = cardsHtml;
+
+        // Set initial z-index values for 3D Coverflow effect (for achievements and events sliders)
+        if (sliderId === 'achievements-slider' || sliderId === 'events-slider') {
+            const cards = Array.from(track.querySelectorAll('.slide-card'));
+            cards.forEach((card, index) => {
+                if (card.classList.contains('active')) {
+                    card.style.zIndex = '10';
+                } else if (card.classList.contains('next')) {
+                    card.style.zIndex = '5';
+                } else {
+                    card.style.zIndex = '0';
+                }
+            });
+        }
 
         // open modal when any part of a card is clicked (event delegation)
         if (!track._postClickBound) {
