@@ -609,8 +609,10 @@ if (empty($heroVideoUrl)) {
         const cardsHtml = posts.map((post, index) => {
             // Create SVG data URI placeholder that always works
             const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
-            // Fallback placeholder image path
-            const placeholderImagePath = (typeof basePath !== 'undefined' ? basePath : '') + '/Picture/Logo2.png';
+            // Fallback placeholder image path - try Picture/placeholder.png first, then Logo2.png
+            const base = (typeof basePath !== 'undefined' ? basePath : '');
+            const placeholderImagePath = base + '/Picture/placeholder.png';
+            const fallbackPlaceholderPath = base + '/Picture/Logo2.png';
             
             let imageSrc = placeholderSvg;
             let hasImage = false;
@@ -623,14 +625,19 @@ if (empty($heroVideoUrl)) {
                     hasImage = true;
                 } else {
                     // Handle local paths (uploads/posts/filename.png)
-                    // Paths from database are like "uploads/posts/filename.png" (no leading slash)
-                    // They need to be accessible from the root
+                    // Paths from database might be:
+                    // - "uploads/posts/filename.png" (root level)
+                    // - "admin/uploads/posts/filename.png" (admin folder)
+                    // - "/uploads/posts/filename.png" (with leading slash)
                     let cleanPath = post.image_path.trim();
                     
                     // Remove leading slash if present (normalize)
                     if (cleanPath.startsWith('/')) {
                         cleanPath = cleanPath.substring(1);
                     }
+                    
+                    // Check if path already includes 'admin/' prefix
+                    const hasAdminPrefix = cleanPath.startsWith('admin/');
                     
                     // Build the full path with basePath if needed
                     if (basePath && basePath !== '') {
@@ -639,7 +646,15 @@ if (empty($heroVideoUrl)) {
                         imageSrc = base + '/' + cleanPath;
                     } else {
                         // Root-relative path (starts with /)
-                        imageSrc = '/' + cleanPath;
+                        // If path doesn't have admin prefix, we'll try root first
+                        // The error handler will fallback to admin/ if root fails
+                        if (!hasAdminPrefix && cleanPath.startsWith('uploads/')) {
+                            // Try root/uploads/ first, error handler will try admin/uploads/ if it fails
+                            imageSrc = '/' + cleanPath;
+                        } else {
+                            // Path already has admin prefix or different structure
+                            imageSrc = '/' + cleanPath;
+                        }
                     }
                     hasImage = true;
                 }
@@ -656,10 +671,20 @@ if (empty($heroVideoUrl)) {
                 sliderClass = 'hidden';
             }
             
+            // Image error handler: try admin path, then placeholder.png, then Logo2.png, then SVG
+            // Build admin path if original is root/uploads/
+            let adminPath = '';
+            if (hasImage && imageSrc.includes('/uploads/') && !imageSrc.includes('/admin/')) {
+                adminPath = imageSrc.replace('/uploads/', '/admin/uploads/');
+            }
+            
+            // Create error handler with proper escaping
+            const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0&&'${adminPath}'){img.src='${adminPath}';img.dataset.tries='1';}else if(tries<=1){img.src='${placeholderImagePath}';img.dataset.tries='2';}else if(tries==2){img.src='${fallbackPlaceholderPath}';img.dataset.tries='3';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
+            
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="this.onerror=null;this.src='${placeholderImagePath}';this.onerror=function(){this.onerror=null;this.src='${placeholderSvg}';this.style.backgroundColor='#2d2d2d';};" loading="lazy" style="background-color: #2d2d2d;">`
+              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="${imageErrorHandler}(this)" loading="lazy" style="background-color: #2d2d2d;">`
               +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
@@ -926,17 +951,20 @@ if (empty($heroVideoUrl)) {
                 return;
             }
             renderSlider(posts, 'achievements-slider');
-            // Initialize coverflow carousel after DOM is fully updated (double RAF for safety)
+            // Initialize coverflow carousel after DOM is fully updated
+            // Use triple requestAnimationFrame to ensure all rendering is complete
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    const slider = document.getElementById('achievements-slider');
-                    const track = slider ? slider.querySelector('.slider-track') : null;
-                    if (track) {
-                        const cards = Array.from(track.querySelectorAll('.slide-card'));
-                        if (cards.length > 0) {
-                            setupCoverflowCarousel(slider, track, cards);
+                    requestAnimationFrame(() => {
+                        const slider = document.getElementById('achievements-slider');
+                        const track = slider ? slider.querySelector('.slider-track') : null;
+                        if (track) {
+                            const cards = Array.from(track.querySelectorAll('.slide-card'));
+                            if (cards.length > 0) {
+                                setupCoverflowCarousel(slider, track, cards);
+                            }
                         }
-                    }
+                    });
                 });
             });
         })
@@ -953,17 +981,20 @@ if (empty($heroVideoUrl)) {
                 return;
             }
             renderSlider(posts, 'events-slider');
-            // Initialize coverflow carousel after DOM is fully updated (double RAF for safety)
+            // Initialize coverflow carousel after DOM is fully updated
+            // Use triple requestAnimationFrame to ensure all rendering is complete
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    const slider = document.getElementById('events-slider');
-                    const track = slider ? slider.querySelector('.slider-track') : null;
-                    if (track) {
-                        const cards = Array.from(track.querySelectorAll('.slide-card'));
-                        if (cards.length > 0) {
-                            setupCoverflowCarousel(slider, track, cards);
+                    requestAnimationFrame(() => {
+                        const slider = document.getElementById('events-slider');
+                        const track = slider ? slider.querySelector('.slider-track') : null;
+                        if (track) {
+                            const cards = Array.from(track.querySelectorAll('.slide-card'));
+                            if (cards.length > 0) {
+                                setupCoverflowCarousel(slider, track, cards);
+                            }
                         }
-                    }
+                    });
                 });
             });
         })
