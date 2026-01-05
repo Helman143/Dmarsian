@@ -659,7 +659,7 @@ if (empty($heroVideoUrl)) {
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="this.onerror=null; this.src='${placeholderImagePath}'; this.onerror=function(){this.src='${placeholderSvg}'; this.onerror=null;}; this.style.backgroundColor='#2d2d2d';" loading="lazy" style="background-color: #2d2d2d;">`
+              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="this.onerror=null;this.src='${placeholderImagePath}';this.onerror=function(){this.onerror=null;this.src='${placeholderSvg}';this.style.backgroundColor='#2d2d2d';};" loading="lazy" style="background-color: #2d2d2d;">`
               +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
