@@ -23,9 +23,13 @@ try {
     $category = isset($_GET['category']) ? $_GET['category'] : '';
     $year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 
-    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND (status = 'active' OR status IS NULL)";
-    $params = [$year];
-    $types = "i";
+    // Show posts from current year and previous year (last 2 years)
+    $currentYear = date('Y');
+    $previousYear = $currentYear - 1;
+    
+    $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND (status = 'active' OR status IS NULL)";
+    $params = [$currentYear, $previousYear];
+    $types = "ii";
 
     if ($category) {
         if ($category === 'achievement') {
