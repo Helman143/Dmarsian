@@ -625,10 +625,8 @@ if (empty($heroVideoUrl)) {
                     hasImage = true;
                 } else {
                     // Handle local paths (uploads/posts/filename.png)
-                    // Paths from database might be:
-                    // - "uploads/posts/filename.png" (root level)
-                    // - "admin/uploads/posts/filename.png" (admin folder)
-                    // - "/uploads/posts/filename.png" (with leading slash)
+                    // Paths from database are like "uploads/posts/filename.png"
+                    // MUST be changed to "admin/uploads/posts/filename.png"
                     let cleanPath = post.image_path.trim();
                     
                     // Remove leading slash if present (normalize)
@@ -636,8 +634,10 @@ if (empty($heroVideoUrl)) {
                         cleanPath = cleanPath.substring(1);
                     }
                     
-                    // Check if path already includes 'admin/' prefix
-                    const hasAdminPrefix = cleanPath.startsWith('admin/');
+                    // If path starts with 'uploads/', prepend 'admin/'
+                    if (cleanPath.startsWith('uploads/')) {
+                        cleanPath = 'admin/' + cleanPath;
+                    }
                     
                     // Build the full path with basePath if needed
                     if (basePath && basePath !== '') {
@@ -646,15 +646,7 @@ if (empty($heroVideoUrl)) {
                         imageSrc = base + '/' + cleanPath;
                     } else {
                         // Root-relative path (starts with /)
-                        // If path doesn't have admin prefix, we'll try root first
-                        // The error handler will fallback to admin/ if root fails
-                        if (!hasAdminPrefix && cleanPath.startsWith('uploads/')) {
-                            // Try root/uploads/ first, error handler will try admin/uploads/ if it fails
-                            imageSrc = '/' + cleanPath;
-                        } else {
-                            // Path already has admin prefix or different structure
-                            imageSrc = '/' + cleanPath;
-                        }
+                        imageSrc = '/' + cleanPath;
                     }
                     hasImage = true;
                 }
@@ -671,15 +663,9 @@ if (empty($heroVideoUrl)) {
                 sliderClass = 'hidden';
             }
             
-            // Image error handler: try admin path, then placeholder.png, then Logo2.png, then SVG
-            // Build admin path if original is root/uploads/
-            let adminPath = '';
-            if (hasImage && imageSrc.includes('/uploads/') && !imageSrc.includes('/admin/')) {
-                adminPath = imageSrc.replace('/uploads/', '/admin/uploads/');
-            }
-            
-            // Create error handler with proper escaping
-            const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0&&'${adminPath}'){img.src='${adminPath}';img.dataset.tries='1';}else if(tries<=1){img.src='${placeholderImagePath}';img.dataset.tries='2';}else if(tries==2){img.src='${fallbackPlaceholderPath}';img.dataset.tries='3';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
+            // Image error handler: try placeholder.png, then Logo2.png, then SVG
+            // Since we already prepend admin/ to uploads/ paths, no need to try admin path again
+            const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0){img.src='${placeholderImagePath}';img.dataset.tries='1';}else if(tries==1){img.src='${fallbackPlaceholderPath}';img.dataset.tries='2';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
             
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
@@ -903,41 +889,54 @@ if (empty($heroVideoUrl)) {
             });
         }
         
-        // Remove any existing listeners by cloning buttons
+        // Remove any existing listeners by cloning buttons (preserves all classes and attributes)
         const nextBtnClone = nextBtn.cloneNode(true);
         const prevBtnClone = prevBtn.cloneNode(true);
+        // Replace buttons to remove old event listeners
         nextBtn.parentNode.replaceChild(nextBtnClone, nextBtn);
         prevBtn.parentNode.replaceChild(prevBtnClone, prevBtn);
         
-        // Get fresh references
-        const newNextBtn = slider.querySelector('.arrow-btn.next');
-        const newPrevBtn = slider.querySelector('.arrow-btn.prev');
+        // Get fresh references to the cloned buttons
+        const finalNextBtn = slider.querySelector('.arrow-btn.next');
+        const finalPrevBtn = slider.querySelector('.arrow-btn.prev');
         
-        // Ensure they're enabled
-        newNextBtn.disabled = false;
-        newPrevBtn.disabled = false;
+        // Ensure they're enabled and visible
+        if (finalNextBtn) {
+            finalNextBtn.disabled = false;
+            finalNextBtn.style.pointerEvents = 'auto';
+            finalNextBtn.style.opacity = '1';
+        }
+        if (finalPrevBtn) {
+            finalPrevBtn.disabled = false;
+            finalPrevBtn.style.pointerEvents = 'auto';
+            finalPrevBtn.style.opacity = '1';
+        }
         
         // Event listener for next button
-        newNextBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (cards.length > 0) {
-                currentIndex = (currentIndex + 1) % cards.length;
-                updateCarousel();
-            }
-        }, { once: false });
+        if (finalNextBtn) {
+            finalNextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (cards.length > 0) {
+                    currentIndex = (currentIndex + 1) % cards.length;
+                    updateCarousel();
+                }
+            }, { once: false });
+        }
         
         // Event listener for previous button
-        newPrevBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (cards.length > 0) {
-                currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-                updateCarousel();
-            }
-        }, { once: false });
+        if (finalPrevBtn) {
+            finalPrevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (cards.length > 0) {
+                    currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+                    updateCarousel();
+                }
+            }, { once: false });
+        }
         
-        // Initialize the carousel on load
+        // Initialize the carousel on load - ensure classes are applied
         updateCarousel();
         
         console.log('Coverflow carousel initialized with', cards.length, 'cards');
@@ -951,9 +950,9 @@ if (empty($heroVideoUrl)) {
                 return;
             }
             renderSlider(posts, 'achievements-slider');
-            // Initialize coverflow carousel after DOM is fully updated
-            // Use triple requestAnimationFrame to ensure all rendering is complete
-            requestAnimationFrame(() => {
+            // Initialize coverflow carousel AFTER renderSlider has finished DOM injection
+            // Use setTimeout to ensure renderSlider's innerHTML and all DOM updates are complete
+            setTimeout(() => {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         const slider = document.getElementById('achievements-slider');
@@ -966,7 +965,7 @@ if (empty($heroVideoUrl)) {
                         }
                     });
                 });
-            });
+            }, 100); // Small delay to ensure DOM is fully updated
         })
         .catch(err => {
             console.error('Error loading achievements:', err);
@@ -981,9 +980,9 @@ if (empty($heroVideoUrl)) {
                 return;
             }
             renderSlider(posts, 'events-slider');
-            // Initialize coverflow carousel after DOM is fully updated
-            // Use triple requestAnimationFrame to ensure all rendering is complete
-            requestAnimationFrame(() => {
+            // Initialize coverflow carousel AFTER renderSlider has finished DOM injection
+            // Use setTimeout to ensure renderSlider's innerHTML and all DOM updates are complete
+            setTimeout(() => {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         const slider = document.getElementById('events-slider');
@@ -996,7 +995,7 @@ if (empty($heroVideoUrl)) {
                         }
                     });
                 });
-            });
+            }, 100); // Small delay to ensure DOM is fully updated
         })
         .catch(err => {
             console.error('Error loading events:', err);
@@ -1032,13 +1031,25 @@ if (empty($heroVideoUrl)) {
         if (!imgSrc || imgSrc.trim() === '') {
             return placeholderSvg;
         }
-        // Ensure path starts with / for absolute path (if not already a full URL)
-        if (!imgSrc.match(/^(https?:\/\/|data:)/)) {
-            // Use base path if detected, otherwise use root-relative path
-            const cleanPath = imgSrc.replace(/^\//, '');
-            imgSrc = (typeof basePath !== 'undefined' ? basePath : '') + '/' + cleanPath;
+        // Handle full URLs (Spaces/CDN)
+        if (imgSrc.match(/^(https?:\/\/|data:)/)) {
+            return imgSrc;
         }
-        return imgSrc;
+        // Handle local paths - prepend admin/ to uploads/ paths
+        let cleanPath = imgSrc.trim();
+        if (cleanPath.startsWith('/')) {
+            cleanPath = cleanPath.substring(1);
+        }
+        // If path starts with 'uploads/', prepend 'admin/'
+        if (cleanPath.startsWith('uploads/')) {
+            cleanPath = 'admin/' + cleanPath;
+        }
+        // Build the full path with basePath if needed
+        if (typeof basePath !== 'undefined' && basePath !== '') {
+            const base = basePath.replace(/\/$/, '');
+            return base + '/' + cleanPath;
+        }
+        return '/' + cleanPath;
     }
     function openPostModal(post) {
         const overlay = document.getElementById('postModal');
