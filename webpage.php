@@ -627,8 +627,9 @@ if (empty($heroVideoUrl)) {
                     // Handle local paths - use absolute path for Linux compatibility
                     // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
                     const fileName = post.image_path.split('/').pop();
-                    // Use absolute path starting with forward slash: /admin/uploads/posts/
-                    imageSrc = `/admin/uploads/posts/${fileName}`;
+                    // Use absolute path starting with forward slash: /uploads/posts/
+                    // Images are confirmed to be in uploads/posts/ (not admin/uploads/posts/)
+                    imageSrc = `/uploads/posts/${fileName}`;
                     hasImage = true;
                 }
             }
@@ -1029,8 +1030,9 @@ if (empty($heroVideoUrl)) {
         // Handle local paths - use absolute path for Linux compatibility
         // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
         const fileName = imgSrc.split('/').pop();
-        // Use absolute path starting with forward slash: /admin/uploads/posts/
-        return `/admin/uploads/posts/${fileName}`;
+        // Use absolute path starting with forward slash: /uploads/posts/
+        // Images are confirmed to be in uploads/posts/ (not admin/uploads/posts/)
+        return `/uploads/posts/${fileName}`;
     }
     function openPostModal(post) {
         const overlay = document.getElementById('postModal');
