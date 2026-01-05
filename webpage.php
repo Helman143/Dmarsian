@@ -674,16 +674,19 @@ if (empty($heroVideoUrl)) {
         track.innerHTML = cardsHtml;
 
         // Set initial z-index values for 3D Coverflow effect (for achievements and events sliders)
+        // Wait for DOM to update before querying
         if (sliderId === 'achievements-slider' || sliderId === 'events-slider') {
-            const cards = Array.from(track.querySelectorAll('.slide-card'));
-            cards.forEach((card, index) => {
-                if (card.classList.contains('active')) {
-                    card.style.zIndex = '10';
-                } else if (card.classList.contains('next')) {
-                    card.style.zIndex = '5';
-                } else {
-                    card.style.zIndex = '0';
-                }
+            requestAnimationFrame(() => {
+                const cards = Array.from(track.querySelectorAll('.slide-card'));
+                cards.forEach((card, index) => {
+                    if (card.classList.contains('active')) {
+                        card.style.zIndex = '10';
+                    } else if (card.classList.contains('next')) {
+                        card.style.zIndex = '5';
+                    } else {
+                        card.style.zIndex = '0';
+                    }
+                });
             });
         }
 
@@ -923,15 +926,17 @@ if (empty($heroVideoUrl)) {
                 return;
             }
             renderSlider(posts, 'achievements-slider');
-            // Initialize coverflow carousel immediately after rendering (cards are already in DOM)
-            const slider = document.getElementById('achievements-slider');
-            const track = slider ? slider.querySelector('.slider-track') : null;
-            if (track) {
-                const cards = Array.from(track.querySelectorAll('.slide-card'));
-                if (cards.length > 0) {
-                    setupCoverflowCarousel(slider, track, cards);
+            // Initialize coverflow carousel after DOM is updated
+            requestAnimationFrame(() => {
+                const slider = document.getElementById('achievements-slider');
+                const track = slider ? slider.querySelector('.slider-track') : null;
+                if (track) {
+                    const cards = Array.from(track.querySelectorAll('.slide-card'));
+                    if (cards.length > 0) {
+                        setupCoverflowCarousel(slider, track, cards);
+                    }
                 }
-            }
+            });
         })
         .catch(err => {
             console.error('Error loading achievements:', err);
@@ -946,15 +951,17 @@ if (empty($heroVideoUrl)) {
                 return;
             }
             renderSlider(posts, 'events-slider');
-            // Initialize coverflow carousel immediately after rendering (cards are already in DOM)
-            const slider = document.getElementById('events-slider');
-            const track = slider ? slider.querySelector('.slider-track') : null;
-            if (track) {
-                const cards = Array.from(track.querySelectorAll('.slide-card'));
-                if (cards.length > 0) {
-                    setupCoverflowCarousel(slider, track, cards);
+            // Initialize coverflow carousel after DOM is updated
+            requestAnimationFrame(() => {
+                const slider = document.getElementById('events-slider');
+                const track = slider ? slider.querySelector('.slider-track') : null;
+                if (track) {
+                    const cards = Array.from(track.querySelectorAll('.slide-card'));
+                    if (cards.length > 0) {
+                        setupCoverflowCarousel(slider, track, cards);
+                    }
                 }
-            }
+            });
         })
         .catch(err => {
             console.error('Error loading events:', err);
