@@ -549,15 +549,8 @@ if (empty($heroVideoUrl)) {
         // Check if we're on DigitalOcean App Platform (production)
         const isProduction = window.location.hostname.includes('ondigitalocean.app');
         
-        // #region agent log
-        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePath',message:'Base path detection',data:{isProduction:isProduction,hostname:window.location.hostname,pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-        // #endregion
-        
         // On production, always use root (no base path)
         if (isProduction) {
-            // #region agent log
-            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathProd',message:'Production detected - using empty basePath',data:{basePath:''},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-            // #endregion
             return '';
         }
         
@@ -569,9 +562,6 @@ if (empty($heroVideoUrl)) {
         // If we're in a subdirectory (e.g., /Dmarsian/webpage.php), extract it
         if (pathParts.length > 0) {
             const potentialBase = '/' + pathParts[0];
-            // #region agent log
-            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathLocal',message:'Localhost subdirectory detected',data:{basePath:potentialBase},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-            // #endregion
             return potentialBase;
         }
         
@@ -586,15 +576,8 @@ if (empty($heroVideoUrl)) {
             }
         }
         
-        // #region agent log
-        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathEmpty',message:'No base path detected - using empty',data:{basePath:''},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-        // #endregion
         return '';
     })();
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webpage.php:basePathFinal',message:'Final base path',data:{basePath:basePath},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'H'})}).catch(()=>{});
-    // #endregion
     
     function renderSlider(posts, sliderId) {
         const slider = document.getElementById(sliderId);
@@ -816,12 +799,15 @@ if (empty($heroVideoUrl)) {
     }
 
     // Fetch and render sliders
-    // Global error handler for images
+    // Global error handler for images (fallback for any images that fail to load)
     window.addEventListener('error', function(e) {
         if (e.target && e.target.tagName === 'IMG') {
             const img = e.target;
-            if (!img.src.includes('placeholder.com')) {
-                img.src = 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=Image+Not+Found';
+            // Only handle if it's not already a placeholder (SVG or local placeholder)
+            if (!img.src.includes('data:image/svg') && !img.src.includes('Logo2.png')) {
+                // Use local placeholder instead of external service
+                const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+                img.src = placeholderSvg;
                 img.onerror = null; // Prevent infinite loop
             }
         }
