@@ -602,6 +602,10 @@ if (empty($heroVideoUrl)) {
         const track = slider.querySelector('[data-slider-track]');
         if (!track) return;
 
+        // Get button references once (used throughout function)
+        const prevBtn = slider.querySelector('.arrow-btn.prev');
+        const nextBtn = slider.querySelector('.arrow-btn.next');
+
         // Handle empty state - show message if no posts
         if (!posts || posts.length === 0) {
             const categoryName = sliderId === 'achievements-slider' ? 'achievements' : 'events';
@@ -609,16 +613,12 @@ if (empty($heroVideoUrl)) {
                 <p style="margin: 0;">No ${categoryName} available at this time.</p>
             </div>`;
             // Hide navigation arrows for empty state
-            const prevBtn = slider.querySelector('.arrow-btn.prev');
-            const nextBtn = slider.querySelector('.arrow-btn.next');
             if (prevBtn) prevBtn.style.display = 'none';
             if (nextBtn) nextBtn.style.display = 'none';
             return;
         }
 
         // Show navigation arrows if they were hidden
-        const prevBtn = slider.querySelector('.arrow-btn.prev');
-        const nextBtn = slider.querySelector('.arrow-btn.next');
         if (prevBtn) prevBtn.style.display = '';
         if (nextBtn) nextBtn.style.display = '';
 
@@ -734,9 +734,6 @@ if (empty($heroVideoUrl)) {
                 }
             });
         });
-
-        const prevBtn = slider.querySelector('.arrow-btn.prev');
-        const nextBtn = slider.querySelector('.arrow-btn.next');
 
         function getStep() {
             const firstCard = track.querySelector('.slide-card');
