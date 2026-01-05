@@ -602,29 +602,63 @@ if (empty($heroVideoUrl)) {
         const track = slider.querySelector('[data-slider-track]');
         if (!track) return;
 
+        // Handle empty state - show message if no posts
+        if (!posts || posts.length === 0) {
+            const categoryName = sliderId === 'achievements-slider' ? 'achievements' : 'events';
+            track.innerHTML = `<div class="slider-empty-state" style="text-align: center; padding: 40px 20px; color: #888; font-size: 1.1rem;">
+                <p style="margin: 0;">No ${categoryName} available at this time.</p>
+            </div>`;
+            // Hide navigation arrows for empty state
+            const prevBtn = slider.querySelector('.arrow-btn.prev');
+            const nextBtn = slider.querySelector('.arrow-btn.next');
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            return;
+        }
+
+        // Show navigation arrows if they were hidden
+        const prevBtn = slider.querySelector('.arrow-btn.prev');
+        const nextBtn = slider.querySelector('.arrow-btn.next');
+        if (prevBtn) prevBtn.style.display = '';
+        if (nextBtn) nextBtn.style.display = '';
+
         const cardsHtml = posts.map((post, index) => {
             // Create SVG data URI placeholder that always works
             const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+            // Fallback placeholder image path
+            const placeholderImagePath = (typeof basePath !== 'undefined' ? basePath : '') + '/Picture/Logo2.png';
             
             let imageSrc = placeholderSvg;
             let hasImage = false;
             
             // Check if we have a valid image path
             if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
-                // Ensure path starts with / for absolute path (if not already a full URL)
-                if (!post.image_path.match(/^(https?:\/\/|data:)/)) {
-                    // Use base path if detected, otherwise use root-relative path
-                    const cleanPath = post.image_path.replace(/^\//, '');
-                    // Ensure we have a leading slash
-                    if (basePath === '') {
-                        imageSrc = '/' + cleanPath;
-                    } else {
-                        imageSrc = basePath + '/' + cleanPath;
-                    }
-                } else {
+                // Handle full URLs (Spaces/CDN)
+                if (post.image_path.match(/^(https?:\/\/|data:)/)) {
                     imageSrc = post.image_path;
+                    hasImage = true;
+                } else {
+                    // Handle local paths (uploads/posts/filename.png)
+                    // Paths from database are like "uploads/posts/filename.png" (no leading slash)
+                    // They need to be accessible from the root
+                    let cleanPath = post.image_path.trim();
+                    
+                    // Remove leading slash if present (normalize)
+                    if (cleanPath.startsWith('/')) {
+                        cleanPath = cleanPath.substring(1);
+                    }
+                    
+                    // Build the full path with basePath if needed
+                    if (basePath && basePath !== '') {
+                        // Remove trailing slash from basePath if present
+                        const base = basePath.replace(/\/$/, '');
+                        imageSrc = base + '/' + cleanPath;
+                    } else {
+                        // Root-relative path (starts with /)
+                        imageSrc = '/' + cleanPath;
+                    }
+                    hasImage = true;
                 }
-                hasImage = true;
             }
             
             // Determine initial slider class based on index (for 3D Coverflow effect)
@@ -641,7 +675,7 @@ if (empty($heroVideoUrl)) {
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
               +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="this.onerror=null; this.src='${placeholderSvg}'; this.style.backgroundColor='#2d2d2d';" loading="lazy" style="background-color: #2d2d2d;">`
+              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="this.onerror=null; this.src='${placeholderImagePath}'; this.onerror=function(){this.src='${placeholderSvg}'; this.onerror=null;}; this.style.backgroundColor='#2d2d2d';" loading="lazy" style="background-color: #2d2d2d;">`
               +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
               +     `<span class="hover-overlay"></span>`
               +   `</div>`
@@ -797,26 +831,6 @@ if (empty($heroVideoUrl)) {
     }, true); // Use capture phase
 
     // Infinite Loop Coverflow Carousel for Achievements and Events
-    function initCoverflowCarousel(sliderId) {
-        const slider = document.getElementById(sliderId);
-        if (!slider) return;
-        
-        const track = slider.querySelector('.slider-track');
-        if (!track) return;
-        
-        // Wait for cards to be rendered
-        const checkCards = setInterval(() => {
-            const cards = Array.from(track.querySelectorAll('.slide-card'));
-            if (cards.length > 0) {
-                clearInterval(checkCards);
-                setupCoverflowCarousel(slider, track, cards);
-            }
-        }, 100);
-        
-        // Stop checking after 5 seconds
-        setTimeout(() => clearInterval(checkCards), 5000);
-    }
-    
     function setupCoverflowCarousel(slider, track, cards) {
         const nextBtn = slider.querySelector('.arrow-btn.next');
         const prevBtn = slider.querySelector('.arrow-btn.prev');
@@ -920,22 +934,48 @@ if (empty($heroVideoUrl)) {
     fetch('get_posts.php?category=achievement')
         .then(res => res.json())
         .then(posts => { 
+            if (!posts || posts.length === 0) {
+                renderSlider([], 'achievements-slider');
+                return;
+            }
             renderSlider(posts, 'achievements-slider');
-            // Initialize coverflow carousel after rendering
-            setTimeout(() => initCoverflowCarousel('achievements-slider'), 500);
+            // Initialize coverflow carousel immediately after rendering (cards are already in DOM)
+            const slider = document.getElementById('achievements-slider');
+            const track = slider ? slider.querySelector('.slider-track') : null;
+            if (track) {
+                const cards = Array.from(track.querySelectorAll('.slide-card'));
+                if (cards.length > 0) {
+                    setupCoverflowCarousel(slider, track, cards);
+                }
+            }
         })
-        .catch(err => console.error('Error loading achievements:', err));
+        .catch(err => {
+            console.error('Error loading achievements:', err);
+            renderSlider([], 'achievements-slider');
+        });
 
     fetch('get_posts.php?category=event')
         .then(res => res.json())
         .then(posts => { 
+            if (!posts || posts.length === 0) {
+                renderSlider([], 'events-slider');
+                return;
+            }
             renderSlider(posts, 'events-slider');
-            // Initialize coverflow carousel after rendering
-            setTimeout(() => {
-                initCoverflowCarousel('events-slider');
-            }, 800);
+            // Initialize coverflow carousel immediately after rendering (cards are already in DOM)
+            const slider = document.getElementById('events-slider');
+            const track = slider ? slider.querySelector('.slider-track') : null;
+            if (track) {
+                const cards = Array.from(track.querySelectorAll('.slide-card'));
+                if (cards.length > 0) {
+                    setupCoverflowCarousel(slider, track, cards);
+                }
+            }
         })
-        .catch(err => console.error('Error loading events:', err));
+        .catch(err => {
+            console.error('Error loading events:', err);
+            renderSlider([], 'events-slider');
+        });
 
     // Post modal helpers
     function normalizePostDate(post) {
