@@ -626,7 +626,7 @@ if (empty($heroVideoUrl)) {
                 } else {
                     // Handle local paths (uploads/posts/filename.png)
                     // Paths from database are like "uploads/posts/filename.png"
-                    // MUST be changed to "admin/uploads/posts/filename.png"
+                    // Images are stored at root level: uploads/posts/ (NOT admin/uploads/posts/)
                     let cleanPath = post.image_path.trim();
                     
                     // Remove leading slash if present (normalize)
@@ -634,9 +634,11 @@ if (empty($heroVideoUrl)) {
                         cleanPath = cleanPath.substring(1);
                     }
                     
-                    // If path starts with 'uploads/', prepend 'admin/'
-                    if (cleanPath.startsWith('uploads/')) {
-                        cleanPath = 'admin/' + cleanPath;
+                    // If path doesn't start with 'uploads/', it might be just a filename
+                    // Try to construct the full path
+                    if (!cleanPath.startsWith('uploads/') && !cleanPath.startsWith('admin/')) {
+                        // Assume it's just a filename, prepend uploads/posts/
+                        cleanPath = 'uploads/posts/' + cleanPath;
                     }
                     
                     // Build the full path with basePath if needed
@@ -648,6 +650,8 @@ if (empty($heroVideoUrl)) {
                         // Root-relative path (starts with /)
                         imageSrc = '/' + cleanPath;
                     }
+                    // Debug: log the path being used
+                    console.log('Image path for post:', post.title, 'Original:', post.image_path, 'Final:', imageSrc);
                     hasImage = true;
                 }
             }
@@ -663,9 +667,14 @@ if (empty($heroVideoUrl)) {
                 sliderClass = 'hidden';
             }
             
-            // Image error handler: try placeholder.png, then Logo2.png, then SVG
-            // Since we already prepend admin/ to uploads/ paths, no need to try admin path again
-            const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0){img.src='${placeholderImagePath}';img.dataset.tries='1';}else if(tries==1){img.src='${fallbackPlaceholderPath}';img.dataset.tries='2';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
+            // Image error handler: try admin path, then placeholder.png, then Logo2.png, then SVG
+            // Try admin path if original path doesn't include it
+            let adminPath = '';
+            if (hasImage && imageSrc.includes('/uploads/') && !imageSrc.includes('/admin/')) {
+                adminPath = imageSrc.replace('/uploads/', '/admin/uploads/');
+            }
+            
+            const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');var admin='${adminPath}';if(tries==0&&admin){img.src=admin;img.dataset.tries='1';}else if(tries<=1){img.src='${placeholderImagePath}';img.dataset.tries='2';}else if(tries==2){img.src='${fallbackPlaceholderPath}';img.dataset.tries='3';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
             
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
@@ -1035,14 +1044,14 @@ if (empty($heroVideoUrl)) {
         if (imgSrc.match(/^(https?:\/\/|data:)/)) {
             return imgSrc;
         }
-        // Handle local paths - prepend admin/ to uploads/ paths
+        // Handle local paths - images are at root level: uploads/posts/ (NOT admin/)
         let cleanPath = imgSrc.trim();
         if (cleanPath.startsWith('/')) {
             cleanPath = cleanPath.substring(1);
         }
-        // If path starts with 'uploads/', prepend 'admin/'
-        if (cleanPath.startsWith('uploads/')) {
-            cleanPath = 'admin/' + cleanPath;
+        // If path doesn't start with 'uploads/', it might be just a filename
+        if (!cleanPath.startsWith('uploads/') && !cleanPath.startsWith('admin/')) {
+            cleanPath = 'uploads/posts/' + cleanPath;
         }
         // Build the full path with basePath if needed
         if (typeof basePath !== 'undefined' && basePath !== '') {
