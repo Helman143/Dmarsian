@@ -925,17 +925,21 @@ if (empty($heroVideoUrl)) {
                 renderSlider([], 'achievements-slider');
                 return;
             }
+            console.log('Achievements posts received:', posts.length);
             renderSlider(posts, 'achievements-slider');
-            // Initialize coverflow carousel after DOM is updated
+            // Initialize coverflow carousel after DOM is fully updated (double RAF for safety)
             requestAnimationFrame(() => {
-                const slider = document.getElementById('achievements-slider');
-                const track = slider ? slider.querySelector('.slider-track') : null;
-                if (track) {
-                    const cards = Array.from(track.querySelectorAll('.slide-card'));
-                    if (cards.length > 0) {
-                        setupCoverflowCarousel(slider, track, cards);
+                requestAnimationFrame(() => {
+                    const slider = document.getElementById('achievements-slider');
+                    const track = slider ? slider.querySelector('.slider-track') : null;
+                    if (track) {
+                        const cards = Array.from(track.querySelectorAll('.slide-card'));
+                        console.log('Achievements cards found in DOM:', cards.length);
+                        if (cards.length > 0) {
+                            setupCoverflowCarousel(slider, track, cards);
+                        }
                     }
-                }
+                });
             });
         })
         .catch(err => {
@@ -950,17 +954,21 @@ if (empty($heroVideoUrl)) {
                 renderSlider([], 'events-slider');
                 return;
             }
+            console.log('Events posts received:', posts.length);
             renderSlider(posts, 'events-slider');
-            // Initialize coverflow carousel after DOM is updated
+            // Initialize coverflow carousel after DOM is fully updated (double RAF for safety)
             requestAnimationFrame(() => {
-                const slider = document.getElementById('events-slider');
-                const track = slider ? slider.querySelector('.slider-track') : null;
-                if (track) {
-                    const cards = Array.from(track.querySelectorAll('.slide-card'));
-                    if (cards.length > 0) {
-                        setupCoverflowCarousel(slider, track, cards);
+                requestAnimationFrame(() => {
+                    const slider = document.getElementById('events-slider');
+                    const track = slider ? slider.querySelector('.slider-track') : null;
+                    if (track) {
+                        const cards = Array.from(track.querySelectorAll('.slide-card'));
+                        console.log('Events cards found in DOM:', cards.length);
+                        if (cards.length > 0) {
+                            setupCoverflowCarousel(slider, track, cards);
+                        }
                     }
-                }
+                });
             });
         })
         .catch(err => {
