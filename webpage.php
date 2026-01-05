@@ -624,41 +624,11 @@ if (empty($heroVideoUrl)) {
                     imageSrc = post.image_path;
                     hasImage = true;
                 } else {
-                    // Handle local paths
-                    // Database may store: "uploads/posts/filename.png" OR just "filename.png"
-                    // Images are actually in: uploads/posts/ (NOT admin/uploads/posts/)
-                    let cleanPath = post.image_path.trim();
-                    
-                    // Remove leading slash if present (normalize)
-                    if (cleanPath.startsWith('/')) {
-                        cleanPath = cleanPath.substring(1);
-                    }
-                    
-                    // If it's just a filename (no slashes), prepend uploads/posts/
-                    if (!cleanPath.includes('/')) {
-                        cleanPath = 'uploads/posts/' + cleanPath;
-                    } else if (cleanPath.startsWith('admin/uploads/')) {
-                        // If database has admin/ prefix, remove it (images are in uploads/, not admin/uploads/)
-                        cleanPath = cleanPath.replace(/^admin\//, '');
-                    }
-                    // If it already starts with 'uploads/', keep it as is
-                    
-                    // Build the full path with basePath if needed
-                    if (basePath && basePath !== '') {
-                        // Remove trailing slash from basePath if present
-                        const base = basePath.replace(/\/$/, '');
-                        imageSrc = base + '/' + cleanPath;
-                    } else {
-                        // Root-relative path (starts with /)
-                        imageSrc = '/' + cleanPath;
-                    }
-                    // Debug: verify the path transformation
-                    console.log('Image path transformation:', {
-                        original: post.image_path,
-                        cleanPath: cleanPath,
-                        final: imageSrc,
-                        postTitle: post.title
-                    });
+                    // Handle local paths - use absolute path for Linux compatibility
+                    // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
+                    const fileName = post.image_path.split('/').pop();
+                    // Use absolute path starting with forward slash: /admin/uploads/posts/
+                    imageSrc = `/admin/uploads/posts/${fileName}`;
                     hasImage = true;
                 }
             }
@@ -677,6 +647,9 @@ if (empty($heroVideoUrl)) {
             // Image error handler: try placeholder.png, then Logo2.png, then SVG
             // Multi-tier fallback: try placeholder images, then SVG
             const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0){img.src='${placeholderImagePath}';img.dataset.tries='1';}else if(tries==1){img.src='${fallbackPlaceholderPath}';img.dataset.tries='2';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
+            
+            // Debug: log file existence check before returning
+            console.log("Checking file existence for:", imageSrc);
             
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
@@ -1053,25 +1026,11 @@ if (empty($heroVideoUrl)) {
         if (imgSrc.match(/^(https?:\/\/|data:)/)) {
             return imgSrc;
         }
-        // Handle local paths - images are in uploads/posts/ (NOT admin/uploads/posts/)
-        let cleanPath = imgSrc.trim();
-        if (cleanPath.startsWith('/')) {
-            cleanPath = cleanPath.substring(1);
-        }
-        // If it's just a filename (no slashes), prepend uploads/posts/
-        if (!cleanPath.includes('/')) {
-            cleanPath = 'uploads/posts/' + cleanPath;
-        } else if (cleanPath.startsWith('admin/uploads/')) {
-            // If database has admin/ prefix, remove it (images are in uploads/, not admin/uploads/)
-            cleanPath = cleanPath.replace(/^admin\//, '');
-        }
-        // If it already starts with 'uploads/', keep it as is
-        // Build the full path with basePath if needed
-        if (typeof basePath !== 'undefined' && basePath !== '') {
-            const base = basePath.replace(/\/$/, '');
-            return base + '/' + cleanPath;
-        }
-        return '/' + cleanPath;
+        // Handle local paths - use absolute path for Linux compatibility
+        // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
+        const fileName = imgSrc.split('/').pop();
+        // Use absolute path starting with forward slash: /admin/uploads/posts/
+        return `/admin/uploads/posts/${fileName}`;
     }
     function openPostModal(post) {
         const overlay = document.getElementById('postModal');
