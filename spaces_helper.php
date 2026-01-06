@@ -162,3 +162,10 @@ function deleteImageFromSpaces($imagePath) {
     return false;
 }
 ?>
+
+
+
+
+
+
+

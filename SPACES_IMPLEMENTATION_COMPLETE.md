@@ -167,3 +167,10 @@ After installing the AWS SDK:
 **Questions?** Check the existing documentation:
 - `UPLOADS_STORAGE_SETUP.md` - Detailed setup guide
 - `VIDEO_STORAGE_SETUP.md` - Similar setup for video (already done)
+
+
+
+
+
+
+
