@@ -211,27 +211,78 @@ function archivePost() {
     
     $id = (int)$_POST['id'];
     
+    // First, verify the post exists
+    $check_sql = "SELECT id, status FROM posts WHERE id = ?";
+    $check_stmt = mysqli_prepare($conn, $check_sql);
+    mysqli_stmt_bind_param($check_stmt, "i", $id);
+    mysqli_stmt_execute($check_stmt);
+    $check_result = mysqli_stmt_get_result($check_stmt);
+    $post = mysqli_fetch_assoc($check_result);
+    mysqli_stmt_close($check_stmt);
+    
+    if (!$post) {
+        mysqli_close($conn);
+        echo json_encode(['success' => false, 'message' => 'Post not found']);
+        return;
+    }
+    
+    // Update the post status
     $sql = "UPDATE posts SET status='archived' WHERE id=?";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id);
     
     if (mysqli_stmt_execute($stmt)) {
-        // Log activity
-        $admin_account = getAdminAccountName($conn);
-        $action_type = 'Post Archive';
-        $student_id = '';
-        $details = 'Archived post ID: ' . $id;
-        $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
-        $log_stmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
-        $log_stmt->execute();
-        $log_stmt->close();
-        echo json_encode(['success' => true, 'message' => 'Post archived successfully']);
+        // Check if any rows were actually affected
+        $affected_rows = mysqli_stmt_affected_rows($stmt);
+        
+        if ($affected_rows > 0) {
+            // Verify the update worked
+            $verify_sql = "SELECT status FROM posts WHERE id = ?";
+            $verify_stmt = mysqli_prepare($conn, $verify_sql);
+            mysqli_stmt_bind_param($verify_stmt, "i", $id);
+            mysqli_stmt_execute($verify_stmt);
+            $verify_result = mysqli_stmt_get_result($verify_stmt);
+            $updated_post = mysqli_fetch_assoc($verify_result);
+            mysqli_stmt_close($verify_stmt);
+            
+            // Log activity
+            $admin_account = getAdminAccountName($conn);
+            $action_type = 'Post Archive';
+            $student_id = '';
+            $details = 'Archived post ID: ' . $id;
+            $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
+            $log_stmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
+            $log_stmt->execute();
+            $log_stmt->close();
+            
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Post archived successfully',
+                'debug' => [
+                    'post_id' => $id,
+                    'old_status' => $post['status'],
+                    'new_status' => $updated_post['status'] ?? 'unknown',
+                    'affected_rows' => $affected_rows
+                ]
+            ]);
+        } else {
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
+            echo json_encode([
+                'success' => false, 
+                'message' => 'No rows were updated. Post may already be archived or does not exist.',
+                'debug' => ['post_id' => $id, 'current_status' => $post['status']]
+            ]);
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error archiving post: ' . mysqli_error($conn)]);
+        $error = mysqli_error($conn);
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+        echo json_encode(['success' => false, 'message' => 'Error archiving post: ' . $error]);
     }
-    
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
 }
 
 function fetchPosts() {
