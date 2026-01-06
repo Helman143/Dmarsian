@@ -544,6 +544,27 @@ if (empty($heroVideoUrl)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="Scripts/webpage.js"></script>
     <script>
+    // Base URL helper function - handles both relative and absolute paths
+    // On DigitalOcean App Platform, use relative paths (no leading slash)
+    // On localhost with subdirectory, use subdirectory path
+    function getImageUrl(imagePath) {
+        if (!imagePath || imagePath.trim() === '') {
+            return null;
+        }
+        
+        // If it's already a full URL (Spaces/CDN) or data URI, use it directly
+        if (imagePath.match(/^(https?:\/\/|data:)/)) {
+            return imagePath;
+        }
+        
+        // For local paths, extract filename and construct relative path
+        const fileName = imagePath.split('/').pop();
+        
+        // Use relative path (no leading slash) for better compatibility
+        // This works on both root installations and subdirectories
+        return `uploads/posts/${fileName}`;
+    }
+    
     // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
     // On production (DigitalOcean), app is at root, so base path should be empty
     const basePath = (function() {
@@ -609,32 +630,22 @@ if (empty($heroVideoUrl)) {
         const cardsHtml = posts.map((post, index) => {
             // Create SVG data URI placeholder that always works
             const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
-            // Fallback placeholder image path - try Picture/placeholder.png first, then Logo2.png
-            const base = (typeof basePath !== 'undefined' ? basePath : '');
-            const placeholderImagePath = base + '/Picture/placeholder.png';
-            const fallbackPlaceholderPath = base + '/Picture/Logo2.png';
+            // Fallback placeholder image paths - use relative paths
+            const placeholderImagePath = 'Picture/placeholder.png';
+            const fallbackPlaceholderPath = 'Picture/Logo2.png';
             
             let imageSrc = placeholderSvg;
             let hasImage = false;
             
             // Check if we have a valid image path
             if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
-                // Handle full URLs (Spaces/CDN)
-                if (post.image_path.match(/^(https?:\/\/|data:)/)) {
-                    imageSrc = post.image_path;
-                    hasImage = true;
-                } else {
-                    // Handle local paths - use basePath for correct path resolution
-                    // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
-                    const fileName = post.image_path.split('/').pop();
-                    // Use basePath-aware path: basePath + /uploads/posts/filename
-                    // Images are confirmed to be in uploads/posts/ (not admin/uploads/posts/)
-                    const base = (typeof basePath !== 'undefined' ? basePath : '');
-                    // Ensure no double slashes: if base ends with / or is empty, use single /
-                    imageSrc = base ? `${base}/uploads/posts/${fileName}` : `/uploads/posts/${fileName}`;
+                // Use the helper function to get the correct image URL
+                const resolvedUrl = getImageUrl(post.image_path);
+                if (resolvedUrl) {
+                    imageSrc = resolvedUrl;
                     hasImage = true;
                     // Debug logging
-                    console.log(`Image path construction: original="${post.image_path}", fileName="${fileName}", base="${base}", final="${imageSrc}"`);
+                    console.log(`Image path construction: original="${post.image_path}", resolved="${resolvedUrl}"`);
                 }
             }
             
@@ -1027,18 +1038,10 @@ if (empty($heroVideoUrl)) {
         if (!imgSrc || imgSrc.trim() === '') {
             return placeholderSvg;
         }
-        // Handle full URLs (Spaces/CDN)
-        if (imgSrc.match(/^(https?:\/\/|data:)/)) {
-            return imgSrc;
-        }
-        // Handle local paths - use basePath for correct path resolution
-        // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
-        const fileName = imgSrc.split('/').pop();
-        // Use basePath-aware path: basePath + /uploads/posts/filename
-        // Images are confirmed to be in uploads/posts/ (not admin/uploads/posts/)
-        const base = (typeof basePath !== 'undefined' ? basePath : '');
-        // Ensure no double slashes: if base ends with / or is empty, use single /
-        return base ? `${base}/uploads/posts/${fileName}` : `/uploads/posts/${fileName}`;
+        
+        // Use the helper function to get the correct image URL
+        const resolvedUrl = getImageUrl(imgSrc);
+        return resolvedUrl || placeholderSvg;
     }
     function openPostModal(post) {
         const overlay = document.getElementById('postModal');
