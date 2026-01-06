@@ -13,6 +13,15 @@ if (empty($heroVideoUrl)) {
     // Fallback to local video for development
     $heroVideoUrl = 'Video/quality_restoration_20251105174029661.mp4';
 }
+
+// Get DigitalOcean Spaces base URL for images
+// Format: https://[SPACES_NAME].[SPACES_REGION].digitaloceanspaces.com/posts/
+$spacesBaseUrl = null;
+$spacesName = getenv('SPACES_NAME');
+$spacesRegion = getenv('SPACES_REGION') ?: 'nyc3';
+if (!empty($spacesName) && !empty($spacesRegion)) {
+    $spacesBaseUrl = "https://{$spacesName}.{$spacesRegion}.digitaloceanspaces.com/posts/";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -544,9 +553,11 @@ if (empty($heroVideoUrl)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="Scripts/webpage.js"></script>
     <script>
-    // Base URL helper function - handles both relative and absolute paths
-    // On DigitalOcean App Platform, use relative paths (no leading slash)
-    // On localhost with subdirectory, use subdirectory path
+    // DigitalOcean Spaces base URL for images (set by PHP)
+    const SPACES_BASE_URL = <?php echo $spacesBaseUrl ? json_encode($spacesBaseUrl) : 'null'; ?>;
+    
+    // Base URL helper function - handles both Spaces URLs and local paths
+    // Priority: Full URL > Spaces URL > Local relative path
     function getImageUrl(imagePath) {
         if (!imagePath || imagePath.trim() === '') {
             return null;
@@ -557,11 +568,15 @@ if (empty($heroVideoUrl)) {
             return imagePath;
         }
         
-        // For local paths, extract filename and construct relative path
+        // Extract filename from path (handles "uploads/posts/file.jpg" or just "file.jpg")
         const fileName = imagePath.split('/').pop();
         
-        // Use relative path (no leading slash) for better compatibility
-        // This works on both root installations and subdirectories
+        // If Spaces is configured, use Spaces URL
+        if (SPACES_BASE_URL) {
+            return SPACES_BASE_URL + fileName;
+        }
+        
+        // Fallback to local relative path (no leading slash for compatibility)
         return `uploads/posts/${fileName}`;
     }
     
@@ -664,8 +679,8 @@ if (empty($heroVideoUrl)) {
             // Multi-tier fallback: try placeholder images, then SVG
             const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0){img.src='${placeholderImagePath}';img.dataset.tries='1';}else if(tries==1){img.src='${fallbackPlaceholderPath}';img.dataset.tries='2';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
             
-            // Debug: log file existence check before returning
-            console.log("Checking file existence for:", imageSrc);
+            // Debug: log image URL construction
+            console.log("Image URL resolved:", imageSrc);
             
             return (
                 `<article class="slide-card post-card ${sliderClass}">`
