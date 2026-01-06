@@ -81,19 +81,29 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-// Validate image paths - remove invalid ones
+// Validate image paths - remove invalid local ones
+// IMPORTANT: Do NOT run file_exists() on remote URLs (Spaces/CDN),
+// just keep them as-is so the browser can load them.
 foreach ($posts as &$post) {
     if (!empty($post['image_path']) && trim($post['image_path']) !== '') {
         $img_path = trim($post['image_path']);
+
+        // If this is already a full URL (e.g., DigitalOcean Spaces), keep it
+        if (preg_match('/^(https?:\/\/|data:)/', $img_path)) {
+            $post['image_path'] = $img_path;
+            continue;
+        }
+
+        // Local path – check if the file actually exists
         $file_path = $img_path;
         // Remove leading / for file system check if present
         if (strpos($file_path, '/') === 0) {
             $file_path = substr($file_path, 1);
         }
-        
+
         // Use absolute path based on script directory for reliable file existence check
         $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
-        
+
         // Check if file exists using both absolute and relative paths
         if (!file_exists($absolute_path) && !file_exists($file_path)) {
             // File doesn't exist - set to null (will show placeholder)
@@ -182,23 +192,26 @@ mysqli_close($conn);
                         // Check if we have a valid image path
                         if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                             $img_path = trim($img_path_value);
-                            
-                            // Verify file exists - use absolute path for reliability
-                            $file_path = $img_path;
-                            // Remove leading / for file system check if present
-                            if (strpos($file_path, '/') === 0) {
-                                $file_path = substr($file_path, 1);
-                            }
-                            
-                            // Use absolute path based on script directory
-                            $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
-                            
-                            if (file_exists($absolute_path) || file_exists($file_path)) {
-                                // File exists - ensure path starts with / for web URL (if not already a full URL)
-                                if (!preg_match('/^(https?:\/\/|data:)/', $img_path)) {
+
+                            // If already a full URL (Spaces/CDN), use it directly
+                            if (preg_match('/^(https?:\/\/|data:)/', $img_path)) {
+                                $final_img_path = $img_path;
+                                $has_image = true;
+                            } else {
+                                // Local file: verify it exists before using it
+                                $file_path = $img_path;
+                                // Remove leading / for file system check if present
+                                if (strpos($file_path, '/') === 0) {
+                                    $file_path = substr($file_path, 1);
+                                }
+
+                                // Use absolute path based on script directory
+                                $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
+
+                                if (file_exists($absolute_path) || file_exists($file_path)) {
+                                    // File exists - ensure path starts with / for web URL
                                     // Use base path if in subdirectory, otherwise use root-relative path
                                     $clean_path = ltrim($img_path, '/');
-                                    // Ensure we have a leading slash
                                     if ($basePath === '') {
                                         $final_img_path = '/' . $clean_path;
                                     } else {
@@ -223,28 +236,26 @@ mysqli_close($conn);
                                     ]) . "\n";
                                     @file_put_contents($log_file, $log_entry, FILE_APPEND);
                                     // #endregion
+                                    $has_image = true;
                                 } else {
-                                    $final_img_path = $img_path;
+                                    // #region agent log
+                                    $log_entry = json_encode([
+                                        'id' => 'log_' . time() . '_' . uniqid(),
+                                        'timestamp' => round(microtime(true) * 1000),
+                                        'location' => 'post_management.php:210',
+                                        'message' => 'File not found in rendering',
+                                        'data' => [
+                                            'post_id' => $post['id'],
+                                            'checked_paths' => [$file_path, $absolute_path],
+                                            'has_image' => false,
+                                            'hypothesisId' => 'H'
+                                        ],
+                                        'sessionId' => 'debug-session',
+                                        'runId' => 'run4'
+                                    ]) . "\n";
+                                    @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                    // #endregion
                                 }
-                                $has_image = true;
-                            } else {
-                                // #region agent log
-                                $log_entry = json_encode([
-                                    'id' => 'log_' . time() . '_' . uniqid(),
-                                    'timestamp' => round(microtime(true) * 1000),
-                                    'location' => 'post_management.php:210',
-                                    'message' => 'File not found in rendering',
-                                    'data' => [
-                                        'post_id' => $post['id'],
-                                        'checked_paths' => [$file_path, $absolute_path],
-                                        'has_image' => false,
-                                        'hypothesisId' => 'H'
-                                    ],
-                                    'sessionId' => 'debug-session',
-                                    'runId' => 'run4'
-                                ]) . "\n";
-                                @file_put_contents($log_file, $log_entry, FILE_APPEND);
-                                // #endregion
                             }
                         }
                         
