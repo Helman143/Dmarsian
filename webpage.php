@@ -624,13 +624,17 @@ if (empty($heroVideoUrl)) {
                     imageSrc = post.image_path;
                     hasImage = true;
                 } else {
-                    // Handle local paths - use absolute path for Linux compatibility
+                    // Handle local paths - use basePath for correct path resolution
                     // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
                     const fileName = post.image_path.split('/').pop();
-                    // Use absolute path starting with forward slash: /uploads/posts/
+                    // Use basePath-aware path: basePath + /uploads/posts/filename
                     // Images are confirmed to be in uploads/posts/ (not admin/uploads/posts/)
-                    imageSrc = `/uploads/posts/${fileName}`;
+                    const base = (typeof basePath !== 'undefined' ? basePath : '');
+                    // Ensure no double slashes: if base ends with / or is empty, use single /
+                    imageSrc = base ? `${base}/uploads/posts/${fileName}` : `/uploads/posts/${fileName}`;
                     hasImage = true;
+                    // Debug logging
+                    console.log(`Image path construction: original="${post.image_path}", fileName="${fileName}", base="${base}", final="${imageSrc}"`);
                 }
             }
             
@@ -1027,12 +1031,14 @@ if (empty($heroVideoUrl)) {
         if (imgSrc.match(/^(https?:\/\/|data:)/)) {
             return imgSrc;
         }
-        // Handle local paths - use absolute path for Linux compatibility
+        // Handle local paths - use basePath for correct path resolution
         // Extract just the filename from the path (handles both "uploads/posts/file.jpg" and "file.jpg")
         const fileName = imgSrc.split('/').pop();
-        // Use absolute path starting with forward slash: /uploads/posts/
+        // Use basePath-aware path: basePath + /uploads/posts/filename
         // Images are confirmed to be in uploads/posts/ (not admin/uploads/posts/)
-        return `/uploads/posts/${fileName}`;
+        const base = (typeof basePath !== 'undefined' ? basePath : '');
+        // Ensure no double slashes: if base ends with / or is empty, use single /
+        return base ? `${base}/uploads/posts/${fileName}` : `/uploads/posts/${fileName}`;
     }
     function openPostModal(post) {
         const overlay = document.getElementById('postModal');
