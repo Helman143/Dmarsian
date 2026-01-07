@@ -282,22 +282,44 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
     async function loadStudents() {
         try {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:283',message:'Before fetch call',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
+
             const response = await fetch('get_students.php');
+
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:289',message:'After fetch response',data:{status:response.status,statusText:response.statusText,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
             
             // Check if response is OK
             if (!response.ok) {
+                // #region agent log
+                const errorText = await response.text().catch(() => 'Failed to read response');
+                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:294',message:'Response not OK',data:{status:response.status,responseText:errorText.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                // #endregion
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             // Check content type
             const contentType = response.headers.get('content-type');
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:298',message:'Content type check',data:{contentType:contentType},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
+
             if (!contentType || !contentType.includes('application/json')) {
                 const text = await response.text();
+                // #region agent log
+                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:303',message:'Non-JSON response detected',data:{responseText:text.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                // #endregion
                 console.error('Expected JSON but got:', text.substring(0, 200));
                 throw new Error('Server returned non-JSON response. Check console for details.');
             }
             
             const result = await response.json();
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:312',message:'JSON parsed successfully',data:{status:result.status,dataLength:result.data?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
             
             if (result.status === 'success') {
                 const tbody = document.getElementById('studentTableBody');
@@ -392,6 +414,10 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 }
             }
         } catch (error) {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_student_management.php:398',message:'Error caught in loadStudents',data:{errorMessage:error.message,errorName:error.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
+
             console.error('Error loading students:', error);
             
             // Show user-friendly error message
