@@ -38,37 +38,15 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
     <!-- Updated typography: Orbitron/Teko for headings, Montserrat for body -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Teko:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-    /* Post details modal */
-    .postmodal-overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: transparent; z-index: 1050; }
-    .postmodal-overlay.open { display: flex; }
-    .postmodal-dialog { position: relative; max-width: 1000px; width: min(92vw, 1000px); max-height: 90vh; background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.15); overflow: hidden; }
-    .postmodal-close { position: absolute; top: 8px; right: 12px; background: none; border: 0; font-size: 2rem; line-height: 1; color: #222; cursor: pointer; }
-    .postmodal-body { display: grid; grid-template-columns: clamp(280px, 38vw, 420px) 1fr; align-items: stretch; gap: 0; height: 100%; }
-    .postmodal-image { background: #f2f2f2; display: flex; align-items: center; justify-content: center; height: 100%; min-height: 280px; }
-    .postmodal-image img { width: 100%; height: 100%; object-fit: contain; }
-    .postmodal-content { padding: 20px 24px; overflow-y: auto; overflow-x: hidden; color: #111; min-width: 0; }
-    .postmodal-content h3 { margin: 0 0 .25rem; color: #111; text-align: center; }
-    .postmodal-meta { margin: 0 0 1rem; color: #666; }
-    .postmodal-desc { color: #333; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; text-align: center; font-size: 1.1rem; }
-    @media (max-width: 768px) {
-        .postmodal-body { grid-template-columns: 1fr; }
-        .postmodal-dialog { width: 94vw; }
-        .postmodal-image { height: 60vh; min-height: 260px; }
-        .postmodal-image img { width: 100%; height: 100%; object-fit: contain; }
-    }
-
     /* Slider card description clamp with See more toggle */
     .slide-card .card-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
     .slide-card .see-more { display: none; margin-top: 6px; background: none; border: 0; color: #198754; font-weight: 600; cursor: pointer; padding: 0; }
     .slide-card.has-more .see-more { display: inline; }
     .slide-card.expanded .card-text { -webkit-line-clamp: unset; display: block; }
     
-    /* Larger fonts for Achievements and Events headings, and post modal text */
+    /* Larger fonts for Achievements and Events headings */
     .achievements-section h2,
     .events-section h2 { font-size: clamp(2rem, 3.2vw, 3rem); }
-    .postmodal-content h3 { font-size: clamp(1.5rem, 2.8vw, 2.25rem); }
-    .postmodal-meta { font-size: 1rem; }
-    .postmodal-desc { font-size: 1.25rem; }
     </style>
 </head>
 <body>
