@@ -1,0 +1,76 @@
+# Config files (sensitive)
+config.php
+
+# Environment variables (contains sensitive credentials)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Composer
+/vendor/
+# composer.lock should be committed for consistent deployments
+composer.phar
+composer-setup.php
+
+# Large folders - user uploads and media files (should not be in version control)
+# NOTE: uploads/ temporarily REMOVED from gitignore to deploy existing images to production
+# TODO: Implement DigitalOcean Spaces for persistent image storage, then re-add uploads/ to gitignore
+# uploads/ - user uploads/media (TEMPORARILY ENABLED - remove after implementing Spaces)
+# Video/ - large videos (keep out of git)
+Video/
+# Local binaries/tools
+ngrok.exe
+# Local runtime data
+trial_requests.json
+
+# Database dumps
+*.sql
+db.sql
+*.sql.gz
+
+# Logs
+*.log
+logs/
+error_log
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# PHPMailer (if using Composer version, can remove PHPMailer-master folder)
+# PHPMailer-master/
+
+# Node modules (if any)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build files
+dist/
+build/

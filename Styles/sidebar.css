@@ -1,0 +1,255 @@
+:root {
+	--sidebar-width: 260px;
+	--sidebar-bg: rgba(0, 20, 10, 0.85);
+	--primary-color: #00ff6a;
+	--text: #fff;
+	--success-backdrop: rgba(0, 255, 106, 0.22);
+}
+
+.sidebar {
+	width: var(--sidebar-width);
+	--bs-offcanvas-width: var(--sidebar-width);
+	--bs-offcanvas-bg: var(--sidebar-bg);
+	background: var(--sidebar-bg);
+	color: var(--text);
+	min-height: 100vh;
+	/* Keep the sidebar flush to the viewport top (mobile + desktop) */
+	position: fixed;
+	top: 0;
+	left: 0;
+	padding: 0 20px 60px 20px; /* no top gap */
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	backdrop-filter: blur(15px);
+	-webkit-backdrop-filter: blur(15px);
+	border-right: 1px solid rgba(0, 255, 106, 0.2);
+	box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+	/* Use Bootstrap's offcanvas z-index expectations */
+	z-index: 1045;
+	overflow-y: auto;
+}
+
+.sidebar .logo h2 {
+	color: var(--text);
+	font-size: 1.1rem;
+	line-height: 1.1;
+}
+
+.sidebar .logo {
+	position: relative;
+	border-bottom: 1px solid rgba(0, 255, 106, 0.2);
+	/* Override generic `.logo { padding: ... }` from other admin styles */
+	padding: 12px 0 16px 0;
+	margin-bottom: 20px;
+}
+
+/* Dashboard-style neon separator under the logo (premium "system" anchor) */
+.sidebar .logo::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	bottom: -10px;
+	transform: translateX(-50%);
+	width: 78%;
+	height: 2px;
+	background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+	box-shadow: 0 0 12px rgba(0, 255, 106, 0.65);
+	pointer-events: none;
+}
+
+.sidebar nav a,
+.sidebar .dropdown-toggle,
+.sidebar .dropdown-content a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: rgba(255,255,255,0.7);
+	text-decoration: none;
+	padding: 15px 20px;
+	border-radius: 12px;
+	background: transparent;
+	transition: all 0.3s ease;
+	font-weight: 500;
+}
+
+.sidebar nav a:hover {
+	background: rgba(0, 255, 106, 0.1);
+	color: #ffffff;
+	transform: translateX(5px);
+}
+.sidebar nav a:hover i { color: #ffffff; }
+
+.sidebar nav a.active,
+.sidebar .dropdown-content a.active {
+	/* Solid selected state (matches the premium dashboard feel) */
+	background: linear-gradient(180deg, rgba(0, 255, 106, 0.85), rgba(0, 204, 85, 0.75)) !important;
+	color: #ffffff !important;
+	border: 1px solid rgba(0, 255, 106, 0.55);
+	box-shadow: 0 0 16px rgba(0, 255, 106, 0.45);
+}
+
+.sidebar nav a.active i,
+.sidebar .dropdown-content a.active i { color: #ffffff !important; }
+
+.sidebar .dropdown { position: relative; }
+.sidebar .dropdown .arrow { margin-left: auto; }
+
+.sidebar .dropdown-content {
+	display: none;
+	background: var(--sidebar-bg);
+	padding-left: 10px;
+}
+
+.sidebar .dropdown:hover .dropdown-content { display: block; }
+
+.sidebar .logout-container { margin-top: auto; padding: 10px 12px; margin-bottom: 40px; }
+.sidebar .logout { color: var(--text); display: flex; align-items: center; gap: 10px; }
+
+/* Submenu indentation and hierarchy */
+.sidebar .dropdown-content a {
+	padding-left: 26px;
+	font-size: 13px;
+	border-left: 2px solid rgba(0, 255, 106, 0.3);
+}
+
+/* Desktop: fixed sidebar + push content to the right */
+@media (min-width: 768px) {
+	.sidebar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100vh;
+	}
+	/* Works even when a topbar sits between sidebar and main-content */
+	.sidebar ~ .main-content {
+		margin-left: var(--sidebar-width) !important;
+	}
+}
+
+/* Mobile: sidebar becomes offcanvas drawer; content must be full width */
+@media (max-width: 767.98px) {
+	/* Turn the full-width mobile "topbar" into a small floating sidebar toggle.
+	   This keeps the UI as a true sidebar experience (not a top header strip). */
+	.mobile-topbar {
+		position: fixed;
+		top: 14px;
+		left: 14px;
+		width: auto;
+		background: transparent !important;
+		padding: 0 !important;
+		border: 0;
+		z-index: 1055;
+	}
+	.mobile-topbar span { display: none !important; }
+	.mobile-topbar .btn {
+		background: rgba(0, 0, 0, 0.35);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border: 1px solid rgba(0, 255, 106, 0.65) !important;
+		color: var(--primary-color) !important;
+		padding: 10px 10px;
+		border-radius: 12px;
+		box-shadow: 0 0 18px rgba(0, 255, 106, 0.18);
+	}
+	.mobile-topbar .btn i { color: var(--primary-color) !important; font-size: 1.1rem; }
+
+	/* Provide room so the floating button doesn't overlap the page title */
+	.mobile-topbar + .main-content { padding-top: 78px !important; }
+
+	.sidebar {
+		height: 100vh;
+		/* prevent the offcanvas from feeling too wide on very small screens */
+		max-width: 92vw;
+	}
+	.sidebar ~ .main-content {
+		margin-left: 0 !important;
+	}
+}
+
+/* Bootstrap offcanvas backdrop: "success" neon tint */
+/* Offcanvas backdrop: make it "success" themed (green tint like Bootstrap success). */
+.offcanvas-backdrop.backdrop-success,
+.offcanvas-backdrop.bg-success,
+.offcanvas-backdrop.show,
+.offcanvas-backdrop.fade.show {
+	/* override Bootstrap's opacity-based backdrop so tint is obvious */
+	opacity: 1 !important;
+	background: rgba(25, 135, 84, 0.52) !important;
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}
+
+/* Add neon texture only when we tagged it (keeps other backdrops clean) */
+.offcanvas-backdrop.backdrop-success.show,
+.offcanvas-backdrop.backdrop-success.fade.show {
+	background:
+		radial-gradient(1100px circle at 18% 12%, rgba(0, 255, 106, 0.65), transparent 58%),
+		radial-gradient(900px circle at 86% 88%, rgba(0, 255, 106, 0.40), transparent 62%),
+		rgba(25, 135, 84, 0.52) !important;
+}
+
+/* Admin Student Management: neon squircle sidebar toggle
+   (button is only visible below md due to d-md-none) */
+@media (max-width: 767.98px) {
+	button.neon-menu-btn.btn.btn-outline-primary.d-md-none.mb-3 {
+		width: clamp(44px, 12vw, 56px) !important;
+		height: clamp(54px, 14vw, 68px) !important; /* vertical squircle */
+		padding: 0 !important;
+		border-radius: 18px !important;
+		border: 1.5px solid rgba(0, 255, 106, 0.92) !important;
+		background: rgba(0, 0, 0, 0.25) !important;
+		color: rgba(0, 255, 106, 0.98) !important;
+		display: inline-flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		box-shadow:
+			0 0 0 1px rgba(0, 255, 106, 0.20) inset,
+			0 0 22px rgba(0, 255, 106, 0.22) !important;
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+
+	/* Rounded-cap hamburger (3 lines using box-shadow) */
+	button.neon-menu-btn .neon-hamburger {
+		--bar-h: 3px;
+		--bar-gap: 7px;
+		width: clamp(18px, 4.8vw, 22px);
+		height: var(--bar-h);
+		border-radius: 999px;
+		background: rgba(0, 255, 106, 0.98);
+		box-shadow:
+			0 calc(-1 * var(--bar-gap)) 0 rgba(0, 255, 106, 0.98),
+			0 var(--bar-gap) 0 rgba(0, 255, 106, 0.98),
+			0 0 12px rgba(0, 255, 106, 0.35);
+	}
+
+	button.neon-menu-btn:hover {
+		border-color: rgba(0, 255, 106, 1) !important;
+		box-shadow:
+			0 0 0 1px rgba(0, 255, 106, 0.24) inset,
+			0 0 30px rgba(0, 255, 106, 0.55),
+			0 0 52px rgba(0, 255, 106, 0.22) !important;
+		transform: translateY(-1px);
+	}
+
+	button.neon-menu-btn:active {
+		transform: translateY(0);
+		box-shadow:
+			0 0 0 1px rgba(0, 255, 106, 0.24) inset,
+			0 0 18px rgba(0, 255, 106, 0.32) !important;
+	}
+
+	button.neon-menu-btn:focus-visible {
+		outline: none;
+		box-shadow:
+			0 0 0 2px rgba(0, 0, 0, 0.5),
+			0 0 0 3px rgba(0, 255, 106, 0.85),
+			0 0 26px rgba(0, 255, 106, 0.35) !important;
+	}
+}
+
+

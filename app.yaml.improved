@@ -1,0 +1,122 @@
+# Improved app.yaml with recommendations
+# Review and compare with your current app.yaml
+# Replace values marked with [REVIEW] or [SET_IN_DASHBOARD]
+
+name: dmarsians-taekwondo
+region: nyc  # [REVIEW] Change to your preferred region (nyc, sfo, ams, etc.)
+
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: Helman143/Dmarsian  # [REVIEW] Update if different
+    branch: main
+    deploy_on_push: true  # [REVIEW] Set to false for manual deployments
+  
+  # Build command - installs Composer dependencies
+  build_command: composer install --no-dev --optimize-autoloader
+  
+  # Run command - starts PHP built-in server
+  run_command: php -S 0.0.0.0:8080 -t public public/index.php
+  
+  # PHP version - specify for consistency
+  environment_slug: php-8.2  # [REVIEW] Use php-8.1 or php-8.2 (or leave as 'php' for auto-detect)
+  
+  # Instance configuration
+  instance_count: 1  # [REVIEW] Start with 1, scale up as needed
+  instance_size_slug: basic-xxs  # [REVIEW] Options: basic-xxs, basic-xs, basic-s, professional-xs, etc.
+  
+  # HTTP configuration
+  http_port: 8080  # Required for App Platform
+  
+  # Health check (recommended)
+  health_check:
+    http_path: /health.php  # [RECOMMENDATION] Create health.php endpoint
+    initial_delay_seconds: 10
+    period_seconds: 10
+    timeout_seconds: 3
+    success_threshold: 1
+    failure_threshold: 3
+  
+  # Routes
+  routes:
+  - path: /
+  
+  # Environment variables
+  # NOTE: Sensitive values should be set in App Platform dashboard, not here
+  envs:
+  # Application environment
+  - key: APP_ENV
+    value: production
+    scope: RUN_TIME
+  
+  # Database variables (auto-set by database component)
+  - key: DB_HOST
+    value: ${db.HOSTNAME}
+    scope: RUN_TIME
+  - key: DB_USER
+    value: ${db.USERNAME}
+    scope: RUN_TIME
+  - key: DB_PASS
+    value: ${db.PASSWORD}
+    scope: RUN_TIME
+  - key: DB_NAME
+    value: ${db.DATABASE}
+    scope: RUN_TIME
+  - key: DB_PORT
+    value: ${db.PORT}
+    scope: RUN_TIME
+  
+  # Email configuration
+  # [IMPORTANT] Set actual values in App Platform dashboard, not here
+  - key: SMTP2GO_SENDER_NAME
+    value: D'Marsians Taekwondo Gym  # Non-sensitive, OK to keep here
+    scope: RUN_TIME
+  
+  # [SET_IN_DASHBOARD] These should be set in App Platform dashboard:
+  # - SMTP2GO_API_KEY
+  # - SMTP2GO_SENDER_EMAIL
+  # - ADMIN_BCC_EMAIL
+  
+  # DigitalOcean Spaces (if implementing file upload storage)
+  # [SET_IN_DASHBOARD] Set these in App Platform dashboard:
+  # - SPACES_KEY
+  # - SPACES_SECRET
+  # - SPACES_NAME
+  # - SPACES_REGION
+
+# Database component
+databases:
+- name: db  # Must match ${db.*} references above
+  engine: MYSQL
+  version: "8"
+  production: false  # [REVIEW] Set to true for production database
+  # [RECOMMENDATION] Add backup configuration
+  # backup_restore:
+  #   backup_name: daily-backup
+  #   restore_from_backup: false
+
+# [RECOMMENDATION] Add worker component if you need background jobs
+# workers:
+# - name: background-worker
+#   source_dir: /
+#   github:
+#     repo: Helman143/Dmarsian
+#     branch: main
+#   run_command: php worker.php
+#   environment_slug: php-8.2
+#   instance_count: 1
+#   instance_size_slug: basic-xxs
+
+# [RECOMMENDATION] Add static site component if you have separate frontend
+# static_sites:
+# - name: frontend
+#   source_dir: /frontend
+#   github:
+#     repo: Helman143/Dmarsian
+#     branch: main
+#   routes:
+#   - path: /
+
+
+

@@ -1,0 +1,24 @@
+name: dmarsians-taekwondo
+region: nyc
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: Helman143/Dmarsian
+    branch: main
+    deploy_on_push: true
+  build_command: composer install --no-dev --optimize-autoloader
+  run_command: php -S 0.0.0.0:8080 -t public public/index.php
+  environment_slug: php-8.2
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  routes:
+  - path: /
+  envs:
+  - key: APP_ENV
+    value: production
+    scope: RUN_TIME
+  # Database connection variables are set manually in App Platform dashboard
+  # Go to Settings -> App-Level Environment Variables to set:
+  # DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT

@@ -1,0 +1,26 @@
+# robots.txt for Martial Arts School Management System
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/
+Disallow: /Database/
+Disallow: /PHPMailer-master/
+Disallow: /tests/
+Disallow: /vendor/
+Disallow: /*.php$
+Disallow: /*.sql$
+Disallow: /*.env$
+Disallow: /*.log$
+
+# Sitemap (update with your actual domain)
+# Sitemap: https://yourdomain.com/sitemap.xml
+
+
+
+
+
+
+
+
