@@ -421,10 +421,20 @@ async function filterPosts() {
     const yearFilter = document.getElementById('year-filter').value;
     const categoryFilter = document.getElementById('category-filter').value;
     
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_post_management.js:420',message:'filterPosts called',data:{yearFilter,categoryFilter},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
+    
     // Build URL with filters
-    let url = 'admin_post_management.php?';
-    if (yearFilter) url += `year=${yearFilter}`;
-    if (categoryFilter) url += `${yearFilter ? '&' : ''}category=${categoryFilter}`;
+    const params = [];
+    if (yearFilter) params.push(`year=${yearFilter}`);
+    if (categoryFilter) params.push(`category=${categoryFilter}`);
+    
+    const url = 'admin_post_management.php?' + params.join('&');
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_post_management.js:430',message:'Redirecting with filters',data:{url,params},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
     
     // Redirect to filtered page
     window.location.href = url;

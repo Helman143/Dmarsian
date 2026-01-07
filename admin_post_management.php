@@ -30,11 +30,58 @@ function getBasePath() {
 
 $basePath = getBasePath();
 
+// Get DigitalOcean Spaces base URL for images (like webpage.php does)
+$spacesBaseUrl = null;
+$spacesName = getenv('SPACES_NAME');
+$spacesRegion = getenv('SPACES_REGION') ?: 'nyc3';
+if (!empty($spacesName) && !empty($spacesRegion)) {
+    $spacesBaseUrl = "https://{$spacesName}.{$spacesRegion}.digitaloceanspaces.com/posts/";
+}
+
+// #region agent log
+$log_file = __DIR__ . '/.cursor/debug.log';
+$log_entry = json_encode([
+    'id' => 'log_' . time() . '_' . uniqid(),
+    'timestamp' => round(microtime(true) * 1000),
+    'location' => 'admin_post_management.php:35',
+    'message' => 'Spaces configuration check',
+    'data' => [
+        'spacesName' => $spacesName,
+        'spacesRegion' => $spacesRegion,
+        'spacesBaseUrl' => $spacesBaseUrl,
+        'basePath' => $basePath,
+        'hypothesisId' => 'H1'
+    ],
+    'sessionId' => 'debug-session',
+    'runId' => 'run1'
+]) . "\n";
+@file_put_contents($log_file, $log_entry, FILE_APPEND);
+// #endregion
+
 // Fetch posts for display
 $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
+
+// #region agent log
+$log_entry = json_encode([
+    'id' => 'log_' . time() . '_' . uniqid(),
+    'timestamp' => round(microtime(true) * 1000),
+    'location' => 'admin_post_management.php:60',
+    'message' => 'Filter parameters',
+    'data' => [
+        'year_filter' => $year_filter,
+        'category_filter_raw' => $category_filter_raw,
+        'category_filter' => $category_filter,
+        'current_year' => date('Y'),
+        'hypothesisId' => 'H2'
+    ],
+    'sessionId' => 'debug-session',
+    'runId' => 'run1'
+]) . "\n";
+@file_put_contents($log_file, $log_entry, FILE_APPEND);
+// #endregion
 
 // Base query: exclude archived posts and filter by year
 $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
@@ -139,9 +186,14 @@ mysqli_close($conn);
             <div class="filters">
                 <div class="filter-dropdown">
                     <select id="year-filter" onchange="filterPosts()">
-                        <option value="2025" <?php echo $year_filter == 2025 ? 'selected' : ''; ?>>2025</option>
-                        <option value="2024" <?php echo $year_filter == 2024 ? 'selected' : ''; ?>>2024</option>
-                        <option value="2023" <?php echo $year_filter == 2023 ? 'selected' : ''; ?>>2023</option>
+                        <?php
+                        $current_year = date('Y');
+                        // Generate years from current year down to 5 years ago
+                        for ($year = $current_year; $year >= $current_year - 5; $year--) {
+                            $selected = $year_filter == $year ? 'selected' : '';
+                            echo "<option value=\"{$year}\" {$selected}>{$year}</option>";
+                        }
+                        ?>
                     </select>
                     <i class="fas fa-chevron-down"></i>
                 </div>
@@ -174,36 +226,136 @@ mysqli_close($conn);
                         if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                             $img_path = trim($img_path_value);
                             
+                            // #region agent log
+                            $log_entry = json_encode([
+                                'id' => 'log_' . time() . '_' . uniqid(),
+                                'timestamp' => round(microtime(true) * 1000),
+                                'location' => 'admin_post_management.php:180',
+                                'message' => 'Processing image path',
+                                'data' => [
+                                    'post_id' => $post['id'],
+                                    'original_img_path' => $img_path,
+                                    'is_full_url' => preg_match('/^(https?:\/\/|data:)/', $img_path) ? true : false,
+                                    'spacesBaseUrl' => $spacesBaseUrl,
+                                    'hypothesisId' => 'H1'
+                                ],
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1'
+                            ]) . "\n";
+                            @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                            // #endregion
+                            
                             // If already a full URL (Spaces/CDN), use it directly
                             if (preg_match('/^(https?:\/\/|data:)/', $img_path)) {
                                 $final_img_path = $img_path;
                                 $has_image = true;
+                                
+                                // #region agent log
+                                $log_entry = json_encode([
+                                    'id' => 'log_' . time() . '_' . uniqid(),
+                                    'timestamp' => round(microtime(true) * 1000),
+                                    'location' => 'admin_post_management.php:200',
+                                    'message' => 'Using full URL directly',
+                                    'data' => [
+                                        'post_id' => $post['id'],
+                                        'final_img_path' => $final_img_path,
+                                        'hypothesisId' => 'H1'
+                                    ],
+                                    'sessionId' => 'debug-session',
+                                    'runId' => 'run1'
+                                ]) . "\n";
+                                @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                // #endregion
                             } else {
-                                // Local file: verify it exists before using it
-                                $file_path = $img_path;
-                                // Remove leading / for file system check if present
-                                if (strpos($file_path, '/') === 0) {
-                                    $file_path = substr($file_path, 1);
-                                }
-                                
-                                // Use absolute path based on script directory
-                                $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
-                                
-                                if (file_exists($absolute_path) || file_exists($file_path)) {
-                                    // File exists - ensure path starts with / for web URL (if not already a full URL)
-                                    if (!preg_match('/^(https?:\/\/|data:)/', $img_path)) {
-                                        // Use base path if in subdirectory, otherwise use root-relative path
-                                        $clean_path = ltrim($img_path, '/');
-                                        // Ensure we have a leading slash
-                                        if ($basePath === '') {
-                                            $final_img_path = '/' . $clean_path;
-                                        } else {
-                                            $final_img_path = $basePath . '/' . $clean_path;
-                                        }
-                                    } else {
-                                        $final_img_path = $img_path;
-                                    }
+                                // Try Spaces URL first if configured (like webpage.php does)
+                                if ($spacesBaseUrl) {
+                                    // Extract filename from path
+                                    $fileName = basename($img_path);
+                                    $spacesUrl = $spacesBaseUrl . $fileName;
+                                    $final_img_path = $spacesUrl;
                                     $has_image = true;
+                                    
+                                    // #region agent log
+                                    $log_entry = json_encode([
+                                        'id' => 'log_' . time() . '_' . uniqid(),
+                                        'timestamp' => round(microtime(true) * 1000),
+                                        'location' => 'admin_post_management.php:220',
+                                        'message' => 'Constructed Spaces URL',
+                                        'data' => [
+                                            'post_id' => $post['id'],
+                                            'original_path' => $img_path,
+                                            'fileName' => $fileName,
+                                            'spacesUrl' => $spacesUrl,
+                                            'final_img_path' => $final_img_path,
+                                            'hypothesisId' => 'H1'
+                                        ],
+                                        'sessionId' => 'debug-session',
+                                        'runId' => 'run1'
+                                    ]) . "\n";
+                                    @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                    // #endregion
+                                } else {
+                                    // Local file: verify it exists before using it
+                                    $file_path = $img_path;
+                                    // Remove leading / for file system check if present
+                                    if (strpos($file_path, '/') === 0) {
+                                        $file_path = substr($file_path, 1);
+                                    }
+                                    
+                                    // Use absolute path based on script directory
+                                    $absolute_path = __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path);
+                                    
+                                    if (file_exists($absolute_path) || file_exists($file_path)) {
+                                        // File exists - ensure path starts with / for web URL (if not already a full URL)
+                                        if (!preg_match('/^(https?:\/\/|data:)/', $img_path)) {
+                                            // Use base path if in subdirectory, otherwise use root-relative path
+                                            $clean_path = ltrim($img_path, '/');
+                                            // Ensure we have a leading slash
+                                            if ($basePath === '') {
+                                                $final_img_path = '/' . $clean_path;
+                                            } else {
+                                                $final_img_path = $basePath . '/' . $clean_path;
+                                            }
+                                        } else {
+                                            $final_img_path = $img_path;
+                                        }
+                                        $has_image = true;
+                                        
+                                        // #region agent log
+                                        $log_entry = json_encode([
+                                            'id' => 'log_' . time() . '_' . uniqid(),
+                                            'timestamp' => round(microtime(true) * 1000),
+                                            'location' => 'admin_post_management.php:260',
+                                            'message' => 'Using local file path',
+                                            'data' => [
+                                                'post_id' => $post['id'],
+                                                'final_img_path' => $final_img_path,
+                                                'hypothesisId' => 'H1'
+                                            ],
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1'
+                                        ]) . "\n";
+                                        @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                        // #endregion
+                                    } else {
+                                        // #region agent log
+                                        $log_entry = json_encode([
+                                            'id' => 'log_' . time() . '_' . uniqid(),
+                                            'timestamp' => round(microtime(true) * 1000),
+                                            'location' => 'admin_post_management.php:275',
+                                            'message' => 'Local file not found',
+                                            'data' => [
+                                                'post_id' => $post['id'],
+                                                'checked_paths' => [$file_path, $absolute_path],
+                                                'has_image' => false,
+                                                'hypothesisId' => 'H1'
+                                            ],
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1'
+                                        ]) . "\n";
+                                        @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                        // #endregion
+                                    }
                                 }
                             }
                         }
