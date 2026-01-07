@@ -38,50 +38,11 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
     $spacesBaseUrl = "https://{$spacesName}.{$spacesRegion}.digitaloceanspaces.com/posts/";
 }
 
-// #region agent log
-$log_file = __DIR__ . '/.cursor/debug.log';
-$log_entry = json_encode([
-    'id' => 'log_' . time() . '_' . uniqid(),
-    'timestamp' => round(microtime(true) * 1000),
-    'location' => 'post_management.php:35',
-    'message' => 'Spaces configuration check',
-    'data' => [
-        'spacesName' => $spacesName,
-        'spacesRegion' => $spacesRegion,
-        'spacesBaseUrl' => $spacesBaseUrl,
-        'basePath' => $basePath,
-        'hypothesisId' => 'H1'
-    ],
-    'sessionId' => 'debug-session',
-    'runId' => 'run1'
-]) . "\n";
-@file_put_contents($log_file, $log_entry, FILE_APPEND);
-// #endregion
-
 // Fetch posts for display
 $conn = connectDB();
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
-
-// #region agent log
-$log_entry = json_encode([
-    'id' => 'log_' . time() . '_' . uniqid(),
-    'timestamp' => round(microtime(true) * 1000),
-    'location' => 'post_management.php:60',
-    'message' => 'Filter parameters',
-    'data' => [
-        'year_filter' => $year_filter,
-        'category_filter_raw' => $category_filter_raw,
-        'category_filter' => $category_filter,
-        'current_year' => date('Y'),
-        'hypothesisId' => 'H2'
-    ],
-    'sessionId' => 'debug-session',
-    'runId' => 'run1'
-]) . "\n";
-@file_put_contents($log_file, $log_entry, FILE_APPEND);
-// #endregion
 
 // Base query: exclude archived posts and filter by year
 $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
@@ -226,46 +187,10 @@ mysqli_close($conn);
                         if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                             $img_path = trim($img_path_value);
 
-                            // #region agent log
-                            $log_entry = json_encode([
-                                'id' => 'log_' . time() . '_' . uniqid(),
-                                'timestamp' => round(microtime(true) * 1000),
-                                'location' => 'post_management.php:200',
-                                'message' => 'Processing image path',
-                                'data' => [
-                                    'post_id' => $post['id'],
-                                    'original_img_path' => $img_path,
-                                    'is_full_url' => preg_match('/^(https?:\/\/|data:)/', $img_path) ? true : false,
-                                    'spacesBaseUrl' => $spacesBaseUrl,
-                                    'hypothesisId' => 'H1'
-                                ],
-                                'sessionId' => 'debug-session',
-                                'runId' => 'run1'
-                            ]) . "\n";
-                            @file_put_contents($log_file, $log_entry, FILE_APPEND);
-                            // #endregion
-
                             // If already a full URL (Spaces/CDN), use it directly
                             if (preg_match('/^(https?:\/\/|data:)/', $img_path)) {
                                 $final_img_path = $img_path;
                                 $has_image = true;
-                                
-                                // #region agent log
-                                $log_entry = json_encode([
-                                    'id' => 'log_' . time() . '_' . uniqid(),
-                                    'timestamp' => round(microtime(true) * 1000),
-                                    'location' => 'post_management.php:220',
-                                    'message' => 'Using full URL directly',
-                                    'data' => [
-                                        'post_id' => $post['id'],
-                                        'final_img_path' => $final_img_path,
-                                        'hypothesisId' => 'H1'
-                                    ],
-                                    'sessionId' => 'debug-session',
-                                    'runId' => 'run1'
-                                ]) . "\n";
-                                @file_put_contents($log_file, $log_entry, FILE_APPEND);
-                                // #endregion
                             } else {
                                 // Try Spaces URL first if configured (like webpage.php does)
                                 if ($spacesBaseUrl) {
@@ -274,26 +199,6 @@ mysqli_close($conn);
                                     $spacesUrl = $spacesBaseUrl . $fileName;
                                     $final_img_path = $spacesUrl;
                                     $has_image = true;
-                                    
-                                    // #region agent log
-                                    $log_entry = json_encode([
-                                        'id' => 'log_' . time() . '_' . uniqid(),
-                                        'timestamp' => round(microtime(true) * 1000),
-                                        'location' => 'post_management.php:240',
-                                        'message' => 'Constructed Spaces URL',
-                                        'data' => [
-                                            'post_id' => $post['id'],
-                                            'original_path' => $img_path,
-                                            'fileName' => $fileName,
-                                            'spacesUrl' => $spacesUrl,
-                                            'final_img_path' => $final_img_path,
-                                            'hypothesisId' => 'H1'
-                                        ],
-                                        'sessionId' => 'debug-session',
-                                        'runId' => 'run1'
-                                    ]) . "\n";
-                                    @file_put_contents($log_file, $log_entry, FILE_APPEND);
-                                    // #endregion
                                 } else {
                                     // Local file: verify it exists before using it
                                     $file_path = $img_path;
@@ -315,41 +220,6 @@ mysqli_close($conn);
                                             $final_img_path = $basePath . '/' . $clean_path;
                                         }
                                         $has_image = true;
-                                        
-                                        // #region agent log
-                                        $log_entry = json_encode([
-                                            'id' => 'log_' . time() . '_' . uniqid(),
-                                            'timestamp' => round(microtime(true) * 1000),
-                                            'location' => 'post_management.php:270',
-                                            'message' => 'Using local file path',
-                                            'data' => [
-                                                'post_id' => $post['id'],
-                                                'final_img_path' => $final_img_path,
-                                                'hypothesisId' => 'H1'
-                                            ],
-                                            'sessionId' => 'debug-session',
-                                            'runId' => 'run1'
-                                        ]) . "\n";
-                                        @file_put_contents($log_file, $log_entry, FILE_APPEND);
-                                        // #endregion
-                                    } else {
-                                        // #region agent log
-                                        $log_entry = json_encode([
-                                            'id' => 'log_' . time() . '_' . uniqid(),
-                                            'timestamp' => round(microtime(true) * 1000),
-                                            'location' => 'post_management.php:285',
-                                            'message' => 'Local file not found',
-                                            'data' => [
-                                                'post_id' => $post['id'],
-                                                'checked_paths' => [$file_path, $absolute_path],
-                                                'has_image' => false,
-                                                'hypothesisId' => 'H1'
-                                            ],
-                                            'sessionId' => 'debug-session',
-                                            'runId' => 'run1'
-                                        ]) . "\n";
-                                        @file_put_contents($log_file, $log_entry, FILE_APPEND);
-                                        // #endregion
                                     }
                                 }
                             }
