@@ -187,10 +187,50 @@ mysqli_close($conn);
                         if ($img_path_value !== null && $img_path_value !== '' && trim($img_path_value) !== '') {
                             $img_path = trim($img_path_value);
                             
+                            // #region agent log
+                            $log_file = __DIR__ . '/.cursor/debug.log';
+                            $log_entry = json_encode([
+                                'id' => 'log_' . time() . '_' . uniqid(),
+                                'timestamp' => round(microtime(true) * 1000),
+                                'location' => 'admin_post_management.php:180',
+                                'message' => 'Processing image path for post',
+                                'data' => [
+                                    'post_id' => $post['id'],
+                                    'post_title' => $post['title'] ?? 'N/A',
+                                    'original_img_path_value' => $img_path_value,
+                                    'trimmed_img_path' => $img_path,
+                                    'is_full_url' => preg_match('/^(https?:\/\/|data:)/', $img_path) ? true : false,
+                                    'spacesBaseUrl' => $spacesBaseUrl,
+                                    'hypothesisId' => 'H1'
+                                ],
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1'
+                            ]) . "\n";
+                            @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                            // #endregion
+                            
                             // If already a full URL (Spaces/CDN), use it directly
                             if (preg_match('/^(https?:\/\/|data:)/', $img_path)) {
                                 $final_img_path = $img_path;
                                 $has_image = true;
+                                
+                                // #region agent log
+                                $log_entry = json_encode([
+                                    'id' => 'log_' . time() . '_' . uniqid(),
+                                    'timestamp' => round(microtime(true) * 1000),
+                                    'location' => 'admin_post_management.php:200',
+                                    'message' => 'Using full URL directly',
+                                    'data' => [
+                                        'post_id' => $post['id'],
+                                        'final_img_path' => $final_img_path,
+                                        'has_image' => $has_image,
+                                        'hypothesisId' => 'H1'
+                                    ],
+                                    'sessionId' => 'debug-session',
+                                    'runId' => 'run1'
+                                ]) . "\n";
+                                @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                // #endregion
                             } else {
                                 // Try Spaces URL first if configured (like webpage.php does)
                                 if ($spacesBaseUrl) {
@@ -199,6 +239,27 @@ mysqli_close($conn);
                                     $spacesUrl = $spacesBaseUrl . $fileName;
                                     $final_img_path = $spacesUrl;
                                     $has_image = true;
+                                    
+                                    // #region agent log
+                                    $log_entry = json_encode([
+                                        'id' => 'log_' . time() . '_' . uniqid(),
+                                        'timestamp' => round(microtime(true) * 1000),
+                                        'location' => 'admin_post_management.php:220',
+                                        'message' => 'Constructed Spaces URL from filename',
+                                        'data' => [
+                                            'post_id' => $post['id'],
+                                            'original_path' => $img_path,
+                                            'fileName' => $fileName,
+                                            'spacesUrl' => $spacesUrl,
+                                            'final_img_path' => $final_img_path,
+                                            'has_image' => $has_image,
+                                            'hypothesisId' => 'H1'
+                                        ],
+                                        'sessionId' => 'debug-session',
+                                        'runId' => 'run1'
+                                    ]) . "\n";
+                                    @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                    // #endregion
                                 } else {
                                     // Local file: verify it exists before using it
                                     $file_path = $img_path;
@@ -225,14 +286,90 @@ mysqli_close($conn);
                                             $final_img_path = $img_path;
                                         }
                                         $has_image = true;
+                                        
+                                        // #region agent log
+                                        $log_entry = json_encode([
+                                            'id' => 'log_' . time() . '_' . uniqid(),
+                                            'timestamp' => round(microtime(true) * 1000),
+                                            'location' => 'admin_post_management.php:260',
+                                            'message' => 'Using local file path',
+                                            'data' => [
+                                                'post_id' => $post['id'],
+                                                'final_img_path' => $final_img_path,
+                                                'has_image' => $has_image,
+                                                'hypothesisId' => 'H1'
+                                            ],
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1'
+                                        ]) . "\n";
+                                        @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                        // #endregion
+                                    } else {
+                                        // #region agent log
+                                        $log_entry = json_encode([
+                                            'id' => 'log_' . time() . '_' . uniqid(),
+                                            'timestamp' => round(microtime(true) * 1000),
+                                            'location' => 'admin_post_management.php:275',
+                                            'message' => 'Local file not found',
+                                            'data' => [
+                                                'post_id' => $post['id'],
+                                                'checked_paths' => [$file_path, $absolute_path],
+                                                'has_image' => false,
+                                                'hypothesisId' => 'H1'
+                                            ],
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1'
+                                        ]) . "\n";
+                                        @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                                        // #endregion
                                     }
                                 }
                             }
+                        } else {
+                            // #region agent log
+                            $log_file = __DIR__ . '/.cursor/debug.log';
+                            $log_entry = json_encode([
+                                'id' => 'log_' . time() . '_' . uniqid(),
+                                'timestamp' => round(microtime(true) * 1000),
+                                'location' => 'admin_post_management.php:295',
+                                'message' => 'No image path for post',
+                                'data' => [
+                                    'post_id' => $post['id'],
+                                    'post_title' => $post['title'] ?? 'N/A',
+                                    'img_path_value' => $img_path_value,
+                                    'has_image' => false,
+                                    'hypothesisId' => 'H1'
+                                ],
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1'
+                            ]) . "\n";
+                            @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                            // #endregion
                         }
                         
                         // If no image, use placeholder
                         if (!$has_image) {
                             $final_img_path = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E";
+                            
+                            // #region agent log
+                            $log_file = __DIR__ . '/.cursor/debug.log';
+                            $log_entry = json_encode([
+                                'id' => 'log_' . time() . '_' . uniqid(),
+                                'timestamp' => round(microtime(true) * 1000),
+                                'location' => 'admin_post_management.php:310',
+                                'message' => 'Using placeholder image',
+                                'data' => [
+                                    'post_id' => $post['id'],
+                                    'post_title' => $post['title'] ?? 'N/A',
+                                    'final_img_path' => 'placeholder',
+                                    'has_image' => false,
+                                    'hypothesisId' => 'H1'
+                                ],
+                                'sessionId' => 'debug-session',
+                                'runId' => 'run1'
+                            ]) . "\n";
+                            @file_put_contents($log_file, $log_entry, FILE_APPEND);
+                            // #endregion
                         }
                         ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
