@@ -191,13 +191,22 @@
     box-shadow: 0 0 20px #ffaa00;
 }
 
+/* Table Header Section */
+.table-header-section {
+    max-width: 1100px;
+    width: calc(100% - 40px);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+
 /* Table Container */
 .table-container {
     background: rgba(255, 255, 255, 0.9); /* place the light tone behind the table */
     border: 1px solid rgba(0, 255, 106, 0.18);
     border-radius: 12px;
     padding: 15px;
-    margin-top: 30px;
+    margin-top: 0;
     margin-left: auto;
     margin-right: auto;
     max-width: 1100px;
@@ -212,14 +221,15 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     min-width: max-content; /* Ensures table maintains readability */
 }
 
 .student-table th,
 .student-table td {
-    padding: 10px 12px;
+    padding: 16px 12px; /* Increased vertical padding for better readability */
     text-align: left;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     white-space: nowrap;
 }
 
@@ -231,10 +241,12 @@
     top: 0;
     z-index: 1;
     letter-spacing: 0.5px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .student-table td {
-    color: #0a1f12;
+    color: #1a1a1a; /* Darkened text color for better contrast */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .student-table tbody tr:nth-child(even) {
@@ -242,7 +254,8 @@
 }
 
 .student-table tbody tr:hover {
-    background: rgba(0, 255, 106, 0.08);
+    background: rgba(249, 250, 251, 0.8); /* Subtle gray-50 equivalent hover state */
+    transition: background-color 0.2s ease;
 }
 
 /* Status Colors */
@@ -256,19 +269,31 @@
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
+    .table-header-section {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: calc(100% - 30px);
+    }
     .table-container {
         margin-left: 15px;
         margin-right: 15px;
         width: calc(100% - 30px);
         padding: 10px;
+        overflow-x: auto; /* Ensure horizontal scrolling on mobile */
     }
 }
 
 @media (max-width: 767.98px) {
+    .table-header-section {
+        margin-left: 10px;
+        margin-right: 10px;
+        width: calc(100% - 20px);
+    }
     .table-container {
         margin-left: 10px;
         margin-right: 10px;
         width: calc(100% - 20px);
+        overflow-x: auto; /* Ensure horizontal scrolling on mobile */
     }
     .main-content {
         min-height: 100vh;
@@ -492,63 +517,46 @@ nav a, .dropdown-toggle, .dropdown-content a {
 @media (min-width: 768px) {
 	/* Hide mobile-only elements on desktop when Bootstrap CSS isn't loaded */
 	.d-md-none { display: none !important; }
-    /* create space so absolute toolbar doesn't overlap table header */
-    .table-container { padding-top: 78px; }
 } 
 
-/* Search HUD dock */
-.table-toolbar {
-    position: absolute;
-    top: 16px;
-    right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    background: rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(0, 255, 106, 0.2);
-    padding: 10px 16px;
-    border-radius: 12px 12px 0 0;
-    z-index: 2;
-    gap: 10px;
-}
-
-.table-toolbar .search-container {
+/* Table Header Section Search */
+.table-header-section .search-container {
 	position: relative;
-	width: 190px;
-	min-width: 160px;
+	width: 220px;
+	min-width: 180px;
 	flex-shrink: 1;
 }
 
-.table-toolbar .search-container input {
+.table-header-section .search-container input {
 	width: 100%;
 	height: 42px;
 	line-height: 1.4;
-	padding: 10px 42px 10px 50px;
+	padding: 10px 42px 10px 16px;
 	border: 1px solid rgba(0, 255, 106, 0.4);
 	border-radius: 14px;
-	background: rgba(0, 0, 0, 0.5);
-	color: #fff;
+	background: rgba(255, 255, 255, 0.95);
+	color: #1a1a1a;
 	font-size: 14px;
 	outline: none;
 	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 	box-sizing: border-box;
-	font-family: 'Courier New', monospace;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.table-toolbar .search-container input:focus {
-	width: 220px;
+.table-header-section .search-container input:focus {
+	width: 250px;
 	border-color: var(--emerald-1);
 	box-shadow: 0 0 15px rgba(0, 255, 106, 0.3), inset 0 0 10px rgba(0, 255, 106, 0.1);
-	background: #000;
+	background: #fff;
 }
 
-.table-toolbar .search-container input::placeholder {
-	color: rgba(255, 255, 255, 0.6);
+.table-header-section .search-container input::placeholder {
+	color: rgba(0, 0, 0, 0.5);
 }
 
-.table-toolbar .search-icon {
+.table-header-section .search-icon {
 	position: absolute;
-	left: 18px;
+	right: 18px;
 	top: 50%;
 	transform: translateY(-50%);
 	color: var(--emerald-1);
@@ -558,12 +566,13 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 
 /* Hard override */
-#studentsDesktopToolbar .search-container #studentSearchBox {
-	background: rgba(0, 0, 0, 0.5) !important;
+.table-header-section .search-container #studentSearchBox {
+	background: rgba(255, 255, 255, 0.95) !important;
 	border: 1px solid rgba(0, 255, 106, 0.4) !important;
 	border-radius: 14px !important;
-	color: #fff !important;
-	padding: 10px 40px 10px 16px !important;
+	color: #1a1a1a !important;
+	padding: 10px 42px 10px 16px !important;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
 }
 
 /* Custom "Hacker" Scrollbar */
@@ -637,7 +646,7 @@ nav a, .dropdown-toggle, .dropdown-content a {
 }
 .student-table th,
 .student-table td {
-    padding: clamp(8px, 1.4vw, 12px);
+    padding: clamp(12px, 2vw, 16px) clamp(10px, 1.4vw, 12px);
 }
 
 .table-toolbar {

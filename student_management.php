@@ -183,13 +183,15 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 				</select>
 			</div>
 
-            <div class="table-container table-responsive enrollees-card">
-                <div id="studentsDesktopToolbar" class="d-none d-md-flex justify-content-end align-items-center gap-2 table-toolbar">
-                    <div class="search-container">
-                        <input type="text" id="studentSearchBox" placeholder="Search students...">
-                        <i class="fas fa-search search-icon"></i>
-                    </div>
+            <!-- Table Header with Search -->
+            <div class="table-header-section d-none d-md-flex justify-content-end align-items-center mb-3">
+                <div class="search-container">
+                    <input type="text" id="studentSearchBox" placeholder="Search students...">
+                    <i class="fas fa-search search-icon"></i>
                 </div>
+            </div>
+
+            <div class="table-container table-responsive enrollees-card">
                 <table class="student-table table table-striped table-hover align-middle">
                     <thead>
                         <tr>
@@ -338,7 +340,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         <td class="d-none d-md-table-cell">${student.address}</td>
                         <td>${student.phone}</td>
                         <td class="d-none d-md-table-cell">${student.email || ''}</td>
-                        <td class="d-none d-md-table-cell">${student.gender || ''}</td>
+                        <td class="d-none d-md-table-cell">${student.gender || '—'}</td>
                         <td class="d-none d-md-table-cell">${student.school || ''}</td>
                         <td class="d-none d-md-table-cell">${student.parent_name || ''}</td>
                         <td class="d-none d-md-table-cell">${student.parent_phone || ''}</td>
