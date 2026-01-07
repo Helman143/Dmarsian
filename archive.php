@@ -99,7 +99,11 @@ mysqli_close($conn);
                     <?php else: ?>
                         <?php foreach ($posts as $i => $post): ?>
                             <div class="col-12 col-sm-6 col-lg-4 d-flex">
-                                <article class="archive-card w-100" style="--i: <?= (int)$i ?>;">
+                                <article class="archive-card w-100" style="--i: <?= (int)$i ?>;"
+                                         data-title="<?= htmlspecialchars($post['title']) ?>"
+                                         data-desc="<?= htmlspecialchars($post['description']) ?>"
+                                         data-date="<?= date('F j, Y g:i A', strtotime($post['post_date'])) ?>"
+                                         data-image="<?= !empty($post['image_path']) ? htmlspecialchars($post['image_path']) : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image' ?>">
                                     <div class="archive-media">
                                         <img class="img-fluid w-100"
                                              src="<?= !empty($post['image_path']) ? htmlspecialchars($post['image_path']) : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image' ?>"
@@ -161,6 +165,69 @@ mysqli_close($conn);
         t = window.setTimeout(() => deck.classList.remove('is-typing'), 350);
       });
     })();
+    </script>
+    
+    <!-- Post Details Modal -->
+    <div class="postmodal-overlay" id="postModal" aria-hidden="true">
+        <div class="postmodal-dialog" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
+            <button class="postmodal-close" type="button" aria-label="Close" id="postModalClose">&times;</button>
+            <div class="postmodal-body">
+                <div class="postmodal-image">
+                    <img id="postModalImg" alt="Post image">
+                </div>
+                <div class="postmodal-content">
+                    <h3 id="postModalTitle"></h3>
+                    <p class="postmodal-meta" id="postModalDate"></p>
+                    <div class="postmodal-desc" id="postModalDesc"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('postModal');
+        const modalImg = document.getElementById('postModalImg');
+        const modalTitle = document.getElementById('postModalTitle');
+        const modalDate = document.getElementById('postModalDate');
+        const modalDesc = document.getElementById('postModalDesc');
+        const closeBtn = document.getElementById('postModalClose');
+        
+        // Open Modal
+        document.querySelectorAll('.archive-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.getAttribute('data-title');
+                const desc = card.getAttribute('data-desc');
+                const date = card.getAttribute('data-date');
+                const image = card.getAttribute('data-image');
+                
+                modalTitle.textContent = title;
+                modalDesc.textContent = desc;
+                modalDate.textContent = date;
+                modalImg.src = image;
+                
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            });
+        });
+        
+        // Close Modal Function
+        const closeModal = () => {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        };
+        
+        // Event Listeners
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+        });
+    });
     </script>
 </body>
 </html> 
