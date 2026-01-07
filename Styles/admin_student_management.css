@@ -268,8 +268,8 @@
 
 /* Table Container */
 .table-container {
-    background: rgba(0, 20, 10, 0.8);
-    border: 1px solid rgba(0, 255, 106, 0.2);
+    background: rgba(255, 255, 255, 0.9); /* place the light tone behind the table */
+    border: 1px solid rgba(0, 255, 106, 0.18);
     border-radius: 12px;
     padding: 15px;
     margin-top: 30px;
@@ -280,7 +280,7 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     position: relative;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .student-table {
@@ -299,8 +299,8 @@
 }
 
 .student-table th {
-    background: rgba(0, 255, 106, 0.15);
-    color: var(--emerald-1);
+    background: rgba(0, 255, 106, 0.16);
+    color: #0d2f1c;
     font-weight: 700;
     position: sticky;
     top: 0;
@@ -309,15 +309,15 @@
 }
 
 .student-table td {
-    color: #fff;
+    color: #0a1f12;
 }
 
 .student-table tbody tr:nth-child(even) {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.025);
 }
 
 .student-table tbody tr:hover {
-    background: rgba(0, 255, 106, 0.05);
+    background: rgba(0, 255, 106, 0.08);
 }
 
 /* Status Colors */
