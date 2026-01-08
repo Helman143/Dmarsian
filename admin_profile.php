@@ -1,6 +1,16 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
+// Check if user is logged in and is super admin
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'super_admin') {
+    header("Location: index.php");
+    exit();
+}
 require_once 'db_connect.php';
+
+// Get user's name from session
+$userName = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin';
 
 // Assume Super Admin has id=1
 $admin_id = 1;
@@ -82,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Profile</title>
+    <title>D'MARSIANS Taekwondo System - Admin Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjIS5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Match style include order used by other admin pages -->
     <link rel="stylesheet" href="Styles/admin_dashboard.css">
@@ -108,49 +118,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <!-- Main Content -->
         <div class="main-content">
-            <div class="container py-3 py-md-4">
-                <div class="row g-4 justify-content-center align-items-start">
-                    <div class="col-12 col-sm-10 col-md-5 col-lg-4">
-                        <div class="profile-image card bg-transparent border-0 p-3 p-md-4">
-                            <div class="ratio ratio-1x1 rounded-3 overflow-hidden border border-success">
-                                <img src="1.png" alt="Profile image" class="w-100 h-100" style="object-fit: cover;">
-                            </div>
+            <div class="welcome-header">
+                <h1>Admin Profile</h1>
+            </div>
+            <div class="profile-container row g-4 justify-content-center">
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="profile-image-card">
+                        <div class="profile-image-wrapper">
+                            <img src="1.png" alt="Profile image" class="profile-image">
+                        </div>
+                        <div class="profile-badge">
+                            <i class="fas fa-user-shield"></i>
+                            <span>Super Admin</span>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-10 col-md-7 col-lg-6">
-                        <div class="profile-card card bg-transparent border-0 p-3 p-md-4">
-                            <h1 class="h3 text-white mb-3">Profile</h1>
-                            <h2 class="h5 text-success mb-3"><i class="fas fa-user-shield me-2"></i>Super Admin</h2>
-                            <?php if ($success): ?>
-                                <div class="alert alert-success py-2" role="alert"><?php echo $success; ?></div>
-                            <?php endif; ?>
-                            <?php if ($error): ?>
-                                <div class="alert alert-danger py-2" role="alert"><?php echo $error; ?></div>
-                            <?php endif; ?>
-                            <form id="profileForm" method="post" autocomplete="off" class="needs-validation" novalidate>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" <?php echo $admin_exists ? 'disabled' : ''; ?> required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
-                                    <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" <?php echo $admin_exists ? 'disabled' : ''; ?> required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" value="" placeholder="Enter new password<?php echo $admin_exists ? ' or leave blank' : ''; ?>" <?php echo $admin_exists ? 'disabled' : ''; ?> <?php echo $admin_exists ? '' : 'required'; ?>>
-                                </div>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <?php if ($admin_exists): ?>
-                                        <button type="button" id="editProfileBtn" class="btn btn-success"><i class="fas fa-pen"></i> Edit Profile</button>
-                                        <button type="submit" id="saveProfileBtn" class="btn btn-primary" style="display:none;"><i class="fas fa-save"></i> Save</button>
-                                        <button type="button" id="cancelEditBtn" class="btn btn-outline-light" style="display:none;"><i class="fas fa-times"></i> Cancel</button>
-                                    <?php else: ?>
-                                        <button type="submit" id="createProfileBtn" class="btn btn-success"><i class="fas fa-user-plus"></i> Create Account</button>
-                                    <?php endif; ?>
-                                </div>
-                            </form>
-                        </div>
+                </div>
+                <div class="col-12 col-md-7 col-lg-6">
+                    <div class="profile-card">
+                        <?php if ($success): ?>
+                            <div class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle me-2"></i><?php echo htmlspecialchars($success); ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($error): ?>
+                            <div class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i><?php echo htmlspecialchars($error); ?>
+                            </div>
+                        <?php endif; ?>
+                        <form id="profileForm" method="post" autocomplete="off" class="needs-validation" novalidate>
+                            <div class="form-group">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>Email
+                                </label>
+                                <input type="email" class="form-control profile-input" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" <?php echo $admin_exists ? 'disabled' : ''; ?> required>
+                            </div>
+                            <div class="form-group">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Username
+                                </label>
+                                <input type="text" class="form-control profile-input" id="username" name="username" value="<?php echo htmlspecialchars($username); ?>" <?php echo $admin_exists ? 'disabled' : ''; ?> required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <input type="password" class="form-control profile-input" id="password" name="password" value="" placeholder="Enter new password<?php echo $admin_exists ? ' or leave blank' : ''; ?>" <?php echo $admin_exists ? 'disabled' : ''; ?> <?php echo $admin_exists ? '' : 'required'; ?>>
+                            </div>
+                            <div class="profile-actions">
+                                <?php if ($admin_exists): ?>
+                                    <button type="button" id="editProfileBtn" class="btn btn-profile-edit">
+                                        <i class="fas fa-pen me-2"></i>Edit Profile
+                                    </button>
+                                    <button type="submit" id="saveProfileBtn" class="btn btn-profile-save" style="display:none;">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                    <button type="button" id="cancelEditBtn" class="btn btn-profile-cancel" style="display:none;">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </button>
+                                <?php else: ?>
+                                    <button type="submit" id="createProfileBtn" class="btn btn-profile-create">
+                                        <i class="fas fa-user-plus me-2"></i>Create Account
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
