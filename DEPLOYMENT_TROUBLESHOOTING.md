@@ -141,13 +141,68 @@ If changes still don't appear:
 3. **Check run_command**: Verify PHP server command is correct
 4. **Contact Support**: Use DigitalOcean support if issue persists
 
-## Prevention Tips
+## Issue: Buildpack PHP Download Failure
+
+### Error Message
+```
+ERROR: Failed to download minimal PHP for bootstrapping!
+This is most likely a temporary internal error.
+```
+
+### Cause
+This error occurs when the Heroku PHP buildpack (used by DigitalOcean App Platform) fails to download PHP during the bootstrapping phase. This is typically a **temporary network issue** with the buildpack's download servers.
+
+### Solutions
+
+#### Solution 1: Retry Deployment (Recommended)
+This is usually a temporary issue. Simply retry the deployment:
+
+1. Go to DigitalOcean App Platform dashboard
+2. Navigate to your app → **Deployments** tab
+3. Click **"Redeploy"** or **"Create Deployment"**
+4. Select the same commit and deploy again
+5. Wait 5-10 minutes for the build to complete
+
+**Most deployments succeed on retry** since this is a transient network issue.
+
+#### Solution 2: Wait and Retry
+If the first retry fails:
+- Wait 15-30 minutes before retrying
+- The buildpack's download servers may be experiencing temporary issues
+- Try again after a short wait
+
+#### Solution 3: Verify PHP Version Configuration
+Ensure your PHP version is correctly specified:
+
+1. Check `.php-version` file contains: `8.2`
+2. Verify `app.yaml` has: `environment_slug: php-8.2`
+3. Check `composer.json` requires: `"php": ">=8.2.0 <8.3.0"`
+
+#### Solution 4: Check Buildpack Status
+If multiple retries fail:
+- Check DigitalOcean status page: https://status.digitalocean.com/
+- Check Heroku status page: https://status.heroku.com/ (since App Platform uses Heroku buildpacks)
+- There may be a known outage
+
+#### Solution 5: Contact Support
+If the issue persists after multiple retries:
+1. Document the error with timestamps
+2. Note how many times you've retried
+3. Contact DigitalOcean support with:
+   - App name: `dmarsians-taekwondo`
+   - Error message
+   - Build logs
+   - Number of retry attempts
+
+### Prevention Tips
 
 1. **Always check deployment status** after pushing
 2. **Test locally first** before deploying
 3. **Use feature branches** for testing
 4. **Monitor build logs** for warnings
 5. **Keep deployment documentation updated**
+6. **Retry failed builds** - most buildpack errors are temporary
+
 
 
 
