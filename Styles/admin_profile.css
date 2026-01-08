@@ -13,7 +13,9 @@
     position: relative;
     z-index: 1060 !important; /* Above sidebar (1045) and mobile-topbar (1055) */
     padding-top: clamp(20px, 3vw, 30px); /* Increased padding to prevent overlap */
+    padding-left: clamp(20px, 3vw, 40px) !important; /* Add left padding to clear sidebar (260px) */
     margin-top: 0;
+    margin-left: 0;
     text-align: right; /* Align header text to the right */
 }
 
@@ -336,7 +338,9 @@
     
     .welcome-header {
         padding-top: clamp(10px, 1.5vw, 20px) !important;
+        padding-left: clamp(20px, 3vw, 40px) !important; /* Ensure left padding on desktop to clear sidebar */
         margin-top: 0 !important;
+        margin-left: 0 !important;
     }
     
     /* Desktop: match dashboard card styling with transparent background and border ring */
