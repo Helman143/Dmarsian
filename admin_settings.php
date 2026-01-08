@@ -1,5 +1,12 @@
 <?php
-// admin_settings.php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+session_start();
+// Check if user is logged in and is super admin
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'super_admin') {
+    header("Location: index.php");
+    exit();
+}
 require_once 'db_connect.php';
 ?>
 <!DOCTYPE html>
