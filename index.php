@@ -1,4 +1,48 @@
 <?php
+// #region agent log
+$logFile = __DIR__ . '/.cursor/debug.log';
+$logData = [
+    'sessionId' => 'debug-session',
+    'runId' => 'run1',
+    'hypothesisId' => 'D',
+    'location' => 'index.php:3',
+    'message' => 'Root index.php accessed',
+    'data' => [
+        'REQUEST_URI' => $_SERVER['REQUEST_URI'] ?? 'NOT_SET',
+        'SCRIPT_NAME' => $_SERVER['SCRIPT_NAME'] ?? 'NOT_SET',
+        'PHP_SELF' => $_SERVER['PHP_SELF'] ?? 'NOT_SET',
+        'isRootRequest' => (($_SERVER['REQUEST_URI'] ?? '/') === '/' || ($_SERVER['REQUEST_URI'] ?? '/') === '/index.php')
+    ],
+    'timestamp' => time() * 1000
+];
+file_put_contents($logFile, json_encode($logData) . "\n", FILE_APPEND);
+// #endregion
+
+// If this is being accessed as root URL, redirect to webpage.php
+// (This shouldn't happen if DirectoryIndex in .htaccess works, but it's a safety measure)
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$parsedPath = parse_url($requestUri, PHP_URL_PATH);
+if (($parsedPath === '/' || trim($parsedPath, '/') === '') && !isset($_GET['force_index'])) {
+    // #region agent log
+    $logData = [
+        'sessionId' => 'debug-session',
+        'runId' => 'run1',
+        'hypothesisId' => 'E',
+        'location' => 'index.php:20',
+        'message' => 'Root index.php redirecting to webpage.php',
+        'data' => [
+            'requestUri' => $requestUri,
+            'parsedPath' => $parsedPath
+        ],
+        'timestamp' => time() * 1000
+    ];
+    file_put_contents($logFile, json_encode($logData) . "\n", FILE_APPEND);
+    // #endregion
+    
+    header('Location: webpage.php', true, 301);
+    exit;
+}
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ?>

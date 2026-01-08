@@ -7,6 +7,24 @@
  * Root URL (/) and index requests are automatically routed to webpage.php
  */
 
+// #region agent log
+$logFile = __DIR__ . '/../.cursor/debug.log';
+$logData = [
+    'sessionId' => 'debug-session',
+    'runId' => 'run1',
+    'hypothesisId' => 'A',
+    'location' => 'public/index.php:14',
+    'message' => 'Entry point called',
+    'data' => [
+        'REQUEST_URI' => $_SERVER['REQUEST_URI'] ?? 'NOT_SET',
+        'SCRIPT_NAME' => $_SERVER['SCRIPT_NAME'] ?? 'NOT_SET',
+        'PHP_SELF' => $_SERVER['PHP_SELF'] ?? 'NOT_SET'
+    ],
+    'timestamp' => time() * 1000
+];
+file_put_contents($logFile, json_encode($logData) . "\n", FILE_APPEND);
+// #endregion
+
 // ============================================
 // CRITICAL: Handle root requests FIRST
 // ============================================
@@ -15,9 +33,44 @@ $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $parsedPath = parse_url($requestUri, PHP_URL_PATH);
 $requestPath = ($parsedPath !== false && $parsedPath !== null) ? $parsedPath : '/';
 
+// #region agent log
+$logData = [
+    'sessionId' => 'debug-session',
+    'runId' => 'run1',
+    'hypothesisId' => 'B',
+    'location' => 'public/index.php:30',
+    'message' => 'Request path parsed',
+    'data' => [
+        'requestUri' => $requestUri,
+        'parsedPath' => $parsedPath,
+        'requestPath' => $requestPath,
+        'isRoot' => ($requestPath === '/' || trim($requestPath, '/') === '')
+    ],
+    'timestamp' => time() * 1000
+];
+file_put_contents($logFile, json_encode($logData) . "\n", FILE_APPEND);
+// #endregion
+
 // If root request, serve webpage.php IMMEDIATELY
 if ($requestPath === '/' || trim($requestPath, '/') === '') {
     $webpagePath = __DIR__ . '/../webpage.php';
+    
+    // #region agent log
+    $logData = [
+        'sessionId' => 'debug-session',
+        'runId' => 'run1',
+        'hypothesisId' => 'C',
+        'location' => 'public/index.php:45',
+        'message' => 'Root request detected, checking webpage.php',
+        'data' => [
+            'webpagePath' => $webpagePath,
+            'fileExists' => file_exists($webpagePath)
+        ],
+        'timestamp' => time() * 1000
+    ];
+    file_put_contents($logFile, json_encode($logData) . "\n", FILE_APPEND);
+    // #endregion
+    
     if (file_exists($webpagePath)) {
         chdir(dirname($webpagePath));
         require $webpagePath;

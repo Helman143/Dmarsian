@@ -1,6 +1,9 @@
 # Apache Configuration for DigitalOcean Deployment
 # Martial Arts School Management System
 
+# Set default index file to webpage.php (before index.php)
+DirectoryIndex webpage.php index.php index.html
+
 # Enable Rewrite Engine
 <IfModule mod_rewrite.c>
     RewriteEngine On
