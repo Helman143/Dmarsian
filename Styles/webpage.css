@@ -2048,6 +2048,7 @@ section#offers {
 }
 
 @media (max-width: 900px) {
+    /* Desktop header adjustments for tablets - will be hidden on mobile via 767.98px breakpoint */
     .main-header {
         flex-direction: column;
         align-items: center;
@@ -2082,15 +2083,8 @@ section#offers {
         padding: 30px 0 20px 0;
     }
 
-    .register-form {
-        grid-template-columns: 1fr 1fr;
-        gap: 14px 18px;
-        max-width: 98vw;
-    }
-
-    .register-form button {
-        width: 100%;
-    }
+    /* Remove grid-template-columns - register-form is flex, not grid */
+    /* Form rows handle the grid layout */
 }
 
 @media (max-width: 600px) {
@@ -2105,11 +2099,7 @@ section#offers {
         gap: 8px;
     }
 
-    .register-form {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
+    /* Form rows already handle single column layout at 768px, no need to duplicate */
     .register-form button {
         width: 100%;
     }

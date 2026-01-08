@@ -86,7 +86,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         </div>
     </div>
     <!-- HEADER & HERO SECTION -->
-    <header class="main-header glassy-nav">
+    <header class="main-header glassy-nav d-none d-md-flex">
         <div class="logo-section d-flex align-items-center gap-2 flex-wrap">
             <img src="Picture/Logo2.png" alt="Logo" class="logo img-fluid">
             <div class="gym-title">
