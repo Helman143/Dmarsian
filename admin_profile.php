@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="col-12 col-md-5 col-lg-4">
                     <div class="profile-image-card">
                         <div class="profile-image-wrapper">
-                            <img src="1.png" alt="Profile image" class="profile-image">
+                            <img src="Picture/1.png" alt="Profile image" class="profile-image">
                         </div>
                         <div class="profile-badge">
                             <i class="fas fa-user-shield"></i>
