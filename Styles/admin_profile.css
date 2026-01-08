@@ -1,8 +1,17 @@
 /* Profile Page Styles - Matching admin_dashboard.css design language */
 
-/* Welcome Header - ensure proper spacing */
+/* Keep the page title above any overlays (sidebar/offcanvas/backdrops) */
+.main-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Welcome Header - ensure proper spacing and stacking */
 .welcome-header {
     margin-bottom: clamp(16px, 2.6vw, 30px);
+    position: relative;
+    z-index: 2;
+    padding-top: clamp(6px, 1.2vw, 12px);
 }
 
 .welcome-header h1 {
@@ -265,6 +274,10 @@
     .main-content {
         margin-left: 0;
         padding: clamp(12px, 2.4vw, 20px);
+    }
+    /* Add extra clearance so the floating mobile toggle never covers the title */
+    .mobile-topbar + .main-content {
+        padding-top: clamp(82px, 16vw, 96px) !important;
     }
 
     .profile-container {
