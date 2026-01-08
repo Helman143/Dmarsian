@@ -13,6 +13,7 @@
     z-index: 1060 !important; /* Above sidebar (1045) and mobile-topbar (1055) */
     padding-top: clamp(20px, 3vw, 30px); /* Increased padding to prevent overlap */
     margin-top: 0;
+    text-align: right; /* Align header text to the right */
 }
 
 .welcome-header h1 {
