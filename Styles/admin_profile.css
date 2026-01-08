@@ -4,6 +4,7 @@
 .main-content {
     position: relative;
     z-index: 1;
+    margin-left: clamp(20px, 3vw, 40px) !important; /* Add left margin to push content to the right */
 }
 
 /* Welcome Header - ensure proper spacing and stacking above sidebar (z-index 1045) and mobile topbar (z-index 1055) */
@@ -330,6 +331,7 @@
     /* Desktop: ensure welcome-header has proper clearance from sidebar */
     .main-content {
         padding-top: clamp(20px, 2.5vw, 30px) !important;
+        margin-left: clamp(20px, 3vw, 40px) !important; /* Add left margin on desktop */
     }
     
     .welcome-header {
