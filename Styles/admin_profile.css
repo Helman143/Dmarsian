@@ -1,8 +1,20 @@
 /* Profile Page Styles - Matching admin_dashboard.css design language */
 
+/* Welcome Header - ensure proper spacing */
+.welcome-header {
+    margin-bottom: clamp(16px, 2.6vw, 30px);
+}
+
+.welcome-header h1 {
+    color: var(--text-main);
+    font-size: clamp(1.25rem, 3.2vw, 2rem);
+    margin: 0;
+    text-shadow: 0 0 10px rgba(0, 255, 106, 0.35);
+}
+
 /* Profile Container */
 .profile-container {
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 /* Profile Image Card */
@@ -27,6 +39,7 @@
 
 .profile-image-wrapper {
     width: 100%;
+    max-width: 100%;
     aspect-ratio: 1;
     border-radius: 12px;
     overflow: hidden;
@@ -255,7 +268,7 @@
     }
 
     .profile-container {
-        margin-top: 10px;
+        margin-top: 0;
     }
 
     .profile-image-card,
@@ -324,7 +337,7 @@
 
 /* Fluid responsive sizing */
 .profile-container {
-    margin-top: clamp(10px, 2vw, 20px);
+    margin-top: 0;
 }
 
 .profile-image-card,
