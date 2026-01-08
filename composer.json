@@ -33,6 +33,7 @@
         "test-verbose": "phpunit --verbose"
     },
     "config": {
+        "process-timeout": 900,
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
