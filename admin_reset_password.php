@@ -32,9 +32,15 @@ $otp = isset($_POST['otp']) ? trim($_POST['otp']) : '';
 $newPassword = isset($_POST['new_password']) ? $_POST['new_password'] : '';
 $confirmPassword = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
 
-if ($email === '' || $otp === '' || $newPassword === '' || $confirmPassword === '' || $newPassword !== $confirmPassword) {
-    error_log("OTP Verification Failed: Missing fields or password mismatch. Email: " . ($email ?: 'empty') . ", OTP length: " . strlen($otp));
-    header('Location: admin_verify_otp.php?error=1');
+if ($email === '' || $otp === '' || $newPassword === '' || $confirmPassword === '') {
+    error_log("OTP Verification Failed: Missing fields. Email: " . ($email ?: 'empty') . ", OTP length: " . strlen($otp));
+    header('Location: admin_verify_otp.php?error=missing&email=' . urlencode($email));
+    exit();
+}
+
+if ($newPassword !== $confirmPassword) {
+    error_log("OTP Verification Failed: Password mismatch. Email: " . $email);
+    header('Location: admin_verify_otp.php?error=mismatch&email=' . urlencode($email));
     exit();
 }
 
@@ -58,6 +64,7 @@ if ($stmt = $conn->prepare("SELECT id, email, otp_hash, otp_expires_at, attempt_
 if (!$reset) {
     error_log("OTP Verification Failed: No active reset found for email: " . $email);
     // Check if there are any resets at all for debugging
+    $hasExpiredOrConsumed = false;
     if ($stmt = $conn->prepare("SELECT id, email, consumed, otp_expires_at FROM admin_password_resets WHERE LOWER(email) = LOWER(?) ORDER BY id DESC LIMIT 5")) {
         $stmt->bind_param('s', $email);
         if ($stmt->execute()) {
@@ -66,6 +73,9 @@ if (!$reset) {
                 error_log("Found " . $res->num_rows . " reset record(s) for email, but none are active:");
                 while ($row = $res->fetch_assoc()) {
                     error_log("  - ID: {$row['id']}, Email: {$row['email']}, Consumed: {$row['consumed']}, Expires: {$row['otp_expires_at']}");
+                    if ($row['consumed'] == 1) {
+                        $hasExpiredOrConsumed = true;
+                    }
                 }
             } else {
                 error_log("No reset records found at all for email: " . $email);
@@ -73,7 +83,8 @@ if (!$reset) {
         }
         $stmt->close();
     }
-    header('Location: admin_verify_otp.php?error=1');
+    $errorType = $hasExpiredOrConsumed ? 'consumed' : 'notfound';
+    header('Location: admin_verify_otp.php?error=' . $errorType . '&email=' . urlencode($email));
     exit();
 }
 
@@ -90,7 +101,7 @@ if ($attempts >= 5) {
         $stmt->execute();
         $stmt->close();
     }
-    header('Location: admin_verify_otp.php?error=1');
+    header('Location: admin_verify_otp.php?error=toomany&email=' . urlencode($email));
     exit();
 }
 
@@ -114,20 +125,20 @@ if ($currentTime > $expiresAt) {
         $stmt->execute();
         $stmt->close();
     }
-    header('Location: admin_verify_otp.php?error=1');
+    header('Location: admin_verify_otp.php?error=expired&email=' . urlencode($email));
     exit();
 }
 
 // Verify OTP
 $validOtp = password_verify($otp, $reset['otp_hash']);
 if (!$validOtp) {
-    error_log("OTP Verification Failed: Invalid OTP for reset ID: {$resetId}, email: {$email}, attempts: {$attempts}, time remaining: {$timeRemaining} seconds");
+    error_log("OTP Verification Failed: Invalid OTP for reset ID: {$resetId}, email: {$email}, attempts: {$attempts}, time remaining: {$timeRemaining} seconds. OTP entered: " . substr($otp, 0, 2) . "****");
     if ($stmt = $conn->prepare("UPDATE admin_password_resets SET attempt_count = attempt_count + 1 WHERE id = ?")) {
         $stmt->bind_param('i', $resetId);
         $stmt->execute();
         $stmt->close();
     }
-    header('Location: admin_verify_otp.php?error=1');
+    header('Location: admin_verify_otp.php?error=invalid&email=' . urlencode($email));
     exit();
 }
 
@@ -157,7 +168,7 @@ if (!$admin) {
         $stmt->execute();
         $stmt->close();
     }
-    header('Location: admin_verify_otp.php?error=1');
+    header('Location: admin_verify_otp.php?error=noaccount&email=' . urlencode($email));
     exit();
 }
 

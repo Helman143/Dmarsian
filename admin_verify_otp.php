@@ -24,11 +24,26 @@ ini_set('display_errors', 1);
             <?php if (isset($_GET['ok'])): ?>
                 <p class="error-message" style="color:#2e7d32">Password has been reset. You may now log in.</p>
             <?php elseif (isset($_GET['error'])): ?>
-                <p class="error-message">Invalid or expired OTP. Please try again.</p>
+                <?php
+                $errorMessages = [
+                    'missing' => 'Please fill in all fields.',
+                    'mismatch' => 'Passwords do not match. Please try again.',
+                    'notfound' => 'No OTP found for this email. Please request a new OTP.',
+                    'consumed' => 'This OTP has already been used. Please request a new OTP.',
+                    'expired' => 'This OTP has expired. Please request a new OTP.',
+                    'invalid' => 'Invalid OTP code. Please check and try again.',
+                    'toomany' => 'Too many failed attempts. Please request a new OTP.',
+                    'noaccount' => 'Admin account not found for this email.',
+                    '1' => 'Invalid or expired OTP. Please try again.'
+                ];
+                $errorType = $_GET['error'] ?? '1';
+                $errorMsg = $errorMessages[$errorType] ?? $errorMessages['1'];
+                ?>
+                <p class="error-message"><?php echo htmlspecialchars($errorMsg); ?></p>
             <?php endif; ?>
-            <form action="admin_reset_password.php" method="POST">
+            <form action="admin_reset_password.php" method="POST" onsubmit="return validateForm()">
                 <div class="input-group">
-                    <input id="email" type="email" name="email" required>
+                    <input id="email" type="email" name="email" value="<?php echo isset($_GET['email']) ? htmlspecialchars($_GET['email']) : ''; ?>" required>
                     <label>Admin Email</label>
                 </div>
                 <div class="input-group">
@@ -83,6 +98,35 @@ ini_set('display_errors', 1);
                 input.type = 'password';
                 button.classList.remove('is-visible');
             }
+        }
+
+        function validateForm() {
+            const email = document.getElementById('email').value.trim();
+            const otp = document.getElementById('otp').value.trim();
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (!email || !otp || !newPassword || !confirmPassword) {
+                alert('Please fill in all fields.');
+                return false;
+            }
+
+            if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+                alert('OTP must be exactly 6 digits.');
+                return false;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match. Please try again.');
+                return false;
+            }
+
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return false;
+            }
+
+            return true;
         }
     </script>
 </body>
