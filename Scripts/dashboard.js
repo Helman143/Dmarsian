@@ -166,72 +166,106 @@ let paymentsChart;
 function fetchAndRenderPaymentsChart() {
     const fromDate = document.getElementById('from-date').value;
     const toDate = document.getElementById('to-date').value;
-    fetch('get_payments.php')
-        .then(response => response.json())
-        .then(payments => {
-            // Filter by date range
-            const filtered = payments.filter(p => {
-                const paidDate = new Date(p.date_paid);
-                const from = fromDate ? new Date(fromDate) : null;
-                const to = toDate ? new Date(toDate) : null;
-                if (from && paidDate < from) return false;
-                if (to && paidDate > to) return false;
-                return true;
-            });
-            let collected = 0, uncollected = 0;
-            filtered.forEach(p => {
-                const amt = parseFloat(p.amount_paid) || 0;
-                if (String(p.status).toLowerCase() === 'paid' || String(p.status).toLowerCase() === 'active') {
-                    collected += amt;
-                } else {
-                    uncollected += amt;
+    
+    // Calculate Collected: Sum of amount_paid from payments within date range (same logic as collection.js)
+    // Calculate Uncollected: Sum of balance from dues within date range
+    
+    Promise.all([
+        fetch('get_payments.php').then(response => response.json()),
+        fetch('api/dues.php').then(response => response.json())
+    ])
+    .then(([payments, duesData]) => {
+        // Calculate Collected: Sum all amount_paid from payments within date range
+        let collected = 0;
+        if (Array.isArray(payments)) {
+            payments.forEach(p => {
+                if (p.date_paid) {
+                    const paidDate = new Date(p.date_paid);
+                    const from = fromDate ? new Date(fromDate) : null;
+                    const to = toDate ? new Date(toDate + 'T23:59:59') : null; // Include full day
+                    
+                    // Check if payment is within date range
+                    let inRange = true;
+                    if (from && paidDate < from) inRange = false;
+                    if (to && paidDate > to) inRange = false;
+                    
+                    if (inRange) {
+                        collected += parseFloat(p.amount_paid || 0);
+                    }
                 }
             });
-            // Always show at least a small value so chart renders
-            if (collected === 0 && uncollected === 0) {
-                collected = 0.0001;
-                uncollected = 0.0001;
-            }
-            const paymentsCanvas = document.getElementById('paymentsChart');
-            if (paymentsCanvas && window.Chart) {
-                const ctx = paymentsCanvas.getContext('2d');
-                if (paymentsChart) paymentsChart.destroy();
-                paymentsChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Collected', 'Uncollected'],
-                        datasets: [{
-                            data: [collected, uncollected],
-                            backgroundColor: ['#00ff6a', '#ff4d4d'],
-                            borderColor: ['#00ff6a', '#ff4d4d'],
-                            borderWidth: 2,
-                            hoverOffset: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '60%',
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: {
-                                    color: '#e9ffee',
-                                    padding: 10,
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.label + ': ₱' + context.raw.toLocaleString();
-                                    }
+        }
+        
+        // Calculate Uncollected: Sum all balance from dues within date range
+        let uncollected = 0;
+        if (duesData.status === 'success' && Array.isArray(duesData.dues)) {
+            duesData.dues.forEach(due => {
+                if (due.due_date) {
+                    const dueDate = new Date(due.due_date);
+                    const from = fromDate ? new Date(fromDate) : null;
+                    const to = toDate ? new Date(toDate + 'T23:59:59') : null;
+                    
+                    // Check if due is within date range
+                    let inRange = true;
+                    if (from && dueDate < from) inRange = false;
+                    if (to && dueDate > to) inRange = false;
+                    
+                    if (inRange) {
+                        uncollected += parseFloat(due.balance || 0);
+                    }
+                }
+            });
+        }
+        
+        // Always show at least a small value so chart renders
+        if (collected === 0 && uncollected === 0) {
+            collected = 0.0001;
+            uncollected = 0.0001;
+        }
+        
+        const paymentsCanvas = document.getElementById('paymentsChart');
+        if (paymentsCanvas && window.Chart) {
+            const ctx = paymentsCanvas.getContext('2d');
+            if (paymentsChart) paymentsChart.destroy();
+            paymentsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Collected', 'Uncollected'],
+                    datasets: [{
+                        data: [collected, uncollected],
+                        backgroundColor: ['#00ff6a', '#ff4d4d'],
+                        borderColor: ['#00ff6a', '#ff4d4d'],
+                        borderWidth: 2,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#e9ffee',
+                                padding: 10,
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ₱' + context.raw.toLocaleString();
                                 }
                             }
                         }
                     }
-                });
-            }
-        });
+                }
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching chart data:', error);
+    });
 }
 
 // Event listeners for date filters
