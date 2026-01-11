@@ -12,7 +12,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D'MARSIANS Taekwondo System - Admin Collection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="Styles/admin_collection.css?v=20250127">
+    <link rel="stylesheet" href="Styles/admin_collection.css">
     <link rel="stylesheet" href="Styles/sidebar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,7 +45,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <div class="main-content">
             <div class="collection-header">
                 <h1>Collection</h1>
-                <!-- Deployment: 2025-01-27 -->
             </div>
 
             <!-- Collection Stats -->
@@ -95,12 +94,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         <option value="weekly">Weekly</option>
                     </select>
                 </div>
-            <div class="chart-container" style="position: relative;">
-                <canvas id="collectionTrendChart"></canvas>
-                <button id="exportChartBtn" type="button" class="btn btn-sm btn-outline-success" title="Export chart" style="position: absolute; right: 12px; bottom: 12px; z-index: 1;">
-                    <i class="fa-solid fa-download"></i> Export
-                </button>
-            </div>
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="collectionTrendChart"></canvas>
+                    <button id="exportChartBtn" type="button" class="btn btn-sm btn-outline-success" title="Export chart"
+                        style="position: absolute; right: 12px; bottom: 12px; z-index: 1;">
+                        <i class="fa-solid fa-download"></i> Export
+                    </button>
+                </div>
             </div>
         </div>
     </div>
