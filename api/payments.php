@@ -47,6 +47,11 @@ try {
     if ($jeja_no && $fullname && $date_paid && $amount_paid && $payment_type && $status) {
         $sql = "INSERT INTO payments (jeja_no, fullname, date_paid, amount_paid, payment_type, discount, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            if (ob_get_length()) { ob_clean(); }
+            echo json_encode(['success' => false, 'message' => 'Database prepare error: ' . $conn->error]);
+            exit();
+        }
         $date_enrolled = date('Y-m-d');
         $stmt->bind_param('ssssssss', $jeja_no, $fullname, $date_paid, $amount_paid, $payment_type, $discount, $date_enrolled, $status);
         if ($stmt->execute()) {
@@ -56,17 +61,22 @@ try {
             $student_id = $jeja_no;
             $details = "Amount: $amount_paid\nPayment Type: $payment_type\nStatus: $status\nDiscount: $discount";
             $logStmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
-            $logStmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
-            @$logStmt->execute();
-            @$logStmt->close();
+            if ($logStmt) {
+                $logStmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
+                @$logStmt->execute();
+                @$logStmt->close();
+            }
 
             // Note: Advance Payment coverage is applied by dues computation (due date +2 months)
+            if (ob_get_length()) { ob_clean(); }
             echo json_encode(['success' => true, 'message' => 'Payment saved successfully!']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+            if (ob_get_length()) { ob_clean(); }
+            echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
         }
         $stmt->close();
     } else {
+        if (ob_get_length()) { ob_clean(); }
         echo json_encode(['success' => false, 'message' => 'All fields are required.']);
     }
 

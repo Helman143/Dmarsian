@@ -213,4 +213,18 @@
     .search-container {
         width: 150px;
     }
+}
+
+/* Payment Message Styles */
+#paymentMessage {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    min-width: 250px;
+    text-align: center;
 } 

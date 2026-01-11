@@ -120,11 +120,10 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                                 <th>Date Enrolled</th>
                                 <th>Balance</th>
                                 <th>Status</th>
+                                
                             </tr>
                         </thead>
-                        <tbody id="paymentTableBody">
-                            <!-- Table rows will be populated by JavaScript -->
-                        </tbody>
+                        <tbody id="paymentTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -178,6 +177,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                     </table>
                 </div>
             </div>
+
+            
         </div>
     </div>
 

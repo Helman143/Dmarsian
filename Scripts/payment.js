@@ -119,38 +119,60 @@ function populatePaymentTable(records, balancesMap = {}, statusesMap = {}) {
 function handlePaymentSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    // Simple validation
-    for (let [key, value] of formData.entries()) {
-        if (!value) {
-            const msgDiv = document.getElementById('paymentMessage');
-            msgDiv.style.display = 'block';
-            msgDiv.textContent = 'All fields are required.';
-            msgDiv.style.color = 'red';
-            setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
-            return;
+    
+    // Validate required fields (excluding readonly discount field)
+    const requiredFields = ['jeja_no', 'payment_type', 'full_name', 'date_paid', 'amount_paid', 'status'];
+    const missingFields = [];
+    
+    for (const field of requiredFields) {
+        const value = formData.get(field);
+        if (!value || value.trim() === '') {
+            missingFields.push(field);
         }
     }
+    
+    if (missingFields.length > 0) {
+        const msgDiv = document.getElementById('paymentMessage');
+        msgDiv.style.display = 'block';
+        msgDiv.textContent = 'Please fill in all required fields.';
+        msgDiv.style.color = 'red';
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+        return;
+    }
+    
+    // Ensure discount has a value (default to 0.00 if empty)
+    if (!formData.get('discount') || formData.get('discount').trim() === '') {
+        formData.set('discount', '0.00');
+    }
+    
     fetch('api/payments.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(result => {
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
-        msgDiv.textContent = result.message;
+        msgDiv.textContent = result.message || (result.success ? 'Payment saved successfully!' : 'Error saving payment.');
         msgDiv.style.color = result.success ? 'green' : 'red';
         if (result.success) {
             event.target.reset();
             document.getElementById('amount_paid').value = '0.00';
+            document.getElementById('discount').value = '0.00';
             fetchPayments();
         }
         setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
     })
-    .catch(() => {
+    .catch(error => {
+        console.error('Payment submission error:', error);
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
-        msgDiv.textContent = 'Error saving payment.';
+        msgDiv.textContent = 'Error saving payment. Please try again.';
         msgDiv.style.color = 'red';
         setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
     });
