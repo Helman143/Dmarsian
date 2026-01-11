@@ -168,11 +168,23 @@ function fetchAndRenderPaymentsChart() {
     const toDate = document.getElementById('to-date').value;
     
     // Calculate Collected: Sum of amount_paid from payments within date range (same logic as collection.js)
-    // Calculate Uncollected: Sum of balance from dues within date range
+    // Calculate Uncollected: Sum of balance from dues for the selected month
+    
+    // Extract month from fromDate (or use current month if not provided)
+    let monthParam = null;
+    if (fromDate) {
+        const dateObj = new Date(fromDate);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        monthParam = `${year}-${month}`;
+    }
+    
+    // Build dues API URL with month parameter
+    const duesUrl = monthParam ? `api/dues.php?month=${monthParam}` : 'api/dues.php';
     
     Promise.all([
         fetch('get_payments.php').then(response => response.json()),
-        fetch('api/dues.php').then(response => response.json())
+        fetch(duesUrl).then(response => response.json())
     ])
     .then(([payments, duesData]) => {
         // Calculate Collected: Sum all amount_paid from payments within date range
@@ -196,26 +208,22 @@ function fetchAndRenderPaymentsChart() {
             });
         }
         
-        // Calculate Uncollected: Sum all balance from dues within date range
+        // Calculate Uncollected: Sum all balance from dues (API already filters by month)
         let uncollected = 0;
         if (duesData.status === 'success' && Array.isArray(duesData.dues)) {
             duesData.dues.forEach(due => {
-                if (due.due_date) {
-                    const dueDate = new Date(due.due_date);
-                    const from = fromDate ? new Date(fromDate) : null;
-                    const to = toDate ? new Date(toDate + 'T23:59:59') : null;
-                    
-                    // Check if due is within date range
-                    let inRange = true;
-                    if (from && dueDate < from) inRange = false;
-                    if (to && dueDate > to) inRange = false;
-                    
-                    if (inRange) {
-                        uncollected += parseFloat(due.balance || 0);
-                    }
-                }
+                // Sum all balances - API already filtered by month
+                uncollected += parseFloat(due.balance || 0);
             });
         }
+        
+        // Debug logging
+        console.log('Chart Data:', {
+            collected: collected,
+            uncollected: uncollected,
+            monthParam: monthParam,
+            duesCount: duesData.status === 'success' && Array.isArray(duesData.dues) ? duesData.dues.length : 0
+        });
         
         // Always show at least a small value so chart renders
         if (collected === 0 && uncollected === 0) {
