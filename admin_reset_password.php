@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $email = isset($_POST['email']) ? trim(strtolower($_POST['email'])) : '';
 $otp = isset($_POST['otp']) ? trim($_POST['otp']) : '';
+// Remove any non-numeric characters from OTP (in case of copy-paste issues)
+$otp = preg_replace('/[^0-9]/', '', $otp);
 $newPassword = isset($_POST['new_password']) ? $_POST['new_password'] : '';
 $confirmPassword = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
 
@@ -65,6 +67,7 @@ if (!$reset) {
     error_log("OTP Verification Failed: No active reset found for email: " . $email);
     // Check if there are any resets at all for debugging
     $hasExpiredOrConsumed = false;
+    $foundEmails = [];
     if ($stmt = $conn->prepare("SELECT id, email, consumed, otp_expires_at FROM admin_password_resets WHERE LOWER(email) = LOWER(?) ORDER BY id DESC LIMIT 5")) {
         $stmt->bind_param('s', $email);
         if ($stmt->execute()) {
@@ -73,12 +76,29 @@ if (!$reset) {
                 error_log("Found " . $res->num_rows . " reset record(s) for email, but none are active:");
                 while ($row = $res->fetch_assoc()) {
                     error_log("  - ID: {$row['id']}, Email: {$row['email']}, Consumed: {$row['consumed']}, Expires: {$row['otp_expires_at']}");
+                    $foundEmails[] = $row['email'];
                     if ($row['consumed'] == 1) {
                         $hasExpiredOrConsumed = true;
                     }
                 }
             } else {
                 error_log("No reset records found at all for email: " . $email);
+                // Try to find similar emails (for typo detection)
+                if ($stmt2 = $conn->prepare("SELECT DISTINCT email FROM admin_password_resets WHERE email LIKE ? OR email LIKE ? ORDER BY id DESC LIMIT 3")) {
+                    $emailPattern1 = substr($email, 0, strpos($email, '@')) . '%';
+                    $emailPattern2 = '%' . substr($email, strpos($email, '@'));
+                    $stmt2->bind_param('ss', $emailPattern1, $emailPattern2);
+                    if ($stmt2->execute()) {
+                        $res2 = $stmt2->get_result();
+                        if ($res2 && $res2->num_rows > 0) {
+                            error_log("Found similar email addresses in database:");
+                            while ($row2 = $res2->fetch_assoc()) {
+                                error_log("  - Similar email: {$row2['email']}");
+                            }
+                        }
+                    }
+                    $stmt2->close();
+                }
             }
         }
         $stmt->close();
@@ -90,8 +110,22 @@ if (!$reset) {
 
 $resetId = intval($reset['id']);
 $attempts = intval($reset['attempt_count']);
-$expiresAt = strtotime($reset['otp_expires_at']);
-$currentTime = time();
+
+// Use DateTime for better timezone handling
+try {
+    $expiresDateTime = new DateTime($reset['otp_expires_at'], new DateTimeZone('Asia/Manila'));
+    $currentDateTime = new DateTime('now', new DateTimeZone('Asia/Manila'));
+    $expiresAt = $expiresDateTime->getTimestamp();
+    $currentTime = $currentDateTime->getTimestamp();
+} catch (Exception $e) {
+    error_log("OTP Verification Failed: DateTime error for reset ID: {$resetId}, email: {$email}, error: " . $e->getMessage());
+    // Fallback to strtotime
+    $expiresAt = strtotime($reset['otp_expires_at']);
+    $currentTime = time();
+}
+
+// Log detailed timing information
+error_log("OTP Verification Debug - Reset ID: {$resetId}, Email: {$email}, Expires At (DB): {$reset['otp_expires_at']}, Expires At (Timestamp): {$expiresAt}, Current Time: {$currentTime}");
 
 // If too many attempts, consume and block
 if ($attempts >= 5) {
@@ -106,20 +140,20 @@ if ($attempts >= 5) {
 }
 
 // Check expiry with detailed logging
-if (!$expiresAt) {
+if (!$expiresAt || $expiresAt === false) {
     error_log("OTP Verification Failed: Invalid expiry time for reset ID: {$resetId}, email: {$email}, expires_at: " . $reset['otp_expires_at']);
     if ($stmt = $conn->prepare("UPDATE admin_password_resets SET consumed = 1 WHERE id = ?")) {
         $stmt->bind_param('i', $resetId);
         $stmt->execute();
         $stmt->close();
     }
-    header('Location: admin_verify_otp.php?error=1');
+    header('Location: admin_verify_otp.php?error=1&email=' . urlencode($email));
     exit();
 }
 
 $timeRemaining = $expiresAt - $currentTime;
 if ($currentTime > $expiresAt) {
-    error_log("OTP Verification Failed: OTP expired for reset ID: {$resetId}, email: {$email}. Expired " . abs($timeRemaining) . " seconds ago. Expires at: " . date('Y-m-d H:i:s', $expiresAt) . ", Current time: " . date('Y-m-d H:i:s', $currentTime));
+    error_log("OTP Verification Failed: OTP expired for reset ID: {$resetId}, email: {$email}. Expired " . abs($timeRemaining) . " seconds ago. Expires at: " . date('Y-m-d H:i:s', $expiresAt) . " (" . $reset['otp_expires_at'] . "), Current time: " . date('Y-m-d H:i:s', $currentTime));
     if ($stmt = $conn->prepare("UPDATE admin_password_resets SET consumed = 1 WHERE id = ?")) {
         $stmt->bind_param('i', $resetId);
         $stmt->execute();
@@ -129,17 +163,32 @@ if ($currentTime > $expiresAt) {
     exit();
 }
 
-// Verify OTP
+// Verify OTP with detailed logging
+error_log("OTP Verification - Attempting to verify OTP for reset ID: {$resetId}, email: {$email}, OTP length: " . strlen($otp) . ", OTP entered: " . substr($otp, 0, 2) . "****, Hash length: " . strlen($reset['otp_hash']));
 $validOtp = password_verify($otp, $reset['otp_hash']);
+error_log("OTP Verification Result: " . ($validOtp ? 'VALID' : 'INVALID') . " for reset ID: {$resetId}");
+
 if (!$validOtp) {
-    error_log("OTP Verification Failed: Invalid OTP for reset ID: {$resetId}, email: {$email}, attempts: {$attempts}, time remaining: {$timeRemaining} seconds. OTP entered: " . substr($otp, 0, 2) . "****");
-    if ($stmt = $conn->prepare("UPDATE admin_password_resets SET attempt_count = attempt_count + 1 WHERE id = ?")) {
-        $stmt->bind_param('i', $resetId);
-        $stmt->execute();
-        $stmt->close();
+    error_log("OTP Verification Failed: Invalid OTP for reset ID: {$resetId}, email: {$email}, attempts: {$attempts}, time remaining: {$timeRemaining} seconds. OTP entered length: " . strlen($otp) . ", First 2 chars: " . substr($otp, 0, 2));
+    // Try to verify with trimmed OTP (in case of extra spaces)
+    $trimmedOtp = trim($otp);
+    if ($trimmedOtp !== $otp) {
+        error_log("OTP Verification - Retrying with trimmed OTP (had whitespace)");
+        $validOtp = password_verify($trimmedOtp, $reset['otp_hash']);
+        if ($validOtp) {
+            error_log("OTP Verification Success after trimming whitespace");
+        }
     }
-    header('Location: admin_verify_otp.php?error=invalid&email=' . urlencode($email));
-    exit();
+    
+    if (!$validOtp) {
+        if ($stmt = $conn->prepare("UPDATE admin_password_resets SET attempt_count = attempt_count + 1 WHERE id = ?")) {
+            $stmt->bind_param('i', $resetId);
+            $stmt->execute();
+            $stmt->close();
+        }
+        header('Location: admin_verify_otp.php?error=invalid&email=' . urlencode($email));
+        exit();
+    }
 }
 
 error_log("OTP Verification Success: Valid OTP for reset ID: {$resetId}, email: {$email}, time remaining: {$timeRemaining} seconds");

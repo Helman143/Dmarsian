@@ -21,6 +21,13 @@ ini_set('display_errors', 1);
                 <img src="Picture/Logo2.png" alt="Logo">
             </div>
             <h2>Verify OTP</h2>
+            <?php if (isset($_GET['otp_sent'])): ?>
+                <div style="background:#e8f5e9;border:1px solid #4caf50;border-radius:4px;padding:12px;margin-bottom:16px">
+                    <p style="color:#2e7d32;margin:0;font-size:14px">
+                        <strong>✓ OTP sent!</strong> Check your email and enter the code below. Use the email address shown in the field.
+                    </p>
+                </div>
+            <?php endif; ?>
             <?php if (isset($_GET['ok'])): ?>
                 <p class="error-message" style="color:#2e7d32">Password has been reset. You may now log in.</p>
             <?php elseif (isset($_GET['error'])): ?>
@@ -28,10 +35,10 @@ ini_set('display_errors', 1);
                 $errorMessages = [
                     'missing' => 'Please fill in all fields.',
                     'mismatch' => 'Passwords do not match. Please try again.',
-                    'notfound' => 'No OTP found for this email. Please request a new OTP.',
+                    'notfound' => 'No OTP found for this email address. Make sure you enter the EXACT email address that received the OTP code. Check for typos (e.g., gmail.com vs 5gmail.cor).',
                     'consumed' => 'This OTP has already been used. Please request a new OTP.',
                     'expired' => 'This OTP has expired. Please request a new OTP.',
-                    'invalid' => 'Invalid OTP code. Please check and try again.',
+                    'invalid' => 'Invalid OTP code. Please check and try again. Make sure you enter all 6 digits correctly.',
                     'toomany' => 'Too many failed attempts. Please request a new OTP.',
                     'noaccount' => 'Admin account not found for this email.',
                     '1' => 'Invalid or expired OTP. Please try again.'
@@ -45,6 +52,7 @@ ini_set('display_errors', 1);
                 <div class="input-group">
                     <input id="email" type="email" name="email" value="<?php echo isset($_GET['email']) ? htmlspecialchars($_GET['email']) : ''; ?>" required>
                     <label>Admin Email</label>
+                    <small style="display:block;margin-top:4px;color:rgba(255,255,255,0.6);font-size:12px;">⚠️ Use the EXACT email address that received the OTP</small>
                 </div>
                 <div class="input-group">
                     <input id="otp" type="text" name="otp" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" required>
@@ -102,7 +110,11 @@ ini_set('display_errors', 1);
 
         function validateForm() {
             const email = document.getElementById('email').value.trim();
-            const otp = document.getElementById('otp').value.trim();
+            let otp = document.getElementById('otp').value.trim();
+            // Remove any non-numeric characters
+            otp = otp.replace(/\D/g, '');
+            // Update the field value
+            document.getElementById('otp').value = otp;
             const newPassword = document.getElementById('new_password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
 
@@ -112,7 +124,7 @@ ini_set('display_errors', 1);
             }
 
             if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
-                alert('OTP must be exactly 6 digits.');
+                alert('OTP must be exactly 6 digits. Please check and try again.');
                 return false;
             }
 

@@ -309,9 +309,14 @@ if (!$emailSent) {
     error_log("WARNING: OTP email was NOT successfully sent to {$adminEmail}. Check SMTP2GO configuration and sender email verification.");
 }
 
-// Always redirect to success page for user privacy (avoid user enumeration)
-// Even if email fails, we don't reveal this to the user
-header('Location: forgot_admin_password.php?sent=1');
+// Redirect to verify page with email pre-filled (if OTP was sent successfully)
+// This helps user know which email to use for verification
+if ($emailSent) {
+    header('Location: admin_verify_otp.php?email=' . urlencode($adminEmail) . '&otp_sent=1');
+} else {
+    // Still redirect to success page for security (avoid user enumeration)
+    header('Location: forgot_admin_password.php?sent=1');
+}
 exit();
 
 
