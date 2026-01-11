@@ -126,12 +126,12 @@ if (!$admin || empty($admin['email'])) {
     exit();
 }
 
-$adminEmail = $admin['email'];
+$adminEmail = strtolower(trim($admin['email']));
 $adminId = intval($admin['id']);
 
-// Basic throttle: avoid sending more than once every 60 seconds
+// Basic throttle: avoid sending more than once every 60 seconds (case-insensitive)
 $tooSoon = false;
-if ($stmt = $conn->prepare("SELECT last_sent_at FROM admin_password_resets WHERE email = ? AND consumed = 0 ORDER BY id DESC LIMIT 1")) {
+if ($stmt = $conn->prepare("SELECT last_sent_at FROM admin_password_resets WHERE LOWER(email) = LOWER(?) AND consumed = 0 ORDER BY id DESC LIMIT 1")) {
     $stmt->bind_param('s', $adminEmail);
     if ($stmt->execute()) {
         $res = $stmt->get_result();
@@ -156,8 +156,8 @@ $otpHash = password_hash($otp, PASSWORD_DEFAULT);
 $expiresAt = date('Y-m-d H:i:s', time() + 5 * 60);
 $now = date('Y-m-d H:i:s');
 
-// Invalidate previous active resets for this email
-if ($stmt = $conn->prepare("UPDATE admin_password_resets SET consumed = 1 WHERE email = ? AND consumed = 0")) {
+// Invalidate previous active resets for this email (case-insensitive)
+if ($stmt = $conn->prepare("UPDATE admin_password_resets SET consumed = 1 WHERE LOWER(email) = LOWER(?) AND consumed = 0")) {
     $stmt->bind_param('s', $adminEmail);
     $stmt->execute();
     $stmt->close();
