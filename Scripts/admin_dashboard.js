@@ -186,9 +186,22 @@ function fetchAndRenderPaymentsChart() {
             }
         }).then(response => {
             // #region agent log
-            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:155',message:'Dashboard payments fetch response',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:188',message:'Payments fetch response',data:{status:response.status,ok:response.ok,url:paymentsUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
             // #endregion
-            return response.json();
+            if (!response.ok) {
+                throw new Error(`Payments fetch failed: ${response.status} ${response.statusText}`);
+            }
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:197',message:'Payments JSON parse error',data:{textPreview:text.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+                    // #endregion
+                    console.error('Failed to parse payments JSON:', text.substring(0, 200));
+                    throw new Error('Invalid JSON response from payments endpoint');
+                }
+            });
         }),
         fetch(duesUrlWithCache, {
             cache: 'no-store',
@@ -196,9 +209,31 @@ function fetchAndRenderPaymentsChart() {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 'Pragma': 'no-cache'
             }
-        }).then(response => response.json())
+        }).then(response => {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:207',message:'Dues fetch response',data:{status:response.status,ok:response.ok,url:duesUrlWithCache},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+            // #endregion
+            if (!response.ok) {
+                throw new Error(`Dues fetch failed: ${response.status} ${response.statusText}`);
+            }
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    // #region agent log
+                    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:216',message:'Dues JSON parse error',data:{textPreview:text.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+                    // #endregion
+                    console.error('Failed to parse dues JSON:', text.substring(0, 200));
+                    throw new Error('Invalid JSON response from dues endpoint');
+                }
+            });
+        })
     ])
     .then(([payments, duesData]) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:225',message:'Both fetches completed',data:{paymentsIsArray:Array.isArray(payments),duesStatus:duesData?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+        // #endregion
+        
         // Calculate Collected: Sum all amount_paid from payments within date range
         let collected = 0;
         if (Array.isArray(payments)) {
@@ -222,11 +257,17 @@ function fetchAndRenderPaymentsChart() {
         
         // Calculate Uncollected: Sum all balance from dues (API already filters by month)
         let uncollected = 0;
-        if (duesData.status === 'success' && Array.isArray(duesData.dues)) {
+        if (duesData && duesData.status === 'success' && Array.isArray(duesData.dues)) {
             duesData.dues.forEach(due => {
                 // Sum all balances - API already filtered by month
                 uncollected += parseFloat(due.balance || 0);
             });
+        } else if (!duesData || duesData.status !== 'success') {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:250',message:'Dues data not available, using 0',data:{duesStatus:duesData?.status,duesMessage:duesData?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+            // #endregion
+            console.warn('Dues data not available, showing only collected payments');
+            uncollected = 0; // Fallback to 0 if dues API fails
         }
         
         // Debug logging
@@ -298,9 +339,99 @@ function fetchAndRenderPaymentsChart() {
     })
     .catch(error => {
         // #region agent log
-        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:284',message:'Chart fetch error',data:{error:error.message,stack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:310',message:'Chart fetch error',data:{error:error.message,errorName:error.name,url:error.url || 'unknown'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
         // #endregion
         console.error('Error fetching chart data:', error);
+        
+        // Try to fetch just payments data as fallback
+        const cacheBuster = '?_t=' + Date.now();
+        const paymentsUrl = 'get_payments.php' + cacheBuster;
+        fetch(paymentsUrl, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Payments fetch failed: ${response.status}`);
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Invalid JSON from payments');
+                }
+            });
+        })
+        .then(payments => {
+            // Calculate collected from payments only
+            let collected = 0;
+            if (Array.isArray(payments)) {
+                payments.forEach(p => {
+                    if (p.date_paid) {
+                        const paidDate = new Date(p.date_paid);
+                        const from = fromDate ? new Date(fromDate) : null;
+                        const to = toDate ? new Date(toDate + 'T23:59:59') : null;
+                        let inRange = true;
+                        if (from && paidDate < from) inRange = false;
+                        if (to && paidDate > to) inRange = false;
+                        if (inRange) {
+                            collected += parseFloat(p.amount_paid || 0);
+                        }
+                    }
+                });
+            }
+            
+            // Render chart with collected only (uncollected = 0)
+            const paymentsCanvas = document.getElementById('paymentsChart');
+            if (paymentsCanvas && window.Chart) {
+                const ctx = paymentsCanvas.getContext('2d');
+                if (paymentsChart) paymentsChart.destroy();
+                const uncollected = 0;
+                const chartCollected = (collected === 0 && uncollected === 0) ? 0.0001 : collected;
+                const chartUncollected = (collected === 0 && uncollected === 0) ? 0.0001 : uncollected;
+                
+                paymentsChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Collected', 'Uncollected (N/A)'],
+                        datasets: [{
+                            data: [chartCollected, chartUncollected],
+                            backgroundColor: ['#5DD62C', '#ff4d4d'],
+                            borderColor: ['#5DD62C', '#ff4d4d'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#fff',
+                                    padding: 10,
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.label.includes('N/A')) {
+                                            return 'Uncollected data unavailable';
+                                        }
+                                        return context.label + ': ₱' + context.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                return; // Success, exit
+            }
+            throw new Error('Canvas or Chart.js not available');
+        })
+        .catch(fallbackError => {
+            console.error('Fallback fetch also failed:', fallbackError);
         
         // Try to render an empty chart or show error message
         const paymentsCanvas = document.getElementById('paymentsChart');
