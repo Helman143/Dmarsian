@@ -442,24 +442,13 @@ async function archivePost(postId) {
             }
             
             alert(data.message);
-            // Remove the post card immediately from the DOM
-            if (postCard) {
-                postCard.style.transition = 'opacity 0.3s';
-                postCard.style.opacity = '0';
-                setTimeout(() => {
-                    postCard.remove();
-                    // Check if grid is empty and show message
-                    const postGrid = document.getElementById('post-grid');
-                    if (postGrid && postGrid.querySelectorAll('.post-card').length === 0) {
-                        location.reload(true); // Force reload with cache bypass
-                    }
-                }, 300);
-            } else {
-                // Force reload with cache bypass to ensure fresh data
-                location.reload(true);
-            }
+            // Always reload to ensure fresh data from server
+            // This ensures archived posts are removed from the list
+            location.reload(true);
         } else {
             alert('Error: ' + data.message);
+            // Reload even on error to ensure UI matches database state
+            location.reload(true);
         }
     } catch (error) {
         console.error('Error archiving post:', error);

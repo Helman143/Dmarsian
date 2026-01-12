@@ -232,8 +232,20 @@ function archivePost() {
         return;
     }
     
+    // Check if post is already archived
+    if ($post['status'] === 'archived') {
+        mysqli_close($conn);
+        // Treat as success since the desired state is already achieved
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Post is already archived',
+            'already_archived' => true
+        ]);
+        return;
+    }
+    
     // Update the post status
-    $sql = "UPDATE posts SET status='archived' WHERE id=?";
+    $sql = "UPDATE posts SET status='archived' WHERE id=? AND (status='active' OR status IS NULL)";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id);
     
@@ -275,13 +287,33 @@ function archivePost() {
                 ]
             ]);
         } else {
+            // No rows affected - post might have been archived by another request
+            // Verify current status
+            $verify_sql = "SELECT status FROM posts WHERE id = ?";
+            $verify_stmt = mysqli_prepare($conn, $verify_sql);
+            mysqli_stmt_bind_param($verify_stmt, "i", $id);
+            mysqli_stmt_execute($verify_stmt);
+            $verify_result = mysqli_stmt_get_result($verify_stmt);
+            $current_post = mysqli_fetch_assoc($verify_result);
+            mysqli_stmt_close($verify_stmt);
+            
             mysqli_stmt_close($stmt);
             mysqli_close($conn);
-            echo json_encode([
-                'success' => false, 
-                'message' => 'No rows were updated. Post may already be archived or does not exist.',
-                'debug' => ['post_id' => $id, 'current_status' => $post['status']]
-            ]);
+            
+            // If already archived, treat as success
+            if ($current_post && $current_post['status'] === 'archived') {
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Post is already archived',
+                    'already_archived' => true
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Failed to archive post. Please try again.',
+                    'debug' => ['post_id' => $id, 'current_status' => $current_post['status'] ?? 'unknown']
+                ]);
+            }
         }
     } else {
         $error = mysqli_error($conn);
