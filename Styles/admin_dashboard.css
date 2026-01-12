@@ -59,7 +59,7 @@ html, body {
     min-height: 100vh;
 }
 
-/* Match Bootstrap wrapper used in admin_dashboard.php */
+/* Match Bootstrap wrapper used in dashboard.php */
 .container-fluid {
     min-height: 100vh;
 }

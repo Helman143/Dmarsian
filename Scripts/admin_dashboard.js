@@ -76,30 +76,32 @@ function fetchDashboardStats() {
                     window.studentOverviewChart.update();
                 } else {
                     window.studentOverviewChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: ["Today's Enrollees", "Weekly Enrollees"],
                             datasets: [{
                                 data: [data.todayEnrollees, data.weeklyEnrollees],
                                 backgroundColor: [
-                                    '#5DD62C',
-                                    'rgba(93, 214, 44, 0.3)'
+                                    '#00ff6a',
+                                    'rgba(0, 255, 106, 0.25)'
                                 ],
                                 borderColor: [
-                                    '#5DD62C',
-                                    '#5DD62C'
+                                    '#00ff6a',
+                                    '#00ff6a'
                                 ],
-                                borderWidth: 1
+                                borderWidth: 2,
+                                hoverOffset: 8
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '60%',
                             plugins: {
                                 legend: {
                                     position: 'bottom',
                                     labels: {
-                                        color: '#5DD62C',
+                                        color: '#00ff6a',
                                         font: { size: 12 },
                                         padding: 20
                                     }
@@ -127,19 +129,21 @@ function fetchDashboardStats() {
                     window.activeInactiveChart.update();
                 } else {
                     window.activeInactiveChart = new Chart(ctx, {
-                        type: 'pie',
+                        type: 'doughnut',
                         data: {
                             labels: ['Active', 'Inactive'],
                             datasets: [{
                                 data: [chartActive, chartInactive],
-                                backgroundColor: ['#5DD62C', '#f00'],
-                                borderColor: ['#5DD62C', '#f00'],
-                                borderWidth: 1
+                                backgroundColor: ['#00ff6a', 'rgba(255,255,255,0.2)'],
+                                borderColor: ['#00ff6a', 'rgba(255,255,255,0.4)'],
+                                borderWidth: 2,
+                                hoverOffset: 8
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            cutout: '60%',
                             plugins: {
                                 legend: {
                                     position: 'top',
@@ -327,24 +331,26 @@ function fetchAndRenderPaymentsChart() {
             const ctx = paymentsCanvas.getContext('2d');
             if (paymentsChart) paymentsChart.destroy();
             paymentsChart = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: ['Collected', 'Uncollected'],
                     datasets: [{
                         data: [chartCollected, chartUncollected],
-                        backgroundColor: ['#5DD62C', '#ff4d4d'],
-                        borderColor: ['#5DD62C', '#ff4d4d'],
-                        borderWidth: 1
+                        backgroundColor: ['#00ff6a', '#ff4d4d'],
+                        borderColor: ['#00ff6a', '#ff4d4d'],
+                        borderWidth: 2,
+                        hoverOffset: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '60%',
                     plugins: {
                         legend: {
                             position: 'top',
                             labels: {
-                                color: '#fff',
+                                color: '#e9ffee',
                                 padding: 10,
                             }
                         },
@@ -455,19 +461,21 @@ function fetchAndRenderPaymentsChart() {
                 const chartUncollected = (collected === 0 && uncollected === 0) ? 0.0001 : uncollected;
                 
                 paymentsChart = new Chart(ctx, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: ['Collected', 'Uncollected (N/A)'],
                         datasets: [{
                             data: [chartCollected, chartUncollected],
-                            backgroundColor: ['#5DD62C', '#ff4d4d'],
-                            borderColor: ['#5DD62C', '#ff4d4d'],
-                            borderWidth: 1
+                            backgroundColor: ['#00ff6a', '#ff4d4d'],
+                            borderColor: ['#00ff6a', '#ff4d4d'],
+                            borderWidth: 2,
+                            hoverOffset: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '60%',
                         plugins: {
                             legend: {
                                 position: 'top',
@@ -503,19 +511,21 @@ function fetchAndRenderPaymentsChart() {
             if (paymentsChart) paymentsChart.destroy();
             // Render empty chart with error state
             paymentsChart = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: ['Error Loading Data'],
                     datasets: [{
                         data: [1],
                         backgroundColor: ['#ff4d4d'],
                         borderColor: ['#ff4d4d'],
-                        borderWidth: 1
+                        borderWidth: 2,
+                        hoverOffset: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '60%',
                     plugins: {
                         legend: {
                             position: 'top',
@@ -535,6 +545,18 @@ function fetchAndRenderPaymentsChart() {
                 }
             });
         }
+    });
+}
+
+// Format date to show month as a word (e.g., "November 10, 2025")
+function formatDateWithWordMonth(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString(undefined, {
+        month: 'long',
+        day: '2-digit',
+        year: 'numeric'
     });
 }
 
@@ -600,7 +622,7 @@ function fetchAndPopulateDues() {
                             const paid = Number(due.amount_paid || 0).toFixed(2);
                             const balance = Number((Number(due.balance) ?? (Number(total) - Number(paid))) || 0).toFixed(2);
                             row.innerHTML = `
-                                <td>${due.due_date}</td>
+                                <td>${formatDateWithWordMonth(due.due_date)}</td>
                                 <td>${due.id_name}</td>
                                 <td>₱${Number(amount).toLocaleString(undefined, {minimumFractionDigits:2})}</td>
                                 <td>₱${Number(discount).toLocaleString(undefined, {minimumFractionDigits:2})}</td>
@@ -691,24 +713,26 @@ function fetchAndRenderActiveInactiveChart() {
                     window.activeInactiveChart.destroy();
                 }
                 window.activeInactiveChart = new Chart(ctx, {
-                    type: 'pie',
+                    type: 'doughnut',
                     data: {
                         labels: ['Active', 'Inactive'],
                         datasets: [{
                             data: [chartActive, chartInactive],
-                            backgroundColor: ['#5DD62C', '#f00'],
-                            borderColor: ['#5DD62C', '#f00'],
-                            borderWidth: 1
+                            backgroundColor: ['#00ff6a', 'rgba(255,255,255,0.2)'],
+                            borderColor: ['#00ff6a', 'rgba(255,255,255,0.4)'],
+                            borderWidth: 2,
+                            hoverOffset: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '60%',
                         plugins: {
                             legend: {
                                 position: 'top',
                                 labels: {
-                                    color: '#fff',
+                                    color: '#e9ffee',
                                     padding: 10,
                                 }
                             },
