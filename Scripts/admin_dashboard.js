@@ -252,7 +252,7 @@ function fetchAndRenderPaymentsChart() {
             }
         }).then(response => {
             // #region agent log
-            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:207',message:'Dues fetch response',data:{status:response.status,ok:response.ok,url:duesUrlWithCache},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:207',message:'Dues fetch response',data:{status:response.status,ok:response.ok,url:duesUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
             // #endregion
             if (!response.ok) {
                 throw new Error(`Dues fetch failed: ${response.status} ${response.statusText}`);
@@ -503,48 +503,49 @@ function fetchAndRenderPaymentsChart() {
         })
         .catch(fallbackError => {
             console.error('Fallback fetch also failed:', fallbackError);
-        
-        // Try to render an empty chart or show error message
-        const paymentsCanvas = document.getElementById('paymentsChart');
-        if (paymentsCanvas && window.Chart) {
-            const ctx = paymentsCanvas.getContext('2d');
-            if (paymentsChart) paymentsChart.destroy();
-            // Render empty chart with error state
-            paymentsChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Error Loading Data'],
-                    datasets: [{
-                        data: [1],
-                        backgroundColor: ['#ff4d4d'],
-                        borderColor: ['#ff4d4d'],
-                        borderWidth: 2,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                color: '#fff',
-                                padding: 10,
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Error: ' + error.message;
+            
+            // Try to render an empty chart or show error message
+            const paymentsCanvas = document.getElementById('paymentsChart');
+            if (paymentsCanvas && window.Chart) {
+                const ctx = paymentsCanvas.getContext('2d');
+                if (paymentsChart) paymentsChart.destroy();
+                // Render empty chart with error state
+                paymentsChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Error Loading Data'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['#ff4d4d'],
+                            borderColor: ['#ff4d4d'],
+                            borderWidth: 2,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#fff',
+                                    padding: 10,
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Error: ' + (fallbackError ? fallbackError.message : 'Unknown error');
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     });
 }
 
