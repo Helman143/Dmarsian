@@ -2,6 +2,24 @@
 let currentPostId = null;
 let isEditMode = false;
 
+// Initialize BroadcastChannel for real-time updates
+let postUpdateChannel = null;
+if (typeof BroadcastChannel !== 'undefined') {
+    postUpdateChannel = new BroadcastChannel('post-updates');
+}
+
+// Helper function to broadcast post updates
+function broadcastPostUpdate(type, category, postId = null) {
+    if (postUpdateChannel) {
+        postUpdateChannel.postMessage({
+            type: type,
+            category: category,
+            postId: postId,
+            timestamp: Date.now()
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     setCurrentDate();
@@ -307,6 +325,15 @@ async function handleFormSubmit(e) {
             } else {
                 console.log('Post created but no image path returned');
             }
+            
+            // Get category from form data
+            const category = formData.get('category');
+            
+            // Broadcast post creation to other tabs
+            if (category) {
+                broadcastPostUpdate('post-created', category);
+            }
+            
             alert(data.message);
             closeModal();
             // Use cache-busting reload to ensure fresh data
@@ -334,6 +361,14 @@ async function updatePost() {
         const data = await response.json();
         
         if (data.success) {
+            // Get category from form data
+            const category = formData.get('category');
+            
+            // Broadcast post update to other tabs
+            if (category && currentPostId) {
+                broadcastPostUpdate('post-updated', category, currentPostId);
+            }
+            
             alert(data.message);
             closeModal();
             location.reload(); // Refresh to show updated post
@@ -363,9 +398,51 @@ async function archivePost(postId) {
         const data = await response.json();
         
         if (data.success) {
+            // Get category from the post card element before removing it
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            let category = null;
+            
+            if (postCard) {
+                // Try to get category from the post tag element
+                const postTag = postCard.querySelector('.post-tag');
+                if (postTag) {
+                    const tagText = postTag.textContent.trim().toLowerCase();
+                    if (tagText === 'achievement') {
+                        category = 'achievement';
+                    } else if (tagText === 'event') {
+                        category = 'event';
+                    } else if (tagText === 'achievement/event') {
+                        category = 'achievement_event';
+                    }
+                }
+            }
+            
+            // If we couldn't get category from DOM, try to fetch it from server
+            if (!category) {
+                try {
+                    const fetchResponse = await fetch('post_operations.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=fetch_single&id=${postId}`
+                    });
+                    const fetchData = await fetchResponse.json();
+                    if (fetchData.success && fetchData.post) {
+                        category = fetchData.post.category;
+                    }
+                } catch (err) {
+                    console.error('Error fetching post category for broadcast:', err);
+                }
+            }
+            
+            // Broadcast post archive to other tabs
+            if (category) {
+                broadcastPostUpdate('post-archived', category, postId);
+            }
+            
             alert(data.message);
             // Remove the post card immediately from the DOM
-            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
             if (postCard) {
                 postCard.style.transition = 'opacity 0.3s';
                 postCard.style.opacity = '0';

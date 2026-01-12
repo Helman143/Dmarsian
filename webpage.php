@@ -1002,6 +1002,90 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             renderSlider([], 'events-slider');
         });
 
+    // Real-time post updates via BroadcastChannel
+    // Function to refresh a specific slider by fetching fresh data
+    function refreshSlider(sliderId, category) {
+        // Determine the API category parameter based on slider
+        let categoryParam;
+        if (sliderId === 'achievements-slider') {
+            categoryParam = 'achievement'; // get_posts.php will return both 'achievement' and 'achievement_event'
+        } else if (sliderId === 'events-slider') {
+            categoryParam = 'event'; // get_posts.php will return both 'event' and 'achievement_event'
+        } else {
+            console.error('Unknown slider ID:', sliderId);
+            return;
+        }
+        
+        fetch(`get_posts.php?category=${categoryParam}`)
+            .then(res => res.json())
+            .then(posts => {
+                if (!posts || posts.length === 0) {
+                    renderSlider([], sliderId);
+                    return;
+                }
+                
+                // get_posts.php already filters correctly, so we can use posts directly
+                renderSlider(posts, sliderId);
+                
+                // Re-initialize coverflow carousel after rendering
+                setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const slider = document.getElementById(sliderId);
+                            const track = slider ? slider.querySelector('.slider-track') : null;
+                            if (track) {
+                                const cards = Array.from(track.querySelectorAll('.slide-card'));
+                                if (cards.length > 0) {
+                                    // Reset initialization flag to allow re-initialization
+                                    slider.dataset.coverflowInitialized = 'false';
+                                    setupCoverflowCarousel(slider, track, cards);
+                                }
+                            }
+                        });
+                    });
+                }, 100);
+            })
+            .catch(err => {
+                console.error(`Error refreshing ${sliderId}:`, err);
+            });
+    }
+
+    // Initialize BroadcastChannel listener for real-time updates
+    if (typeof BroadcastChannel !== 'undefined') {
+        const postUpdateChannel = new BroadcastChannel('post-updates');
+        
+        postUpdateChannel.addEventListener('message', (event) => {
+            const { type, category, postId } = event.data;
+            
+            if (!category) {
+                console.warn('Received post update without category:', event.data);
+                return;
+            }
+            
+            console.log('Received post update:', type, category, postId);
+            
+            // Determine which slider(s) to refresh based on category
+            if (category === 'achievement') {
+                // Refresh achievements slider only
+                refreshSlider('achievements-slider', category);
+            } else if (category === 'event') {
+                // Refresh events slider only
+                refreshSlider('events-slider', category);
+            } else if (category === 'achievement_event') {
+                // Refresh both sliders
+                refreshSlider('achievements-slider', category);
+                refreshSlider('events-slider', category);
+            } else {
+                // Unknown category, refresh both to be safe
+                console.warn('Unknown category, refreshing both sliders:', category);
+                refreshSlider('achievements-slider', 'achievement');
+                refreshSlider('events-slider', 'event');
+            }
+        });
+    } else {
+        console.warn('BroadcastChannel not supported. Real-time updates disabled.');
+    }
+
     // Post modal helpers
     function normalizePostDate(post) {
         return post.posted_at || post.date || post.created_at || '';

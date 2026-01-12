@@ -55,7 +55,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 </div>
                 <div class="stat-box yearly">
                     <h3>Yearly Collected Amount</h3>
-                    <div class="amount">₱433,076</div>
+                    <div class="amount"></div>
                 </div>
             </div>
 
