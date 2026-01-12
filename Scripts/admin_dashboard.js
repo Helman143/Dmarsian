@@ -4,8 +4,11 @@ function fetchDashboardStats() {
     fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:2',message:'fetchDashboardStats called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
     // #endregion
     
+    console.log('Admin Dashboard: Fetching dashboard stats...');
     const cacheBuster = '?_t=' + Date.now();
-    fetch('get_dashboard_stats.php' + cacheBuster, {
+    const statsUrl = 'get_dashboard_stats.php' + cacheBuster;
+    console.log('Admin Dashboard: Stats URL:', statsUrl, 'Current path:', window.location.pathname);
+    fetch(statsUrl, {
         cache: 'no-store',
         headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -16,19 +19,25 @@ function fetchDashboardStats() {
         // #region agent log
         fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:15',message:'Dashboard stats response received',data:{status:response.status,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
         // #endregion
+        console.log('Admin Dashboard: Stats response status:', response.status, response.statusText);
         if (!response.ok) {
+            console.error('Admin Dashboard: Stats fetch failed with status:', response.status);
             throw new Error(`Dashboard stats fetch failed: ${response.status} ${response.statusText}`);
         }
         return response.text().then(text => {
+            console.log('Admin Dashboard: Stats response text preview:', text.substring(0, 100));
             try {
-                return JSON.parse(text);
+                const parsed = JSON.parse(text);
+                console.log('Admin Dashboard: Stats JSON parsed successfully');
+                return parsed;
             } catch (e) {
-                console.error('Failed to parse dashboard stats JSON:', text.substring(0, 200));
-                throw new Error('Invalid JSON response from dashboard stats');
+                console.error('Admin Dashboard: Failed to parse dashboard stats JSON. Full response:', text);
+                throw new Error('Invalid JSON response from dashboard stats: ' + e.message);
             }
         });
     })
     .then(data => {
+        console.log('Admin Dashboard: Stats data received:', data);
         if (data.status === 'success') {
             // Update stat cards with specific IDs
             const todayEnrollees = document.getElementById('today-enrollees');
@@ -36,10 +45,23 @@ function fetchDashboardStats() {
             const todayCollected = document.getElementById('today-collected');
             const weeklyCollected = document.getElementById('weekly-collected');
             
-            if (todayEnrollees) todayEnrollees.textContent = data.todayEnrollees;
-            if (weeklyEnrollees) weeklyEnrollees.textContent = data.weeklyEnrollees;
-            if (todayCollected) todayCollected.textContent = '₱' + data.todayCollected.toLocaleString();
-            if (weeklyCollected) weeklyCollected.textContent = '₱' + data.weeklyCollected.toLocaleString();
+            if (todayEnrollees) {
+                todayEnrollees.textContent = data.todayEnrollees;
+                todayEnrollees.style.color = '';
+            }
+            if (weeklyEnrollees) {
+                weeklyEnrollees.textContent = data.weeklyEnrollees;
+                weeklyEnrollees.style.color = '';
+            }
+            if (todayCollected) {
+                todayCollected.textContent = '₱' + data.todayCollected.toLocaleString();
+                todayCollected.style.color = '';
+            }
+            if (weeklyCollected) {
+                weeklyCollected.textContent = '₱' + data.weeklyCollected.toLocaleString();
+                weeklyCollected.style.color = '';
+            }
+            console.log('Admin Dashboard: Stats updated successfully');
             // Update Student Overview chart if present
             const studentChartCanvas = document.getElementById('studentChart');
             if (studentChartCanvas && window.Chart) {
@@ -151,7 +173,8 @@ function fetchDashboardStats() {
             statElements.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
-                    element.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                    element.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error: ' + (error.message || 'Failed to load');
+                    element.style.color = '#ff4d4d';
                 }
             });
         } catch (domError) {
@@ -188,6 +211,8 @@ function fetchAndRenderPaymentsChart() {
     const cacheBuster = '?_t=' + Date.now();
     const paymentsUrl = 'get_payments.php' + cacheBuster;
     const duesUrl = `api/dues.php?month=${monthParam}` + '&_t=' + Date.now();
+    console.log('Admin Dashboard: Payments URL:', paymentsUrl);
+    console.log('Admin Dashboard: Dues URL:', duesUrl);
     
     Promise.all([
         fetch(paymentsUrl, {
@@ -352,6 +377,34 @@ function fetchAndRenderPaymentsChart() {
         fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:310',message:'Chart fetch error',data:{error:error.message,errorName:error.name,url:error.url || 'unknown'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
         // #endregion
         console.error('Error fetching chart data:', error);
+        // Show error in chart area
+        const paymentsCanvas = document.getElementById('paymentsChart');
+        if (paymentsCanvas && window.Chart) {
+            const ctx = paymentsCanvas.getContext('2d');
+            if (paymentsChart) paymentsChart.destroy();
+            paymentsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Error'],
+                    datasets: [{
+                        label: 'Error Loading Data',
+                        data: [0],
+                        backgroundColor: ['#ff4d4d']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Error: ' + (error.message || 'Failed to load chart data'),
+                            color: '#ff4d4d'
+                        }
+                    }
+                }
+            });
+        }
         
         // Try to fetch just payments data as fallback
         const cacheBuster = '?_t=' + Date.now();
@@ -491,8 +544,11 @@ function fetchAndPopulateDues() {
     fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:253',message:'fetchAndPopulateDues called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
     // #endregion
     
+    console.log('Admin Dashboard: Fetching dues data...');
     const cacheBuster = '?_t=' + Date.now();
-    fetch('api/dues.php' + cacheBuster, {
+    const duesUrl = 'api/dues.php' + cacheBuster;
+    console.log('Admin Dashboard: Dues URL:', duesUrl);
+    fetch(duesUrl, {
         cache: 'no-store',
         headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -500,16 +556,21 @@ function fetchAndPopulateDues() {
         }
     })
         .then(response => {
+            console.log('Admin Dashboard: Dues response status:', response.status, response.statusText);
             if (!response.ok) {
+                console.error('Admin Dashboard: Dues fetch failed with status:', response.status);
                 throw new Error(`Dues fetch failed: ${response.status} ${response.statusText}`);
             }
             return response.text();
         })
         .then(text => {
+            console.log('Admin Dashboard: Dues response text preview:', text.substring(0, 100));
             let data;
             try {
                 data = JSON.parse(text);
+                console.log('Admin Dashboard: Dues JSON parsed successfully');
             } catch (e) {
+                console.error('Admin Dashboard: Failed to parse dues JSON. Full response:', text);
                 const duesTableBody = document.querySelector('.dues-table tbody');
                 if (duesTableBody) {
                     const errRow = document.createElement('tr');
@@ -521,6 +582,7 @@ function fetchAndPopulateDues() {
                 return;
             }
             if (data.status === 'success') {
+                console.log('Admin Dashboard: Dues data received:', data.dues.length, 'items');
                 const duesTableBody = document.querySelector('.dues-table tbody');
                 if (duesTableBody) {
                     duesTableBody.innerHTML = '';
@@ -577,7 +639,7 @@ function fetchAndPopulateDues() {
                 const duesTableBody = document.querySelector('.dues-table tbody');
                 if (duesTableBody) {
                     const errRow = document.createElement('tr');
-                    errRow.innerHTML = '<td colspan="10" style="text-align:center;color:#fff;">Error loading dues: ' + error.message + '</td>';
+                    errRow.innerHTML = '<td colspan="10" style="text-align:center;color:#ff4d4d;padding:20px;"><i class="fas fa-exclamation-triangle"></i> Error loading dues: ' + (error.message || 'Network error') + '<br><small>Check browser console for details</small></td>';
                     duesTableBody.innerHTML = '';
                     duesTableBody.appendChild(errRow);
                 }
@@ -592,8 +654,11 @@ function fetchAndRenderActiveInactiveChart() {
     fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:580',message:'fetchAndRenderActiveInactiveChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
     // #endregion
     
+    console.log('Admin Dashboard: Fetching active/inactive counts...');
     const cacheBuster = '?_t=' + Date.now();
-    fetch('get_active_inactive_counts.php' + cacheBuster, {
+    const activeUrl = 'get_active_inactive_counts.php' + cacheBuster;
+    console.log('Admin Dashboard: Active/Inactive URL:', activeUrl);
+    fetch(activeUrl, {
         cache: 'no-store',
         headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -673,6 +738,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // #region agent log
     fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:631',message:'DOMContentLoaded fired',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
     // #endregion
+    
+    console.log('Admin Dashboard: DOMContentLoaded - Starting data fetch...');
     
     // Initial fetch on page load - must be inside DOMContentLoaded
     fetchDashboardStats();
