@@ -4,15 +4,30 @@ let paymentsData = [];
 // Fetch payment records and update table, stats, and chart
 async function fetchAndDisplayPayments() {
     try {
-        const response = await fetch('get_payments.php');
+        // Add cache-busting parameter
+        const cacheBuster = '?_t=' + Date.now();
+        const response = await fetch('get_payments.php' + cacheBuster, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        });
         if (!response.ok) {
-            throw new Error('Failed to fetch payments');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        let payments = await response.json();
+        const text = await response.text();
+        let payments;
+        try {
+            payments = JSON.parse(text);
+        } catch (e) {
+            console.error('Error parsing payments JSON:', text);
+            payments = [];
+        }
         
         // Ensure payments is an array
         if (!Array.isArray(payments)) {
-            console.error('Invalid payments data format');
+            console.error('Invalid payments data format:', payments);
             payments = [];
         }
 
@@ -20,21 +35,28 @@ async function fetchAndDisplayPayments() {
         const tbody = document.getElementById('transactionTableBody');
         if (tbody) {
             tbody.innerHTML = '';
-            payments.forEach(payment => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${payment.id || ''}</td>
-                    <td>${payment.date_paid || ''}</td>
-                    <td>${payment.jeja_no || ''}</td>
-                    <td>₱${parseFloat(payment.amount_paid || 0).toLocaleString()}</td>
-                    <td>₱${parseFloat(payment.amount_paid || 0).toLocaleString()}</td>
-                    <td>${payment.payment_type || ''}</td>
-                    <td>${payment.discount || 0}</td>
-                    <td>₱${(parseFloat(payment.amount_paid || 0) - parseFloat(payment.discount || 0)).toLocaleString()}</td>
-                    <td>${payment.status || ''}</td>
-                `;
-                tbody.appendChild(row);
-            });
+            if (payments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No payment transactions found.</td></tr>';
+            } else {
+                payments.forEach(payment => {
+                    const row = document.createElement('tr');
+                    const amountPaid = parseFloat(payment.amount_paid || 0);
+                    const discount = parseFloat(payment.discount || 0);
+                    const totalAmount = amountPaid - discount;
+                    row.innerHTML = `
+                        <td>${payment.id || ''}</td>
+                        <td>${payment.date_paid || ''}</td>
+                        <td>${payment.jeja_no || ''}</td>
+                        <td>₱${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>₱${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>${payment.payment_type || ''}</td>
+                        <td>₱${discount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>₱${totalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>${payment.status || ''}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
         }
 
         // 2. Update Monthly and Yearly Stats
@@ -204,6 +226,38 @@ function updateCollectionChart(payments) {
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayPayments();
+    
+    // Listen for payment updates from other pages/tabs
+    // Method 1: BroadcastChannel (modern browsers)
+    if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('payment-updates');
+        channel.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'payment-saved') {
+                console.log('Payment update received via BroadcastChannel, refreshing...');
+                fetchAndDisplayPayments();
+            }
+        });
+    }
+    
+    // Method 2: localStorage event (works across tabs/windows)
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'payment-update-trigger') {
+            console.log('Payment update received via localStorage, refreshing...');
+            fetchAndDisplayPayments();
+        }
+    });
+    
+    // Method 3: Custom event (for same-tab updates)
+    window.addEventListener('payment-updated', (event) => {
+        console.log('Payment update received via custom event, refreshing...');
+        fetchAndDisplayPayments();
+    });
+    
+    // Polling fallback: refresh every 30 seconds as a safety net
+    setInterval(() => {
+        fetchAndDisplayPayments();
+    }, 30000);
+    
     const trendPeriod = document.getElementById('trendPeriod');
     if (trendPeriod) {
         trendPeriod.addEventListener('change', () => {
