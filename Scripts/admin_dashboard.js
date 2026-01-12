@@ -14,9 +14,19 @@ function fetchDashboardStats() {
     })
     .then(response => {
         // #region agent log
-        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:8',message:'Dashboard stats response received',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:15',message:'Dashboard stats response received',data:{status:response.status,ok:response.ok},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
         // #endregion
-        return response.json();
+        if (!response.ok) {
+            throw new Error(`Dashboard stats fetch failed: ${response.status} ${response.statusText}`);
+        }
+        return response.text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Failed to parse dashboard stats JSON:', text.substring(0, 200));
+                throw new Error('Invalid JSON response from dashboard stats');
+            }
+        });
     })
     .then(data => {
         if (data.status === 'success') {
@@ -131,20 +141,24 @@ function fetchDashboardStats() {
         }
     })
     .catch(error => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:133',message:'Dashboard stats fetch error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
+        // #endregion
         console.error('Error fetching dashboard stats:', error);
-        // Show error state in stat cards
-        const statElements = ['today-enrollees', 'weekly-enrollees', 'today-collected', 'weekly-collected'];
-        statElements.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-            }
-        });
+        // Show error state in stat cards only if DOM is ready
+        try {
+            const statElements = ['today-enrollees', 'weekly-enrollees', 'today-collected', 'weekly-collected'];
+            statElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                }
+            });
+        } catch (domError) {
+            console.error('DOM not ready for error display:', domError);
+        }
     });
 }
-
-// Initial fetch on page load
-fetchDashboardStats();
 
 // --- Collected vs. Uncollected Payments Chart Logic ---
 let paymentsChart;
@@ -485,7 +499,12 @@ function fetchAndPopulateDues() {
             'Pragma': 'no-cache'
         }
     })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Dues fetch failed: ${response.status} ${response.statusText}`);
+            }
+            return response.text();
+        })
         .then(text => {
             let data;
             try {
@@ -550,20 +569,27 @@ function fetchAndPopulateDues() {
             }
         })
         .catch(error => {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:550',message:'Dues fetch error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
+            // #endregion
             console.error('Error fetching dues:', error);
-            const duesTableBody = document.querySelector('.dues-table tbody');
-            if (duesTableBody) {
-                const errRow = document.createElement('tr');
-                errRow.innerHTML = '<td colspan="10" style="text-align:center;color:#fff;">Error loading dues</td>';
-                duesTableBody.innerHTML = '';
-                duesTableBody.appendChild(errRow);
+            try {
+                const duesTableBody = document.querySelector('.dues-table tbody');
+                if (duesTableBody) {
+                    const errRow = document.createElement('tr');
+                    errRow.innerHTML = '<td colspan="10" style="text-align:center;color:#fff;">Error loading dues: ' + error.message + '</td>';
+                    duesTableBody.innerHTML = '';
+                    duesTableBody.appendChild(errRow);
+                }
+            } catch (domError) {
+                console.error('DOM not ready for error display:', domError);
             }
         });
 }
 
 function fetchAndRenderActiveInactiveChart() {
     // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:331',message:'fetchAndRenderActiveInactiveChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:580',message:'fetchAndRenderActiveInactiveChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
     // #endregion
     
     const cacheBuster = '?_t=' + Date.now();
@@ -574,7 +600,19 @@ function fetchAndRenderActiveInactiveChart() {
             'Pragma': 'no-cache'
         }
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Active/inactive fetch failed: ${response.status} ${response.statusText}`);
+            }
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Failed to parse active/inactive JSON:', text.substring(0, 200));
+                    throw new Error('Invalid JSON response');
+                }
+            });
+        })
         .then(counts => {
             const active = counts.active || 0;
             const inactive = counts.inactive || 0;
@@ -624,15 +662,20 @@ function fetchAndRenderActiveInactiveChart() {
             }
         })
         .catch(err => {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:625',message:'Active/inactive fetch error',data:{error:err.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
+            // #endregion
             console.error('Error fetching active/inactive counts:', err);
         });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:387',message:'DOMContentLoaded fired',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:631',message:'DOMContentLoaded fired',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
     // #endregion
     
+    // Initial fetch on page load - must be inside DOMContentLoaded
+    fetchDashboardStats();
     fetchAndPopulateDues();
     fetchAndRenderActiveInactiveChart();
     
@@ -713,7 +756,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Pragma': 'no-cache'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Polling fetch failed: ${response.status}`);
+            }
+            return response.text().then(text => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Failed to parse polling JSON:', text.substring(0, 200));
+                    throw new Error('Invalid JSON response');
+                }
+            });
+        })
         .then(data => {
                 if (data.status === 'success') {
                     const todayEnrollees = document.getElementById('today-enrollees');
@@ -738,7 +793,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             })
-            .catch(error => console.error('Error refreshing dashboard stats:', error));
+            .catch(error => {
+                // #region agent log
+                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:790',message:'Polling error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'J'})}).catch(()=>{});
+                // #endregion
+                console.error('Error refreshing dashboard stats:', error);
+            });
         fetchAndPopulateDues();
         fetchAndRenderActiveInactiveChart();
         fetchAndRenderPaymentsChart();
