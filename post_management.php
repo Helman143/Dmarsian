@@ -40,14 +40,25 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
 
 // Fetch posts for display
 $conn = connectDB();
-$year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
+$year_filter = isset($_GET['year']) ? (int)$_GET['year'] : null;
 $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
 // Base query: exclude archived posts and filter by year
-$sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
-$params = [$year_filter];
-$types = "i";
+// If no year filter specified, show current year AND previous year (matching get_posts.php behavior)
+if ($year_filter !== null) {
+    // Specific year selected - show only that year
+    $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
+    $params = [$year_filter];
+    $types = "i";
+} else {
+    // No year filter - show current year and previous year (last 2 years)
+    $currentYear = date('Y');
+    $previousYear = $currentYear - 1;
+    $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND (YEAR(post_date) = ? OR YEAR(post_date) = ?)";
+    $params = [$currentYear, $previousYear];
+    $types = "ii";
+}
 
 // Add category filter if specified
 if (!empty($category_filter)) {
@@ -150,6 +161,9 @@ mysqli_close($conn);
                     <select id="year-filter" onchange="filterPosts()">
                         <?php
                         $current_year = date('Y');
+                        // Add "All Years" option (shows current + previous year, matching get_posts.php)
+                        $selected_all = $year_filter === null ? 'selected' : '';
+                        echo "<option value=\"\" {$selected_all}>ALL YEARS</option>";
                         // Generate years from current year down to 5 years ago
                         for ($year = $current_year; $year >= $current_year - 5; $year--) {
                             $selected = $year_filter == $year ? 'selected' : '';

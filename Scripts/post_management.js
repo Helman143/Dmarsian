@@ -489,10 +489,13 @@ async function filterPosts() {
     
     // Build URL with filters
     const params = [];
-    if (yearFilter) params.push(`year=${yearFilter}`);
+    // Only add year parameter if a specific year is selected (not empty "ALL YEARS")
+    if (yearFilter && yearFilter.trim() !== '') {
+        params.push(`year=${yearFilter}`);
+    }
     if (categoryFilter) params.push(`category=${categoryFilter}`);
     
-    const url = 'post_management.php?' + params.join('&');
+    const url = 'post_management.php' + (params.length > 0 ? '?' + params.join('&') : '');
     
     // Redirect to filtered page
     window.location.href = url;
