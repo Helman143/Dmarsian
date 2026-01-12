@@ -207,6 +207,5 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
     })();
     </script>
-    <div id="paymentMessage" style="display:none;"></div>
 </body>
 </html> 

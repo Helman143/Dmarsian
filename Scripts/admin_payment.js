@@ -5,12 +5,40 @@ function fetchPayments(searchTerm = '') {
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const month = `${yyyy}-${mm}`;
     const paymentsUrl = 'get_payments.php' + (searchTerm ? ('?search=' + encodeURIComponent(searchTerm)) : '');
+    
     Promise.all([
-        fetch(paymentsUrl).then(r => r.json()),
-        fetch('api/balances.php?month=' + encodeURIComponent(month)).then(r => r.json()).catch(() => null),
-        fetch('get_students.php').then(r => r.json()).catch(() => null)
+        fetch(paymentsUrl)
+            .then(r => {
+                if (!r.ok) {
+                    throw new Error(`HTTP error! status: ${r.status}`);
+                }
+                return r.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('Error parsing payments JSON:', text);
+                        return [];
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Error fetching payments:', err);
+                return [];
+            }),
+        fetch('api/balances.php?month=' + encodeURIComponent(month))
+            .then(r => r.json())
+            .catch(() => null),
+        fetch('get_students.php')
+            .then(r => r.json())
+            .catch(() => null)
     ])
     .then(([payments, balancesResp, studentsResp]) => {
+        // Ensure payments is an array
+        if (!Array.isArray(payments)) {
+            console.error('Payments data is not an array:', payments);
+            payments = [];
+        }
+        
         const balancesMap = {};
         if (balancesResp && balancesResp.status === 'success' && Array.isArray(balancesResp.balances)) {
             balancesResp.balances.forEach(b => {
@@ -35,11 +63,14 @@ function fetchPayments(searchTerm = '') {
             });
         }
 
-        populatePaymentTable(payments || [], balancesMap, statusesMap);
+        populatePaymentTable(payments, balancesMap, statusesMap);
     })
-    .catch(() => {
+    .catch(err => {
+        console.error('Error in fetchPayments:', err);
         const tableBody = document.getElementById('paymentTableBody');
-        tableBody.innerHTML = '<tr><td colspan="9">Error fetching payment records.</td></tr>';
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="9">Error fetching payment records. Please refresh the page.</td></tr>';
+        }
     });
 }
 
@@ -113,40 +144,78 @@ function populatePaymentTable(records, balancesMap = {}, statusesMap = {}) {
 function handlePaymentSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    // Simple validation
-    for (let [key, value] of formData.entries()) {
-        if (!value) {
+    
+    // Validation - exclude readonly fields (discount is readonly)
+    const requiredFields = ['jeja_no', 'payment_type', 'full_name', 'date_paid', 'amount_paid', 'status'];
+    for (const field of requiredFields) {
+        const value = formData.get(field);
+        if (!value || value.trim() === '') {
             const msgDiv = document.getElementById('paymentMessage');
             msgDiv.style.display = 'block';
-            msgDiv.textContent = 'All fields are required.';
+            msgDiv.textContent = `Please fill in all required fields. Missing: ${field}`;
             msgDiv.style.color = 'red';
             setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
             return;
         }
     }
+    
+    // Ensure discount has a value (default to 0.00 if empty)
+    if (!formData.get('discount') || formData.get('discount').trim() === '') {
+        formData.set('discount', '0.00');
+    }
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+    
     fetch('api/payments.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Response parsing error:', text);
+                throw new Error('Invalid JSON response from server');
+            }
+        });
+    })
     .then(result => {
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
-        msgDiv.textContent = result.message;
+        msgDiv.textContent = result.message || (result.success ? 'Payment saved successfully!' : 'Failed to save payment.');
         msgDiv.style.color = result.success ? 'green' : 'red';
+        
         if (result.success) {
             event.target.reset();
             document.getElementById('amount_paid').value = '0.00';
-            fetchPayments();
+            document.getElementById('discount').value = '0.00';
+            // Refresh payment table immediately
+            setTimeout(() => {
+                fetchPayments();
+            }, 500);
         }
-        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
     })
-    .catch(() => {
+    .catch(error => {
+        console.error('Payment submission error:', error);
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
-        msgDiv.textContent = 'Error saving payment.';
+        msgDiv.textContent = 'Error saving payment: ' + error.message;
         msgDiv.style.color = 'red';
-        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
+    })
+    .finally(() => {
+        // Restore button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
     });
 }
 
