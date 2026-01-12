@@ -244,6 +244,10 @@ function fetchAndRenderPaymentsChart() {
         }
         
         const paymentsCanvas = document.getElementById('paymentsChart');
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:246',message:'Attempting to render chart',data:{hasCanvas:!!paymentsCanvas,hasChart:typeof window.Chart !== 'undefined',collected:collected,uncollected:uncollected},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        // #endregion
+        
         if (paymentsCanvas && window.Chart) {
             const ctx = paymentsCanvas.getContext('2d');
             if (paymentsChart) paymentsChart.destroy();
@@ -279,21 +283,65 @@ function fetchAndRenderPaymentsChart() {
                     }
                 }
             });
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:281',message:'Chart created successfully',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            // #endregion
+        } else {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:285',message:'Chart not rendered - missing requirements',data:{hasCanvas:!!paymentsCanvas,hasChart:typeof window.Chart !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            // #endregion
+            console.error('Cannot render chart: canvas or Chart.js not available', {
+                hasCanvas: !!paymentsCanvas,
+                hasChart: typeof window.Chart !== 'undefined'
+            });
         }
     })
     .catch(error => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:284',message:'Chart fetch error',data:{error:error.message,stack:error.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        // #endregion
         console.error('Error fetching chart data:', error);
+        
+        // Try to render an empty chart or show error message
+        const paymentsCanvas = document.getElementById('paymentsChart');
+        if (paymentsCanvas && window.Chart) {
+            const ctx = paymentsCanvas.getContext('2d');
+            if (paymentsChart) paymentsChart.destroy();
+            // Render empty chart with error state
+            paymentsChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Error Loading Data'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['#ff4d4d'],
+                        borderColor: ['#ff4d4d'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#fff',
+                                padding: 10,
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Error: ' + error.message;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
     });
-}
-
-// Event listeners for date filters
-const fromDateInput = document.getElementById('from-date');
-const toDateInput = document.getElementById('to-date');
-if (fromDateInput && toDateInput) {
-    fromDateInput.addEventListener('change', fetchAndRenderPaymentsChart);
-    toDateInput.addEventListener('change', fetchAndRenderPaymentsChart);
-    // Initial render
-    fetchAndRenderPaymentsChart();
 }
 
 // --- Dues Table Population ---
@@ -454,8 +502,36 @@ function fetchAndRenderActiveInactiveChart() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:387',message:'DOMContentLoaded fired',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+    // #endregion
+    
     fetchAndPopulateDues();
     fetchAndRenderActiveInactiveChart();
+    
+    // Event listeners for date filters - must be inside DOMContentLoaded
+    const fromDateInput = document.getElementById('from-date');
+    const toDateInput = document.getElementById('to-date');
+    const paymentsCanvas = document.getElementById('paymentsChart');
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:397',message:'Checking DOM elements',data:{hasFromDate:!!fromDateInput,hasToDate:!!toDateInput,hasCanvas:!!paymentsCanvas,hasChart:typeof window.Chart !== 'undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+    // #endregion
+    
+    if (fromDateInput && toDateInput) {
+        fromDateInput.addEventListener('change', fetchAndRenderPaymentsChart);
+        toDateInput.addEventListener('change', fetchAndRenderPaymentsChart);
+        // Initial render
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:405',message:'Calling fetchAndRenderPaymentsChart on DOMContentLoaded',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        // #endregion
+        fetchAndRenderPaymentsChart();
+    } else {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:410',message:'Date inputs not found',data:{hasFromDate:!!fromDateInput,hasToDate:!!toDateInput},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        // #endregion
+        console.error('Date input elements not found!');
+    }
     
     // Listen for payment updates from other pages/tabs
     // Method 1: BroadcastChannel (modern browsers)
