@@ -151,31 +151,29 @@ let paymentsChart;
 
 function fetchAndRenderPaymentsChart() {
     // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:131',message:'fetchAndRenderPaymentsChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:152',message:'fetchAndRenderPaymentsChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
     // #endregion
     
-    const fromDate = document.getElementById('from-date').value;
-    const toDate = document.getElementById('to-date').value;
+    // Get date range from inputs, but default to current month if not set
+    const fromDateInput = document.getElementById('from-date');
+    const toDateInput = document.getElementById('to-date');
+    const fromDate = fromDateInput ? fromDateInput.value : null;
+    const toDate = toDateInput ? toDateInput.value : null;
     
-    // Calculate Collected: Sum of amount_paid from payments within date range (same logic as collection.js)
-    // Calculate Uncollected: Sum of balance from dues for the selected month
+    // Use current month as default (same as admin_collection.js)
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const startOfMonth = fromDate ? new Date(fromDate) : new Date(currentYear, currentMonth, 1);
+    const endOfMonth = toDate ? new Date(toDate + 'T23:59:59') : new Date(currentYear, currentMonth + 1, 0, 23, 59, 59);
     
-    // Extract month from fromDate (or use current month if not provided)
-    let monthParam = null;
-    if (fromDate) {
-        const dateObj = new Date(fromDate);
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        monthParam = `${year}-${month}`;
-    }
-    
-    // Build dues API URL with month parameter
-    const duesUrl = monthParam ? `api/dues.php?month=${monthParam}` : 'api/dues.php';
+    // Extract month parameter for dues API (YYYY-MM format)
+    const monthParam = `${startOfMonth.getFullYear()}-${String(startOfMonth.getMonth() + 1).padStart(2, '0')}`;
     
     // Add cache-busting parameters
-    const cacheBuster = '&_t=' + Date.now();
-    const paymentsUrl = 'get_payments.php' + (cacheBuster.substring(1)); // Remove leading &
-    const duesUrlWithCache = duesUrl + (duesUrl.includes('?') ? cacheBuster : cacheBuster.substring(1));
+    const cacheBuster = '?_t=' + Date.now();
+    const paymentsUrl = 'get_payments.php' + cacheBuster;
+    const duesUrl = `api/dues.php?month=${monthParam}` + '&_t=' + Date.now();
     
     Promise.all([
         fetch(paymentsUrl, {
@@ -203,7 +201,7 @@ function fetchAndRenderPaymentsChart() {
                 }
             });
         }),
-        fetch(duesUrlWithCache, {
+        fetch(duesUrl, {
             cache: 'no-store',
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -234,55 +232,52 @@ function fetchAndRenderPaymentsChart() {
         fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:225',message:'Both fetches completed',data:{paymentsIsArray:Array.isArray(payments),duesStatus:duesData?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
         // #endregion
         
-        // Calculate Collected: Sum all amount_paid from payments within date range
+        // Calculate Collected: Same logic as admin_collection.js - sum amount_paid for current month
         let collected = 0;
         if (Array.isArray(payments)) {
             payments.forEach(p => {
                 if (p.date_paid) {
                     const paidDate = new Date(p.date_paid);
-                    const from = fromDate ? new Date(fromDate) : null;
-                    const to = toDate ? new Date(toDate + 'T23:59:59') : null; // Include full day
-                    
-                    // Check if payment is within date range
-                    let inRange = true;
-                    if (from && paidDate < from) inRange = false;
-                    if (to && paidDate > to) inRange = false;
-                    
-                    if (inRange) {
+                    // Check if payment is within the selected date range
+                    if (!isNaN(paidDate.getTime()) && paidDate >= startOfMonth && paidDate <= endOfMonth) {
                         collected += parseFloat(p.amount_paid || 0);
                     }
                 }
             });
         }
         
-        // Calculate Uncollected: Sum all balance from dues (API already filters by month)
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:240',message:'Collected calculated',data:{collected:collected,monthParam:monthParam,paymentsCount:Array.isArray(payments)?payments.length:0},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+        // #endregion
+        
+        // Calculate Uncollected: Sum all balance from dues (same as dues table in admin_dashboard.php)
         let uncollected = 0;
         if (duesData && duesData.status === 'success' && Array.isArray(duesData.dues)) {
             duesData.dues.forEach(due => {
                 // Sum all balances - API already filtered by month
-                uncollected += parseFloat(due.balance || 0);
+                const balance = parseFloat(due.balance || 0);
+                if (!isNaN(balance) && balance > 0) {
+                    uncollected += balance;
+                }
             });
-        } else if (!duesData || duesData.status !== 'success') {
             // #region agent log
-            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:250',message:'Dues data not available, using 0',data:{duesStatus:duesData?.status,duesMessage:duesData?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:252',message:'Uncollected calculated from dues',data:{uncollected:uncollected,duesCount:duesData.dues.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
             // #endregion
-            console.warn('Dues data not available, showing only collected payments');
-            uncollected = 0; // Fallback to 0 if dues API fails
+        } else {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:260',message:'Dues data not available',data:{duesStatus:duesData?.status,duesMessage:duesData?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+            // #endregion
+            console.warn('Dues data not available, uncollected will be 0');
+            uncollected = 0;
         }
         
-        // Debug logging
-        console.log('Chart Data:', {
-            collected: collected,
-            uncollected: uncollected,
-            monthParam: monthParam,
-            duesCount: duesData.status === 'success' && Array.isArray(duesData.dues) ? duesData.dues.length : 0
-        });
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:275',message:'Chart data ready',data:{collected:collected,uncollected:uncollected,monthParam:monthParam},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+        // #endregion
         
         // Always show at least a small value so chart renders
-        if (collected === 0 && uncollected === 0) {
-            collected = 0.0001;
-            uncollected = 0.0001;
-        }
+        const chartCollected = (collected === 0 && uncollected === 0) ? 0.0001 : collected;
+        const chartUncollected = (collected === 0 && uncollected === 0) ? 0.0001 : uncollected;
         
         const paymentsCanvas = document.getElementById('paymentsChart');
         // #region agent log
@@ -297,7 +292,7 @@ function fetchAndRenderPaymentsChart() {
                 data: {
                     labels: ['Collected', 'Uncollected'],
                     datasets: [{
-                        data: [collected, uncollected],
+                        data: [chartCollected, chartUncollected],
                         backgroundColor: ['#5DD62C', '#ff4d4d'],
                         borderColor: ['#5DD62C', '#ff4d4d'],
                         borderWidth: 1
@@ -317,7 +312,8 @@ function fetchAndRenderPaymentsChart() {
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.label + ': ₱' + context.raw.toLocaleString();
+                                    const value = context.raw === 0.0001 ? 0 : context.raw;
+                                    return context.label + ': ₱' + value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                                 }
                             }
                         }
