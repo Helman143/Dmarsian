@@ -215,16 +215,42 @@
     }
 }
 
-/* Payment Message Styles */
-#paymentMessage {
-    position: fixed;
-    top: 20px;
-    right: 20px;
+/* Payment Message Popup */
+.payment-message {
     padding: 15px 20px;
-    border-radius: 8px;
-    font-weight: bold;
-    z-index: 9999;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    min-width: 250px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 15px;
     text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease-out;
+    border: 2px solid;
+    position: relative;
+    z-index: 1000;
+}
+
+.payment-message[style*="color: green"],
+.payment-message.success {
+    background: rgba(0, 255, 0, 0.15);
+    border-color: #0f0;
+    color: #0f0;
+}
+
+.payment-message[style*="color: red"],
+.payment-message.error {
+    background: rgba(255, 0, 0, 0.15);
+    border-color: #ff3333;
+    color: #ff3333;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 } 

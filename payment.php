@@ -40,6 +40,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             <!-- Payment Form Section -->
             <div class="payment-form-section">
                 <h2>PAYMENT</h2>
+                <div id="paymentMessage" class="payment-message" style="display:none;"></div>
                 <form id="paymentForm" class="payment-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -206,6 +207,5 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
     })();
     </script>
-    <div id="paymentMessage" style="display:none; position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); min-width: 250px; text-align: center; background: rgba(0, 0, 0, 0.9); border: 1px solid #0f0;"></div>
 </body>
 </html> 

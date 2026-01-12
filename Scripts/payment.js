@@ -1,16 +1,53 @@
 // Fetch and populate payment records from the server
 function fetchPayments(searchTerm = '') {
-    const paymentsUrl = 'get_payments.php' + (searchTerm ? ('?search=' + encodeURIComponent(searchTerm)) : '');
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const month = `${yyyy}-${mm}`;
+    // Add cache-busting parameter to prevent stale data
+    const cacheBuster = '&_t=' + Date.now();
+    const paymentsUrl = 'get_payments.php' + (searchTerm ? ('?search=' + encodeURIComponent(searchTerm) + cacheBuster) : ('?' + cacheBuster.substring(1)));
+    
     Promise.all([
-        fetch(paymentsUrl).then(r => r.json()),
-        fetch('api/balances.php?month=' + encodeURIComponent(month)).then(r => r.json()).catch(() => null),
-        fetch('get_students.php').then(r => r.json()).catch(() => null)
+        fetch(paymentsUrl, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        })
+            .then(r => {
+                if (!r.ok) {
+                    throw new Error(`HTTP error! status: ${r.status}`);
+                }
+                return r.text().then(text => {
+                    try {
+                        const parsed = JSON.parse(text);
+                        return parsed;
+                    } catch (e) {
+                        console.error('Error parsing payments JSON:', text);
+                        return [];
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Error fetching payments:', err);
+                return [];
+            }),
+        fetch('api/balances.php?month=' + encodeURIComponent(month))
+            .then(r => r.json())
+            .catch(() => null),
+        fetch('get_students.php')
+            .then(r => r.json())
+            .catch(() => null)
     ])
     .then(([payments, balancesResp, studentsResp]) => {
+        // Ensure payments is an array
+        if (!Array.isArray(payments)) {
+            console.error('Payments data is not an array:', payments);
+            payments = [];
+        }
+        
         const balancesMap = {};
         if (balancesResp && balancesResp.status === 'success' && Array.isArray(balancesResp.balances)) {
             balancesResp.balances.forEach(b => {
@@ -21,7 +58,6 @@ function fetchPayments(searchTerm = '') {
             });
         }
 
-        // Build a map of current student status (Active/Inactive/Freeze) keyed by canonical STD-#####
         const statusesMap = {};
         if (studentsResp && studentsResp.status === 'success' && Array.isArray(studentsResp.data)) {
             studentsResp.data.forEach(s => {
@@ -29,7 +65,6 @@ function fetchPayments(searchTerm = '') {
                 const num = String(raw).replace(/\D/g, '');
                 const key = num ? ('STD-' + num.padStart(5, '0')) : raw;
                 let status = (s.status || '').trim();
-                // normalize to expected values only
                 const lower = status.toLowerCase();
                 if (lower === 'active' || lower === 'inactive' || lower === 'freeze') {
                     statusesMap[key] = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
@@ -37,11 +72,14 @@ function fetchPayments(searchTerm = '') {
             });
         }
 
-        populatePaymentTable(payments || [], balancesMap, statusesMap);
+        populatePaymentTable(payments, balancesMap, statusesMap);
     })
-    .catch(() => {
+    .catch(err => {
+        console.error('Error in fetchPayments:', err);
         const tableBody = document.getElementById('paymentTableBody');
-        tableBody.innerHTML = '<tr><td colspan="9">Error fetching payment records.</td></tr>';
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="9">Error fetching payment records. Please refresh the page.</td></tr>';
+        }
     });
 }
 
@@ -120,24 +158,19 @@ function handlePaymentSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     
-    // Validate required fields (excluding readonly discount field)
+    // Validation - exclude readonly fields (discount is readonly)
     const requiredFields = ['jeja_no', 'payment_type', 'full_name', 'date_paid', 'amount_paid', 'status'];
-    const missingFields = [];
-    
     for (const field of requiredFields) {
         const value = formData.get(field);
         if (!value || value.trim() === '') {
-            missingFields.push(field);
+            const msgDiv = document.getElementById('paymentMessage');
+            msgDiv.style.display = 'block';
+            msgDiv.className = 'payment-message error';
+            msgDiv.textContent = `Please fill in all required fields. Missing: ${field}`;
+            msgDiv.style.color = 'red';
+            setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+            return;
         }
-    }
-    
-    if (missingFields.length > 0) {
-        const msgDiv = document.getElementById('paymentMessage');
-        msgDiv.style.display = 'block';
-        msgDiv.textContent = 'Please fill in all required fields.';
-        msgDiv.style.color = 'red';
-        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
-        return;
     }
     
     // Ensure discount has a value (default to 0.00 if empty)
@@ -145,36 +178,79 @@ function handlePaymentSubmit(event) {
         formData.set('discount', '0.00');
     }
     
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+    
     fetch('api/payments.php', {
         method: 'POST',
         body: formData
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return response.json();
+        return response.text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Response parsing error:', text);
+                throw new Error('Invalid JSON response from server');
+            }
+        });
     })
     .then(result => {
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
-        msgDiv.textContent = result.message || (result.success ? 'Payment saved successfully!' : 'Error saving payment.');
+        msgDiv.className = result.success ? 'payment-message success' : 'payment-message error';
+        msgDiv.textContent = result.message || (result.success ? 'Payment saved successfully!' : 'Failed to save payment.');
         msgDiv.style.color = result.success ? 'green' : 'red';
+        
         if (result.success) {
             event.target.reset();
             document.getElementById('amount_paid').value = '0.00';
             document.getElementById('discount').value = '0.00';
+            
+            // Broadcast payment update event for cross-page communication
+            try {
+                // Method 1: BroadcastChannel (works across tabs/windows)
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const channel = new BroadcastChannel('payment-updates');
+                    channel.postMessage({ type: 'payment-saved', timestamp: Date.now() });
+                    // Don't close immediately - let it stay open for other tabs
+                    setTimeout(() => channel.close(), 100);
+                }
+                // Method 2: localStorage event (works across tabs/windows)
+                const updateTrigger = Date.now().toString();
+                localStorage.setItem('payment-update-trigger', updateTrigger);
+                // For same-tab updates, dispatch a custom event
+                window.dispatchEvent(new CustomEvent('payment-updated', { detail: { timestamp: Date.now() } }));
+                // Remove the trigger after a short delay to allow other tabs to detect it
+                setTimeout(() => localStorage.removeItem('payment-update-trigger'), 100);
+            } catch (e) {
+                console.error('Error broadcasting payment update:', e);
+            }
+            
+            // Refresh payment table immediately (removed setTimeout delay)
             fetchPayments();
         }
-        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
     })
     .catch(error => {
         console.error('Payment submission error:', error);
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
-        msgDiv.textContent = 'Error saving payment. Please try again.';
+        msgDiv.className = 'payment-message error';
+        msgDiv.textContent = 'Error saving payment: ' + error.message;
         msgDiv.style.color = 'red';
-        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
+    })
+    .finally(() => {
+        // Restore button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
     });
 }
 
