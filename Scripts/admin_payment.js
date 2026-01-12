@@ -152,6 +152,7 @@ function handlePaymentSubmit(event) {
         if (!value || value.trim() === '') {
             const msgDiv = document.getElementById('paymentMessage');
             msgDiv.style.display = 'block';
+            msgDiv.className = 'payment-message error';
             msgDiv.textContent = `Please fill in all required fields. Missing: ${field}`;
             msgDiv.style.color = 'red';
             setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
@@ -190,6 +191,7 @@ function handlePaymentSubmit(event) {
     .then(result => {
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
+        msgDiv.className = result.success ? 'payment-message success' : 'payment-message error';
         msgDiv.textContent = result.message || (result.success ? 'Payment saved successfully!' : 'Failed to save payment.');
         msgDiv.style.color = result.success ? 'green' : 'red';
         
@@ -208,6 +210,7 @@ function handlePaymentSubmit(event) {
         console.error('Payment submission error:', error);
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
+        msgDiv.className = 'payment-message error';
         msgDiv.textContent = 'Error saving payment: ' + error.message;
         msgDiv.style.color = 'red';
         setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);

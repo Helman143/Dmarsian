@@ -41,6 +41,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             <!-- Payment Form Section -->
             <div class="payment-form-section">
                 <h2>PAYMENT</h2>
+                <div id="paymentMessage" class="payment-message" style="display:none;"></div>
                 <form id="paymentForm" class="payment-form">
                     <div class="form-row">
                         <div class="form-group">
