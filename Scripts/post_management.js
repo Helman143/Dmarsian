@@ -65,7 +65,7 @@ function initializeEventListeners() {
     if (descriptionTextarea && charCountSpan) {
         descriptionTextarea.addEventListener('input', () => {
             const currentLength = descriptionTextarea.value.length;
-            charCountSpan.textContent = `${currentLength}/200`;
+            charCountSpan.textContent = `${currentLength}/999`;
         });
     }
 }
@@ -156,7 +156,7 @@ function resetForm() {
     // Reset character count
     const charCountSpan = document.getElementById('char-count');
     if (charCountSpan) {
-        charCountSpan.textContent = '0/200';
+        charCountSpan.textContent = '0/999';
     }
 }
 
@@ -270,7 +270,7 @@ async function loadPostData(postId) {
             
             // Update character count
             const charCountSpan = document.getElementById('char-count');
-            charCountSpan.textContent = `${post.description.length}/200`;
+            charCountSpan.textContent = `${post.description.length}/999`;
         }
     } catch (error) {
         console.error('Error loading post data:', error);

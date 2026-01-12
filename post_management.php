@@ -115,13 +115,15 @@ mysqli_close($conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post Management | D'MARSIANS TAEKWONDO SYSTEM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="Styles/admin_post_management.css">
-    <link rel="stylesheet" href="Styles/sidebar.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="Styles/post_management.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+Pro:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Styles/typography.css">
+    <!-- Keep sidebar.css last so it can override page-specific sidebar/logo styles -->
+    <link rel="stylesheet" href="Styles/sidebar.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -178,7 +180,7 @@ mysqli_close($conn);
                 <?php else: ?>
                     <?php foreach ($posts as $post): ?>
                         <?php
-                        // Initialize variables before using them
+                        // Initialize $has_image before using it
                         $img_path_value = isset($post['image_path']) ? $post['image_path'] : null;
                         $has_image = false;
                         $final_img_path = '';
@@ -368,11 +370,9 @@ mysqli_close($conn);
                         }
                         ?>
                         <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
-                            <div class="post-image" style="background-color: #2d2d2d; background-size: cover; background-position: center; position: relative; overflow: hidden;">
+                            <div class="post-image <?php echo $has_image ? '' : 'no-image'; ?>" style="background-color: #2d2d2d; background-size: cover; background-position: center; position: relative; overflow: hidden;">
                                 <?php if ($has_image): ?>
                                     <img src="<?php echo htmlspecialchars($final_img_path); ?>" alt="<?php echo htmlspecialchars($post['title']); ?>" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;" onerror="this.style.display='none'; this.parentElement.style.backgroundImage='url(\'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%232d2d2d\' width=\'400\' height=\'300\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'Arial\' font-size=\'18\'%3ENo Image%3C/text%3E%3C/svg%3E\')';">
-                                <?php else: ?>
-                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; text-align: center; pointer-events: none;">No Image</div>
                                 <?php endif; ?>
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
@@ -441,8 +441,8 @@ mysqli_close($conn);
                             </div>
                             <div class="form-group">
                                 <label for="post-description">Description/Details</label>
-                                <textarea id="post-description" name="description" rows="5" maxlength="999" placeholder="Enter post description" required></textarea>
-                                <span id="char-count">0/999</span>
+                                <textarea id="post-description" name="description" rows="5" maxlength="200" placeholder="Enter post description" required></textarea>
+                                <span id="char-count">0/200</span>
                             </div>
                         </div>
                     </div>
@@ -455,7 +455,7 @@ mysqli_close($conn);
             </div>
         </div>
     </div>
-    <script src="Scripts/admin_post_management.js"></script>
+    <script src="Scripts/post_management.js"></script>
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
