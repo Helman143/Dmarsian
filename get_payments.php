@@ -6,6 +6,10 @@ if (!$conn) {
     exit();
 }
 header('Content-Type: application/json');
+// Add cache-busting headers to prevent stale data
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
 
 // Get all payment records, joining with students table to get correct enrollment date

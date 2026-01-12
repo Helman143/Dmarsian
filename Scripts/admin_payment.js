@@ -1,20 +1,39 @@
 // Fetch and populate payment records from the server
 function fetchPayments(searchTerm = '') {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_payment.js:2',message:'fetchPayments called',data:{searchTerm,hasCacheBuster:true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const month = `${yyyy}-${mm}`;
-    const paymentsUrl = 'get_payments.php' + (searchTerm ? ('?search=' + encodeURIComponent(searchTerm)) : '');
+    // Add cache-busting parameter to prevent stale data
+    const cacheBuster = '&_t=' + Date.now();
+    const paymentsUrl = 'get_payments.php' + (searchTerm ? ('?search=' + encodeURIComponent(searchTerm) + cacheBuster) : ('?' + cacheBuster.substring(1)));
     
     Promise.all([
-        fetch(paymentsUrl)
+        fetch(paymentsUrl, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        })
             .then(r => {
+                // #region agent log
+                fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_payment.js:12',message:'Payments fetch response received',data:{status:r.status,statusText:r.statusText},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                // #endregion
                 if (!r.ok) {
                     throw new Error(`HTTP error! status: ${r.status}`);
                 }
                 return r.text().then(text => {
                     try {
-                        return JSON.parse(text);
+                        const parsed = JSON.parse(text);
+                        // #region agent log
+                        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_payment.js:20',message:'Payments data parsed',data:{recordCount:Array.isArray(parsed)?parsed.length:'not-array'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                        // #endregion
+                        return parsed;
                     } catch (e) {
                         console.error('Error parsing payments JSON:', text);
                         return [];
@@ -189,6 +208,10 @@ function handlePaymentSubmit(event) {
         });
     })
     .then(result => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_payment.js:191',message:'Payment submission result received',data:{success:result.success,message:result.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        
         const msgDiv = document.getElementById('paymentMessage');
         msgDiv.style.display = 'block';
         msgDiv.className = result.success ? 'payment-message success' : 'payment-message error';
@@ -196,13 +219,39 @@ function handlePaymentSubmit(event) {
         msgDiv.style.color = result.success ? 'green' : 'red';
         
         if (result.success) {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_payment.js:200',message:'Payment success - before refresh',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            
             event.target.reset();
             document.getElementById('amount_paid').value = '0.00';
             document.getElementById('discount').value = '0.00';
-            // Refresh payment table immediately
-            setTimeout(() => {
-                fetchPayments();
-            }, 500);
+            
+            // Broadcast payment update event for cross-page communication
+            try {
+                // Method 1: BroadcastChannel (works across tabs/windows)
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const channel = new BroadcastChannel('payment-updates');
+                    channel.postMessage({ type: 'payment-saved', timestamp: Date.now() });
+                    // Don't close immediately - let it stay open for other tabs
+                    setTimeout(() => channel.close(), 100);
+                }
+                // Method 2: localStorage event (works across tabs/windows)
+                const updateTrigger = Date.now().toString();
+                localStorage.setItem('payment-update-trigger', updateTrigger);
+                // For same-tab updates, dispatch a custom event
+                window.dispatchEvent(new CustomEvent('payment-updated', { detail: { timestamp: Date.now() } }));
+                // Remove the trigger after a short delay to allow other tabs to detect it
+                setTimeout(() => localStorage.removeItem('payment-update-trigger'), 100);
+            } catch (e) {
+                console.error('Error broadcasting payment update:', e);
+            }
+            
+            // Refresh payment table immediately (removed setTimeout delay)
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_payment.js:220',message:'Calling fetchPayments immediately',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+            fetchPayments();
         }
         setTimeout(() => { msgDiv.style.display = 'none'; }, 5000);
     })

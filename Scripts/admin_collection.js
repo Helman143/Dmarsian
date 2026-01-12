@@ -3,8 +3,23 @@ let paymentsData = [];
 
 // Fetch payment records and update table, stats, and chart
 async function fetchAndDisplayPayments() {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_collection.js:5',message:'fetchAndDisplayPayments called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    
     try {
-        const response = await fetch('get_payments.php');
+        // Add cache-busting parameter
+        const cacheBuster = '?_t=' + Date.now();
+        const response = await fetch('get_payments.php' + cacheBuster, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        });
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_collection.js:12',message:'Collection fetch response received',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -12,6 +27,9 @@ async function fetchAndDisplayPayments() {
         let payments;
         try {
             payments = JSON.parse(text);
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_collection.js:22',message:'Collection payments parsed',data:{recordCount:Array.isArray(payments)?payments.length:'not-array'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
         } catch (e) {
             console.error('Error parsing payments JSON:', text);
             payments = [];
@@ -218,6 +236,47 @@ function updateCollectionChart(payments) {
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayPayments();
+    
+    // Listen for payment updates from other pages/tabs
+    // Method 1: BroadcastChannel (modern browsers)
+    if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('payment-updates');
+        channel.addEventListener('message', (event) => {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_collection.js:219',message:'BroadcastChannel payment update received',data:{type:event.data.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
+            if (event.data && event.data.type === 'payment-saved') {
+                console.log('Payment update received via BroadcastChannel, refreshing...');
+                fetchAndDisplayPayments();
+            }
+        });
+    }
+    
+    // Method 2: localStorage event (works across tabs/windows)
+    window.addEventListener('storage', (event) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_collection.js:230',message:'Storage event received',data:{key:event.key},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
+        if (event.key === 'payment-update-trigger') {
+            console.log('Payment update received via localStorage, refreshing...');
+            fetchAndDisplayPayments();
+        }
+    });
+    
+    // Method 3: Custom event (for same-tab updates)
+    window.addEventListener('payment-updated', (event) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_collection.js:240',message:'Custom payment-updated event received',data:{timestamp:event.detail?.timestamp},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
+        console.log('Payment update received via custom event, refreshing...');
+        fetchAndDisplayPayments();
+    });
+    
+    // Polling fallback: refresh every 30 seconds as a safety net
+    setInterval(() => {
+        fetchAndDisplayPayments();
+    }, 30000);
+    
     const trendPeriod = document.getElementById('trendPeriod');
     if (trendPeriod) {
         trendPeriod.addEventListener('change', () => {
