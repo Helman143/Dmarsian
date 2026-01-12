@@ -5,6 +5,10 @@ ini_set('display_errors', 0); // Don't display errors, just log them
 ini_set('log_errors', 1);
 
 header('Content-Type: application/json');
+// Prevent caching of API responses
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 try {
     // Load database connection

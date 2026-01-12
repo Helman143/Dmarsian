@@ -97,6 +97,13 @@ Options -Indexes
     <FilesMatch "\.(ico|jpg|jpeg|png|gif|css|js)$">
         Header set Cache-Control "max-age=2592000, public"
     </FilesMatch>
+    
+    # Prevent caching of PHP API endpoints
+    <FilesMatch "^(get_posts|post_operations)\.php$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
 </IfModule>
 
 # Prevent access to uploads directory listing (but allow file access)

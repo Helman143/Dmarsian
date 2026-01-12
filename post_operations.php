@@ -3,6 +3,12 @@ require_once 'db_connect.php';
 require_once 'auth_helpers.php';
 require_once 'spaces_helper.php';
 
+// Prevent caching of API responses
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+header('Content-Type: application/json');
+
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';

@@ -936,7 +936,12 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         console.log('Coverflow carousel initialized with', cards.length, 'cards');
     }
 
-    fetch('get_posts.php?category=achievement')
+    fetch(`get_posts.php?category=achievement&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    })
         .then(res => res.json())
         .then(posts => { 
             if (!posts || posts.length === 0) {
@@ -969,7 +974,12 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             renderSlider([], 'achievements-slider');
         });
 
-    fetch('get_posts.php?category=event')
+    fetch(`get_posts.php?category=event&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    })
         .then(res => res.json())
         .then(posts => { 
             if (!posts || posts.length === 0) {
@@ -1016,7 +1026,12 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             return;
         }
         
-        fetch(`get_posts.php?category=${categoryParam}`)
+        fetch(`get_posts.php?category=${categoryParam}&t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        })
             .then(res => res.json())
             .then(posts => {
                 if (!posts || posts.length === 0) {
