@@ -1,6 +1,23 @@
-// Fetch and update dashboard stat cards
-fetch('get_dashboard_stats.php')
-    .then(response => response.json())
+// Function to fetch and update dashboard stats
+function fetchDashboardStats() {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:2',message:'fetchDashboardStats called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+    
+    const cacheBuster = '?_t=' + Date.now();
+    fetch('get_dashboard_stats.php' + cacheBuster, {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+        }
+    })
+    .then(response => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:8',message:'Dashboard stats response received',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+        // #endregion
+        return response.json();
+    })
     .then(data => {
         if (data.status === 'success') {
             // Update stat cards with specific IDs
@@ -124,11 +141,19 @@ fetch('get_dashboard_stats.php')
             }
         });
     });
+}
+
+// Initial fetch on page load
+fetchDashboardStats();
 
 // --- Collected vs. Uncollected Payments Chart Logic ---
 let paymentsChart;
 
 function fetchAndRenderPaymentsChart() {
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:131',message:'fetchAndRenderPaymentsChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+    
     const fromDate = document.getElementById('from-date').value;
     const toDate = document.getElementById('to-date').value;
     
@@ -147,9 +172,31 @@ function fetchAndRenderPaymentsChart() {
     // Build dues API URL with month parameter
     const duesUrl = monthParam ? `api/dues.php?month=${monthParam}` : 'api/dues.php';
     
+    // Add cache-busting parameters
+    const cacheBuster = '&_t=' + Date.now();
+    const paymentsUrl = 'get_payments.php' + (cacheBuster.substring(1)); // Remove leading &
+    const duesUrlWithCache = duesUrl + (duesUrl.includes('?') ? cacheBuster : cacheBuster.substring(1));
+    
     Promise.all([
-        fetch('get_payments.php').then(response => response.json()),
-        fetch(duesUrl).then(response => response.json())
+        fetch(paymentsUrl, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        }).then(response => {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:155',message:'Dashboard payments fetch response',data:{status:response.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
+            return response.json();
+        }),
+        fetch(duesUrlWithCache, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        }).then(response => response.json())
     ])
     .then(([payments, duesData]) => {
         // Calculate Collected: Sum all amount_paid from payments within date range
@@ -251,7 +298,18 @@ if (fromDateInput && toDateInput) {
 
 // --- Dues Table Population ---
 function fetchAndPopulateDues() {
-    fetch('api/dues.php')
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:253',message:'fetchAndPopulateDues called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+    
+    const cacheBuster = '?_t=' + Date.now();
+    fetch('api/dues.php' + cacheBuster, {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+        }
+    })
         .then(response => response.text())
         .then(text => {
             let data;
@@ -329,7 +387,18 @@ function fetchAndPopulateDues() {
 }
 
 function fetchAndRenderActiveInactiveChart() {
-    fetch('get_active_inactive_counts.php')
+    // #region agent log
+    fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:331',message:'fetchAndRenderActiveInactiveChart called',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+    
+    const cacheBuster = '?_t=' + Date.now();
+    fetch('get_active_inactive_counts.php' + cacheBuster, {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+        }
+    })
         .then(response => response.json())
         .then(counts => {
             const active = counts.active || 0;
@@ -387,10 +456,62 @@ function fetchAndRenderActiveInactiveChart() {
 document.addEventListener('DOMContentLoaded', function() {
     fetchAndPopulateDues();
     fetchAndRenderActiveInactiveChart();
+    
+    // Listen for payment updates from other pages/tabs
+    // Method 1: BroadcastChannel (modern browsers)
+    if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('payment-updates');
+        channel.addEventListener('message', (event) => {
+            // #region agent log
+            fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:390',message:'BroadcastChannel payment update received',data:{type:event.data.type},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+            // #endregion
+            if (event.data && event.data.type === 'payment-saved') {
+                console.log('Payment update received via BroadcastChannel, refreshing dashboard...');
+                fetchDashboardStats();
+                fetchAndRenderPaymentsChart();
+                fetchAndPopulateDues();
+                fetchAndRenderActiveInactiveChart();
+            }
+        });
+    }
+    
+    // Method 2: localStorage event (works across tabs/windows)
+    window.addEventListener('storage', (event) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:405',message:'Storage event received',data:{key:event.key},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+        // #endregion
+        if (event.key === 'payment-update-trigger') {
+            console.log('Payment update received via localStorage, refreshing dashboard...');
+            fetchDashboardStats();
+            fetchAndRenderPaymentsChart();
+            fetchAndPopulateDues();
+            fetchAndRenderActiveInactiveChart();
+        }
+    });
+    
+    // Method 3: Custom event (for same-tab updates)
+    window.addEventListener('payment-updated', (event) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7246/ingest/172589e8-eef2-4849-afba-712c85ef0ddf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin_dashboard.js:418',message:'Custom payment-updated event received',data:{timestamp:event.detail?.timestamp},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+        // #endregion
+        console.log('Payment update received via custom event, refreshing dashboard...');
+        fetchDashboardStats();
+        fetchAndRenderPaymentsChart();
+        fetchAndPopulateDues();
+        fetchAndRenderActiveInactiveChart();
+    });
+    
     setInterval(function() {
-        fetch('get_dashboard_stats.php')
-            .then(response => response.json())
-            .then(data => {
+        const cacheBuster = '?_t=' + Date.now();
+        fetch('get_dashboard_stats.php' + cacheBuster, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
                 if (data.status === 'success') {
                     const todayEnrollees = document.getElementById('today-enrollees');
                     const weeklyEnrollees = document.getElementById('weekly-enrollees');
@@ -417,7 +538,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error refreshing dashboard stats:', error));
         fetchAndPopulateDues();
         fetchAndRenderActiveInactiveChart();
-    }, 300000);
+        fetchAndRenderPaymentsChart();
+    }, 300000); // Polling fallback every 5 minutes
 
     // Single send via table action
     const duesTable = document.querySelector('.dues-table');
