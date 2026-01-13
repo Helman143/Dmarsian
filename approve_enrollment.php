@@ -56,25 +56,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
     if ($existing_student) {
         // Student already exists, just update enrollment request status
-        $update = $conn->prepare("UPDATE enrollment_requests SET status = 'approved' WHERE id = ?");
-        $update->bind_param('i', $id);
-        $update->execute();
-        $update->close();
+        // Use transaction for atomicity
+        $conn->begin_transaction();
+        try {
+            $update = $conn->prepare("UPDATE enrollment_requests SET status = 'approved' WHERE id = ?");
+            $update->bind_param('i', $id);
+            if (!$update->execute()) {
+                throw new Exception('Failed to update enrollment request: ' . $update->error);
+            }
+            $update->close();
 
-        // Log to activity_log
-        $admin_account = getAdminAccountName($conn);
-        $action_type = 'Enrollment (Approval)';
-        $student_id = $existing_student['jeja_no'];
-        $details = 'Enrollment approved - Student already exists: ' . $enrollment['full_name'];
-        $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
-        $log_stmt->bind_param("ssss", $action_type, $admin_account, $student_id, $details);
-        $log_stmt->execute();
-        $log_stmt->close();
+            // Log to activity_log
+            $admin_account = getAdminAccountName($conn);
+            $action_type = 'Enrollment (Approval)';
+            $student_id = $existing_student['jeja_no'];
+            $details = 'Enrollment approved - Student already exists: ' . $enrollment['full_name'];
+            $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
+            $log_stmt->bind_param("ssss", $action_type, $admin_account, $student_id, $details);
+            if (!$log_stmt->execute()) {
+                throw new Exception('Failed to log activity: ' . $log_stmt->error);
+            }
+            $log_stmt->close();
 
-        echo json_encode([
-            'status' => 'success', 
-            'message' => 'Enrollment approved. Student already exists: ' . $existing_student['jeja_no']
-        ]);
+            $conn->commit();
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Enrollment approved. Student already exists: ' . $existing_student['jeja_no']
+            ]);
+        } catch (Exception $e) {
+            $conn->rollback();
+            echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        }
         $conn->close();
         exit();
     }
@@ -103,51 +115,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $status = 'Active';
     $schedule = !empty($enrollment['class']) ? $enrollment['class'] : 'MWF-PM'; // Use class as schedule or default
     
-    // Insert into students table with all required fields
-    $stmt = $conn->prepare("INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param(
-        'ssssssssssdsss',
-        $temp_jeja_no,
-        $enrollment['full_name'],
-        $enrollment['address'],
-        $enrollment['phone'],
-        $enrollment['email'],
-        $enrollment['school'],
-        $enrollment['parent_name'],
-        $enrollment['parent_phone'],
-        $enrollment['parent_email'],
-        $enrollment['belt_rank'],
-        $discount,
-        $schedule,
-        $date_enrolled,
-        $status
-    );
-    
-    if ($stmt->execute()) {
+    // Begin transaction for atomic operations
+    $conn->begin_transaction();
+    try {
+        // Insert into students table with all required fields
+        $stmt = $conn->prepare("INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param(
+            'ssssssssssdsss',
+            $temp_jeja_no,
+            $enrollment['full_name'],
+            $enrollment['address'],
+            $enrollment['phone'],
+            $enrollment['email'],
+            $enrollment['school'],
+            $enrollment['parent_name'],
+            $enrollment['parent_phone'],
+            $enrollment['parent_email'],
+            $enrollment['belt_rank'],
+            $discount,
+            $schedule,
+            $date_enrolled,
+            $status
+        );
+        
+        if (!$stmt->execute()) {
+            throw new Exception('Failed to add student: ' . $stmt->error);
+        }
+        
         $new_id = $conn->insert_id;
         $jeja_no = 'STD-' . str_pad($new_id, 5, '0', STR_PAD_LEFT);
+        $stmt->close();
         
         // Update jeja_no with correct value
         $update_jeja = $conn->prepare("UPDATE students SET jeja_no = ? WHERE id = ?");
         $update_jeja->bind_param('si', $jeja_no, $new_id);
         if (!$update_jeja->execute()) {
-            // If update fails, rollback
-            $delete_stmt = $conn->prepare("DELETE FROM students WHERE id = ?");
-            $delete_stmt->bind_param('i', $new_id);
-            $delete_stmt->execute();
-            $delete_stmt->close();
-            echo json_encode(['status' => 'error', 'message' => 'Failed to set student number: ' . $update_jeja->error]);
-            $update_jeja->close();
-            $stmt->close();
-            $conn->close();
-            exit();
+            throw new Exception('Failed to set student number: ' . $update_jeja->error);
         }
         $update_jeja->close();
         
         // Update status in enrollment_requests
         $update = $conn->prepare("UPDATE enrollment_requests SET status = 'approved' WHERE id = ?");
         $update->bind_param('i', $id);
-        $update->execute();
+        if (!$update->execute()) {
+            throw new Exception('Failed to update enrollment request: ' . $update->error);
+        }
         $update->close();
 
         // Log to activity_log
@@ -157,8 +169,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         $details = 'Enrolled (Approved): ' . $enrollment['full_name'];
         $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
         $log_stmt->bind_param("ssss", $action_type, $admin_account, $student_id, $details);
-        $log_stmt->execute();
+        if (!$log_stmt->execute()) {
+            throw new Exception('Failed to log activity: ' . $log_stmt->error);
+        }
         $log_stmt->close();
+
+        // Commit transaction - all operations succeeded
+        $conn->commit();
 
         // Return the newly created student data for immediate display
         echo json_encode([
@@ -172,11 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 'phone' => $enrollment['phone']
             ]
         ]);
-    } else {
-        $error_msg = $stmt->error;
-        echo json_encode(['status' => 'error', 'message' => 'Failed to add student: ' . $error_msg]);
+    } catch (Exception $e) {
+        // Rollback transaction on any error
+        $conn->rollback();
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
-    $stmt->close();
     $conn->close();
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid request.']);

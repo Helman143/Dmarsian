@@ -1,38 +1,28 @@
 <?php
 require 'db_connect.php';
 header('Content-Type: application/json');
+// Prevent caching to ensure fresh data on DigitalOcean
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
-// Optimized query for immediate results - prioritize recent enrollments first
-// 1. Students enrolled today (most recent - catches newly approved immediately)
-// 2. Students from activity_log with "Enrollment (Approval)" action
-// 3. Students that match approved enrollment requests (case-insensitive, trimmed)
-$sql = "(SELECT DISTINCT s.id, s.jeja_no, s.date_enrolled, s.full_name, s.phone, s.created_at
+// Simplified query: Get all active students that either:
+// 1. Were enrolled today (catches newly approved immediately), OR
+// 2. Match an approved enrollment request
+// This ensures instant visibility of newly approved enrollments
+$sql = "SELECT DISTINCT s.id, s.jeja_no, s.date_enrolled, s.full_name, s.phone, s.created_at
         FROM students s
         WHERE s.status = 'Active' 
-        AND s.date_enrolled = CURDATE()
-        ORDER BY s.created_at DESC)
-        
-        UNION
-        
-        (SELECT DISTINCT s.id, s.jeja_no, s.date_enrolled, s.full_name, s.phone, s.created_at
-        FROM students s
-        INNER JOIN activity_log al ON s.jeja_no = al.student_id
-        WHERE al.action_type = 'Enrollment (Approval)'
-        AND s.status = 'Active'
-        AND s.date_enrolled < CURDATE())
-        
-        UNION
-        
-        (SELECT DISTINCT s.id, s.jeja_no, s.date_enrolled, s.full_name, s.phone, s.created_at
-        FROM students s
-        INNER JOIN enrollment_requests er 
-            ON TRIM(LOWER(s.full_name)) = TRIM(LOWER(er.full_name)) 
-            AND TRIM(s.phone) = TRIM(er.phone)
-        WHERE er.status = 'approved' 
-        AND s.status = 'Active'
-        AND s.date_enrolled < CURDATE())
-        
-        ORDER BY date_enrolled DESC, created_at DESC";
+        AND (
+            s.date_enrolled >= CURDATE() 
+            OR EXISTS (
+                SELECT 1 FROM enrollment_requests er 
+                WHERE er.status = 'approved' 
+                AND TRIM(LOWER(er.full_name)) = TRIM(LOWER(s.full_name)) 
+                AND TRIM(er.phone) = TRIM(s.phone)
+            )
+        )
+        ORDER BY s.date_enrolled DESC, s.created_at DESC";
 
 $result = $conn->query($sql);
 $approved = [];

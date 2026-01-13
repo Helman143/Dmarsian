@@ -1,6 +1,10 @@
 <?php
 require 'db_connect.php';
 header('Content-Type: application/json');
+// Prevent caching to ensure fresh data on DigitalOcean
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 $result = $conn->query("SELECT * FROM enrollment_requests WHERE status = 'pending' ORDER BY created_at DESC");
 $pending = [];
 while ($row = $result->fetch_assoc()) {

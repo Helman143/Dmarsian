@@ -19,6 +19,10 @@ set_time_limit(10); // 10 seconds max - fail fast
 
 // Set JSON header first to ensure proper response type
 header('Content-Type: application/json');
+// Prevent caching to ensure fresh data on DigitalOcean
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Start output buffering to catch any errors
 ob_start();

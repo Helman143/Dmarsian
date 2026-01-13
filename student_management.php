@@ -459,6 +459,18 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     // Load students when the page loads
     document.addEventListener('DOMContentLoaded', loadStudents);
 
+    // Listen for enrollment approvals from enrollment.php via BroadcastChannel
+    if (typeof BroadcastChannel !== 'undefined') {
+        const enrollmentChannel = new BroadcastChannel('enrollment-updates');
+        enrollmentChannel.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'enrollment_approved') {
+                // Refresh student list when enrollment is approved
+                console.log('Enrollment approved in another tab, refreshing student list...');
+                loadStudents();
+            }
+        });
+    }
+
     // Desktop search: filter by STD No., Name, Gender, or Status
     function applyStudentSearch(term) {
         const searchTerm = (term || '').toLowerCase();
