@@ -52,6 +52,25 @@
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
+.form-group input[type="date"] {
+    padding-right: 36px;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 1;
+    cursor: pointer;
+}
+
+.form-group input[type="date"]::-moz-focus-inner {
+    border: 0;
+}
+
+.form-group input[type="date"]::-ms-clear,
+.form-group input[type="date"]::-ms-expand {
+    display: none;
+}
+
 .form-group select option {
     background: #000;
 }
