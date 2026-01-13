@@ -18,6 +18,11 @@ function generateTransactionId() {
 let pendingEnrollments = [];
 let approvedEnrollments = [];
 
+// Initialize BroadcastChannel for cross-page communication
+const enrollmentChannel = typeof BroadcastChannel !== 'undefined' 
+    ? new BroadcastChannel('enrollment-updates') 
+    : null;
+
 function loadPendingEnrollments() {
     fetch('get_pending_enrollments.php')
         .then(response => response.json())
@@ -64,13 +69,22 @@ function searchPending(term) {
 }
 
 function loadApprovedEnrollments() {
-    fetch('get_approved_enrollments.php')
+    // Add cache-busting to ensure fresh data on DigitalOcean
+    fetch('get_approved_enrollments.php?t=' + Date.now(), {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    })
         .then(response => response.json())
         .then(result => {
             if (result.status === 'success') {
                 approvedEnrollments = result.data;
                 renderApprovedTable(approvedEnrollments);
             }
+        })
+        .catch(error => {
+            console.error('Error loading approved enrollments:', error);
         });
 }
 
@@ -159,19 +173,43 @@ function approveEnrollment(id) {
                         phone: student.phone
                     });
                 }
+                
+                // Remove the approved enrollment from pending table immediately
+                pendingEnrollments = pendingEnrollments.filter(req => req.id !== id);
+                renderPendingTable(pendingEnrollments);
+                
+                // Broadcast approval event to other tabs/pages
+                if (enrollmentChannel) {
+                    enrollmentChannel.postMessage({
+                        type: 'enrollment_approved',
+                        student: student,
+                        enrollmentId: id
+                    });
+                }
             }
             
+            // Refresh pending enrollments to remove the approved one
             loadPendingEnrollments();
-            // Small delay to ensure database is updated, then refresh
-            setTimeout(() => {
-                loadApprovedEnrollments();
-            }, 500);
+            // Refresh approved enrollments immediately (no delay needed with transaction)
+            loadApprovedEnrollments();
+            
             // Also update discount tables in payment.php if present
             if (typeof fetchStudentsForDiscountTables === 'function') {
                 fetchStudentsForDiscountTables();
             }
         });
     }
+}
+
+// Listen for enrollment updates from other tabs/pages
+if (enrollmentChannel) {
+    enrollmentChannel.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'enrollment_approved') {
+            // Refresh both tables when enrollment is approved in another tab
+            loadPendingEnrollments();
+            loadApprovedEnrollments();
+        }
+    });
 }
 
 // Event Listeners
