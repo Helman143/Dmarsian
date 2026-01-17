@@ -6,11 +6,13 @@ require_once 'spaces_helper.php';
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Only set JSON headers when handling AJAX requests, not when file is included
-    // Prevent caching of API responses
-    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    // Prevent caching of API responses - ensure no browser or proxy caching
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private');
     header('Pragma: no-cache');
     header('Expires: 0');
     header('Content-Type: application/json');
+    // Add ETag prevention
+    header('ETag: ' . md5(uniqid()));
     $action = $_POST['action'] ?? '';
     
     switch ($action) {
@@ -28,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
         case 'fetch_single':
             fetchSinglePost();
+            break;
+        case 'delete':
+            deletePost();
             break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
@@ -217,8 +222,8 @@ function archivePost() {
     
     $id = (int)$_POST['id'];
     
-    // First, verify the post exists
-    $check_sql = "SELECT id, status FROM posts WHERE id = ?";
+    // First, verify the post exists and get image path for deletion
+    $check_sql = "SELECT id, status, image_path, category FROM posts WHERE id = ?";
     $check_stmt = mysqli_prepare($conn, $check_sql);
     mysqli_stmt_bind_param($check_stmt, "i", $id);
     mysqli_stmt_execute($check_stmt);
@@ -244,6 +249,10 @@ function archivePost() {
         return;
     }
     
+    // Get image path before archiving (for deletion)
+    $image_path = $post['image_path'];
+    $category = $post['category'];
+    
     // Update the post status
     $sql = "UPDATE posts SET status='archived' WHERE id=? AND (status='active' OR status IS NULL)";
     $stmt = mysqli_prepare($conn, $sql);
@@ -254,6 +263,11 @@ function archivePost() {
         $affected_rows = mysqli_stmt_affected_rows($stmt);
         
         if ($affected_rows > 0) {
+            // Delete image file if it exists
+            if (!empty($image_path) && trim($image_path) !== '') {
+                deleteImageFromSpaces($image_path);
+            }
+            
             // Verify the update worked
             $verify_sql = "SELECT status FROM posts WHERE id = ?";
             $verify_stmt = mysqli_prepare($conn, $verify_sql);
@@ -279,12 +293,8 @@ function archivePost() {
             echo json_encode([
                 'success' => true, 
                 'message' => 'Post archived successfully',
-                'debug' => [
-                    'post_id' => $id,
-                    'old_status' => $post['status'],
-                    'new_status' => $updated_post['status'] ?? 'unknown',
-                    'affected_rows' => $affected_rows
-                ]
+                'category' => $category,
+                'post_id' => $id
             ]);
         } else {
             // No rows affected - post might have been archived by another request
@@ -305,7 +315,9 @@ function archivePost() {
                 echo json_encode([
                     'success' => true, 
                     'message' => 'Post is already archived',
-                    'already_archived' => true
+                    'already_archived' => true,
+                    'category' => $category,
+                    'post_id' => $id
                 ]);
             } else {
                 echo json_encode([
@@ -405,5 +417,75 @@ function fetchSinglePost() {
     
     mysqli_stmt_close($stmt);
     mysqli_close($conn);
+}
+
+function deletePost() {
+    $conn = connectDB();
+    
+    $id = (int)$_POST['id'];
+    
+    // First, get post data including image path and category before deletion
+    $get_sql = "SELECT id, image_path, category, title FROM posts WHERE id = ?";
+    $get_stmt = mysqli_prepare($conn, $get_sql);
+    mysqli_stmt_bind_param($get_stmt, "i", $id);
+    mysqli_stmt_execute($get_stmt);
+    $get_result = mysqli_stmt_get_result($get_stmt);
+    $post = mysqli_fetch_assoc($get_result);
+    mysqli_stmt_close($get_stmt);
+    
+    if (!$post) {
+        mysqli_close($conn);
+        echo json_encode(['success' => false, 'message' => 'Post not found']);
+        return;
+    }
+    
+    $image_path = $post['image_path'];
+    $category = $post['category'];
+    $title = $post['title'];
+    
+    // Delete the post from database
+    $sql = "DELETE FROM posts WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $affected_rows = mysqli_stmt_affected_rows($stmt);
+        
+        if ($affected_rows > 0) {
+            // Delete image file if it exists
+            if (!empty($image_path) && trim($image_path) !== '') {
+                deleteImageFromSpaces($image_path);
+            }
+            
+            // Log activity
+            $admin_account = getAdminAccountName($conn);
+            $action_type = 'Post Delete';
+            $student_id = '';
+            $details = 'Deleted post ID: ' . $id . ' (' . $title . ')';
+            $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
+            $log_stmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
+            $log_stmt->execute();
+            $log_stmt->close();
+            
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Post deleted successfully',
+                'category' => $category,
+                'post_id' => $id
+            ]);
+        } else {
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete post. Post may not exist.']);
+        }
+    } else {
+        $error = mysqli_error($conn);
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+        echo json_encode(['success' => false, 'message' => 'Error deleting post: ' . $error]);
+    }
 }
 ?> 

@@ -977,7 +977,8 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
     fetch(`get_posts.php?category=event&t=${Date.now()}`, {
         cache: 'no-store',
         headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
         }
     })
         .then(res => res.json())
@@ -1026,21 +1027,33 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             return;
         }
         
-        fetch(`get_posts.php?category=${categoryParam}&t=${Date.now()}`, {
+        // Use cache-busting timestamp and prevent caching
+        const timestamp = Date.now();
+        fetch(`get_posts.php?category=${categoryParam}&t=${timestamp}`, {
             cache: 'no-store',
             headers: {
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
             }
         })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(posts => {
-                if (!posts || posts.length === 0) {
+                // Handle both array and object responses
+                const postArray = Array.isArray(posts) ? posts : (posts.posts || []);
+                
+                if (!postArray || postArray.length === 0) {
+                    // Render empty state
                     renderSlider([], sliderId);
                     return;
                 }
                 
                 // get_posts.php already filters correctly, so we can use posts directly
-                renderSlider(posts, sliderId);
+                renderSlider(postArray, sliderId);
                 
                 // Re-initialize coverflow carousel after rendering
                 setTimeout(() => {
@@ -1054,6 +1067,9 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                                     // Reset initialization flag to allow re-initialization
                                     slider.dataset.coverflowInitialized = 'false';
                                     setupCoverflowCarousel(slider, track, cards);
+                                } else {
+                                    // No cards, ensure empty state is shown
+                                    renderSlider([], sliderId);
                                 }
                             }
                         });
@@ -1062,6 +1078,8 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             })
             .catch(err => {
                 console.error(`Error refreshing ${sliderId}:`, err);
+                // On error, render empty state to prevent stale data
+                renderSlider([], sliderId);
             });
     }
 
@@ -1080,7 +1098,21 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             console.log('Received post update:', type, category, postId);
             
             // Determine which slider(s) to refresh based on category
-            if (category === 'achievement') {
+            // For delete/archive operations, always refresh to ensure deleted posts are removed
+            if (type === 'post-archived' || type === 'post-deleted') {
+                // Force refresh both sliders to ensure deleted posts are removed
+                if (category === 'achievement' || category === 'achievement_event') {
+                    refreshSlider('achievements-slider', category);
+                }
+                if (category === 'event' || category === 'achievement_event') {
+                    refreshSlider('events-slider', category);
+                }
+                // If achievement_event, refresh both
+                if (category === 'achievement_event') {
+                    refreshSlider('achievements-slider', category);
+                    refreshSlider('events-slider', category);
+                }
+            } else if (category === 'achievement') {
                 // Refresh achievements slider only
                 refreshSlider('achievements-slider', category);
             } else if (category === 'event') {

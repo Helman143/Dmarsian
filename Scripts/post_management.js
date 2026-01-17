@@ -231,11 +231,13 @@ function removeImage() {
 
 async function loadPostData(postId) {
     try {
-        const response = await fetch('post_operations.php', {
+        const response = await fetch(`post_operations.php?t=${Date.now()}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'Cache-Control': 'no-cache'
             },
+            cache: 'no-store',
             body: `action=fetch_single&id=${postId}`
         });
         
@@ -311,8 +313,12 @@ async function handleFormSubmit(e) {
     }
     
     try {
-        const response = await fetch('post_operations.php', {
+        const response = await fetch(`post_operations.php?t=${Date.now()}`, {
             method: 'POST',
+            headers: {
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store',
             body: formData
         });
         
@@ -337,7 +343,7 @@ async function handleFormSubmit(e) {
             alert(data.message);
             closeModal();
             // Use cache-busting reload to ensure fresh data
-            location.reload(true);
+            location.reload();
         } else {
             alert('Error: ' + data.message);
         }
@@ -387,22 +393,24 @@ async function archivePost(postId) {
     }
     
     try {
-        const response = await fetch('post_operations.php', {
+        const response = await fetch(`post_operations.php?t=${Date.now()}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'Cache-Control': 'no-cache'
             },
+            cache: 'no-store',
             body: `action=archive&id=${postId}`
         });
         
         const data = await response.json();
         
         if (data.success) {
-            // Get category from the post card element before removing it
+            // Get category from response or from the post card element before removing it
+            let category = data.category || null;
             const postCard = document.querySelector(`[data-post-id="${postId}"]`);
-            let category = null;
             
-            if (postCard) {
+            if (!category && postCard) {
                 // Try to get category from the post tag element
                 const postTag = postCard.querySelector('.post-tag');
                 if (postTag) {
@@ -417,14 +425,16 @@ async function archivePost(postId) {
                 }
             }
             
-            // If we couldn't get category from DOM, try to fetch it from server
+            // If we still couldn't get category, try to fetch it from server
             if (!category) {
                 try {
-                    const fetchResponse = await fetch('post_operations.php', {
+                    const fetchResponse = await fetch(`post_operations.php?t=${Date.now()}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
+                            'Cache-Control': 'no-cache'
                         },
+                        cache: 'no-store',
                         body: `action=fetch_single&id=${postId}`
                     });
                     const fetchData = await fetchResponse.json();
@@ -436,23 +446,40 @@ async function archivePost(postId) {
                 }
             }
             
-            // Broadcast post archive to other tabs
+            // Broadcast post archive to other tabs (webpage.php)
             if (category) {
                 broadcastPostUpdate('post-archived', category, postId);
             }
             
+            // Immediately remove the post card from DOM
+            if (postCard) {
+                postCard.style.transition = 'opacity 0.3s, transform 0.3s';
+                postCard.style.opacity = '0';
+                postCard.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    postCard.remove();
+                    
+                    // Check if grid is empty and show message
+                    const postGrid = document.getElementById('post-grid');
+                    if (postGrid && postGrid.querySelectorAll('.post-card').length === 0) {
+                        // Reload to show empty state message
+                        location.reload();
+                    }
+                }, 300);
+            } else {
+                // If card not found, reload to ensure UI matches database
+                location.reload();
+            }
+            
             alert(data.message);
-            // Always reload to ensure fresh data from server
-            // This ensures archived posts are removed from the list
-            location.reload(true);
         } else {
             alert('Error: ' + data.message);
             // Reload even on error to ensure UI matches database state
-            location.reload(true);
+            location.reload();
         }
     } catch (error) {
         console.error('Error archiving post:', error);
-        alert('Error archiving post');
+        alert('Error archiving post: ' + error.message);
     }
 }
 
@@ -481,6 +508,82 @@ async function archiveCurrentPost() {
     
     // Now archive the post
     await archivePost(currentPostId);
+}
+
+// Delete post permanently (DELETE FROM database)
+async function deletePost(postId) {
+    if (!confirm('Are you sure you want to PERMANENTLY DELETE this post? This action cannot be undone!')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`post_operations.php?t=${Date.now()}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Cache-Control': 'no-cache'
+            },
+            cache: 'no-store',
+            body: `action=delete&id=${postId}`
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Get category from response or from the post card element before removing it
+            let category = data.category || null;
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            
+            if (!category && postCard) {
+                // Try to get category from the post tag element
+                const postTag = postCard.querySelector('.post-tag');
+                if (postTag) {
+                    const tagText = postTag.textContent.trim().toLowerCase();
+                    if (tagText === 'achievement') {
+                        category = 'achievement';
+                    } else if (tagText === 'event') {
+                        category = 'event';
+                    } else if (tagText === 'achievement/event') {
+                        category = 'achievement_event';
+                    }
+                }
+            }
+            
+            // Broadcast post deletion to other tabs (webpage.php)
+            if (category) {
+                broadcastPostUpdate('post-deleted', category, postId);
+            }
+            
+            // Immediately remove the post card from DOM
+            if (postCard) {
+                postCard.style.transition = 'opacity 0.3s, transform 0.3s';
+                postCard.style.opacity = '0';
+                postCard.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    postCard.remove();
+                    
+                    // Check if grid is empty and show message
+                    const postGrid = document.getElementById('post-grid');
+                    if (postGrid && postGrid.querySelectorAll('.post-card').length === 0) {
+                        // Reload to show empty state message
+                        location.reload();
+                    }
+                }, 300);
+            } else {
+                // If card not found, reload to ensure UI matches database
+                location.reload();
+            }
+            
+            alert(data.message);
+        } else {
+            alert('Error: ' + data.message);
+            // Reload even on error to ensure UI matches database state
+            location.reload();
+        }
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('Error deleting post: ' + error.message);
+    }
 }
 
 async function filterPosts() {

@@ -16,7 +16,7 @@ function getBasePath() {
     }
     
     // On localhost, detect subdirectory if present
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';    
     $scriptDir = dirname($scriptName);
     
     // If script is at root, no base path needed
