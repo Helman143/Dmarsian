@@ -30,10 +30,11 @@ try {
     $year = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 
     // Show posts from current year and previous year (last 2 years)
+    // Status is ENUM('active','archived'), so it cannot be NULL - only check for 'active'
     $currentYear = date('Y');
     $previousYear = $currentYear - 1;
     
-    $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND (status = 'active' OR status IS NULL)";
+    $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND status = 'active'";
     $params = [$currentYear, $previousYear];
     $types = "ii";
 

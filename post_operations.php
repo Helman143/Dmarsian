@@ -253,8 +253,8 @@ function archivePost() {
     $image_path = $post['image_path'];
     $category = $post['category'];
     
-    // Update the post status
-    $sql = "UPDATE posts SET status='archived' WHERE id=? AND (status='active' OR status IS NULL)";
+    // Update the post status - status is ENUM('active','archived'), so no NULL check needed
+    $sql = "UPDATE posts SET status='archived' WHERE id=? AND status='active'";
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id);
     
@@ -268,7 +268,7 @@ function archivePost() {
                 deleteImageFromSpaces($image_path);
             }
             
-            // Verify the update worked
+            // Explicitly verify the status was changed to 'archived'
             $verify_sql = "SELECT status FROM posts WHERE id = ?";
             $verify_stmt = mysqli_prepare($conn, $verify_sql);
             mysqli_stmt_bind_param($verify_stmt, "i", $id);
@@ -276,6 +276,19 @@ function archivePost() {
             $verify_result = mysqli_stmt_get_result($verify_stmt);
             $updated_post = mysqli_fetch_assoc($verify_result);
             mysqli_stmt_close($verify_stmt);
+            
+            // Verify status is actually 'archived'
+            if (!$updated_post || $updated_post['status'] !== 'archived') {
+                mysqli_stmt_close($stmt);
+                mysqli_close($conn);
+                error_log("Archive verification failed: Post ID {$id} status is '{$updated_post['status']}' instead of 'archived'");
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Failed to archive post. Status verification failed.',
+                    'debug' => ['post_id' => $id, 'actual_status' => $updated_post['status'] ?? 'unknown']
+                ]);
+                return;
+            }
             
             // Log activity
             $admin_account = getAdminAccountName($conn);
@@ -341,7 +354,8 @@ function fetchPosts() {
     $year_filter = isset($_POST['year']) ? (int)$_POST['year'] : date('Y');
     $category_filter = isset($_POST['category']) ? mysqli_real_escape_string($conn, $_POST['category']) : '';
     
-    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND (status = 'active' OR status IS NULL)";
+    // Status is ENUM('active','archived'), so it cannot be NULL - only check for 'active'
+    $sql = "SELECT * FROM posts WHERE YEAR(post_date) = ? AND status = 'active'";
     $params = [$year_filter];
     $types = "i";
     
@@ -455,6 +469,27 @@ function deletePost() {
             // Delete image file if it exists
             if (!empty($image_path) && trim($image_path) !== '') {
                 deleteImageFromSpaces($image_path);
+            }
+            
+            // Explicitly verify the post was deleted
+            $verify_sql = "SELECT id FROM posts WHERE id = ?";
+            $verify_stmt = mysqli_prepare($conn, $verify_sql);
+            mysqli_stmt_bind_param($verify_stmt, "i", $id);
+            mysqli_stmt_execute($verify_stmt);
+            $verify_result = mysqli_stmt_get_result($verify_stmt);
+            $still_exists = mysqli_fetch_assoc($verify_result);
+            mysqli_stmt_close($verify_stmt);
+            
+            if ($still_exists) {
+                // Post still exists - deletion failed
+                mysqli_stmt_close($stmt);
+                mysqli_close($conn);
+                error_log("Delete verification failed: Post ID {$id} still exists after DELETE");
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Failed to delete post. Post still exists in database.'
+                ]);
+                return;
             }
             
             // Log activity

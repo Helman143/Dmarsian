@@ -45,7 +45,8 @@ $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
 // Base query: exclude archived posts and filter by year
-$sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
+// Status is ENUM('active','archived'), so it cannot be NULL - only check for 'active'
+$sql = "SELECT * FROM posts WHERE status = 'active' AND YEAR(post_date) = ?";
 $params = [$year_filter];
 $types = "i";
 

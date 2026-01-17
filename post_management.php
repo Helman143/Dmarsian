@@ -45,17 +45,18 @@ $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
 // Base query: exclude archived posts and filter by year
+// Status is ENUM('active','archived'), so it cannot be NULL - only check for 'active'
 // If no year filter specified, show current year AND previous year (matching get_posts.php behavior)
 if ($year_filter !== null) {
     // Specific year selected - show only that year
-    $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND YEAR(post_date) = ?";
+    $sql = "SELECT * FROM posts WHERE status = 'active' AND YEAR(post_date) = ?";
     $params = [$year_filter];
     $types = "i";
 } else {
     // No year filter - show current year and previous year (last 2 years)
     $currentYear = date('Y');
     $previousYear = $currentYear - 1;
-    $sql = "SELECT * FROM posts WHERE (status = 'active' OR status IS NULL) AND (YEAR(post_date) = ? OR YEAR(post_date) = ?)";
+    $sql = "SELECT * FROM posts WHERE status = 'active' AND (YEAR(post_date) = ? OR YEAR(post_date) = ?)";
     $params = [$currentYear, $previousYear];
     $types = "ii";
 }
