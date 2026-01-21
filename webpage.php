@@ -51,7 +51,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
 </head>
 <body>
     <!-- MOBILE COMMAND STRIP (Offcanvas Shutter) -->
-    <nav class="navbar mobile-command fixed-top d-lg-none" aria-label="Mobile navigation">
+    <nav class="navbar mobile-command fixed-top d-xl-none" aria-label="Mobile navigation">
         <div class="container-fluid px-3">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#home">
                 <img src="Picture/Logo2.png" alt="Logo" width="28" height="28" class="d-inline-block">
@@ -68,7 +68,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         </div>
     </nav>
 
-    <div class="offcanvas offcanvas-end offcanvas-holo d-lg-none" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
+    <div class="offcanvas offcanvas-end offcanvas-holo d-xl-none" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="mobileOffcanvasLabel">MENU</h5>
             <button type="button" class="btn-close holo-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -86,14 +86,14 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         </div>
     </div>
     <!-- HEADER & HERO SECTION -->
-    <header class="main-header glassy-nav d-none d-lg-flex">
+    <header class="main-header glassy-nav d-none d-xl-flex">
         <div class="logo-section d-flex align-items-center gap-2">
             <img src="Picture/Logo2.png" alt="Logo" class="logo img-fluid">
             <div class="gym-title">
                 <h1 class="brand-glitch">D'MARSIANS<br>TAEKWONDO GYM</h1>
             </div>
         </div>
-        <nav class="main-nav d-none d-lg-flex justify-content-center">
+        <nav class="main-nav d-none d-xl-flex justify-content-center">
             <a href="#home">HOME</a>
             <a href="#about">ABOUT</a>
             <a href="#offers">OFFER</a>
