@@ -4330,6 +4330,13 @@ body {
     z-index: 100;
 }
 
+#contacts *,
+.footer-contact-bar,
+.footer-console {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
 /* Hide the map overlay potentially causing dark tint */
 .footer-map-bg {
     display: none !important;
@@ -4402,7 +4409,7 @@ body {
     justify-content: center;
     width: 44px;
     height: 44px;
-    background-color: #E5E7EB;
+    background-color: #E5E7EB !important;
     /* Light Gray Pill Default */
     border-radius: 50%;
     /* Circle/Pill shape */
