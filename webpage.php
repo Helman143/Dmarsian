@@ -536,7 +536,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                 <div class="team-header">
                     <img src="Picture/Diskartech.png" alt="DiskarTech Logo" class="team-logo-large">
                     <h2 class="team-name">DISKAR-TECH</h2>
-                    <p class="team-description">Innovators behind the D'Marsians Management System</p>
+                    <p class="team-description">Innovators behind the D'Marsians Taekwondo System</p>
                 </div>
 
                 <div class="team-grid">
