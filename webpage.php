@@ -544,7 +544,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                     <div class="team-member-card">
                         <div class="member-avatar">
                             <!-- Placeholder: Replace with actual image path if available -->
-                            <img src="Picture/Logo2.png" alt="Helman Dashelle Dacuma" class="member-img">
+                            <img src="Picture/a1.png" alt="Helman Dashelle Dacuma" class="member-img">
                         </div>
                         <div class="member-info">
                             <h3 class="member-name">HELMAN DASHELLE DACUMA</h3>
@@ -556,7 +556,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                     <!-- HARRA LOU RAMOS -->
                     <div class="team-member-card">
                         <div class="member-avatar">
-                            <img src="Picture/Logo2.png" alt="Harra Lou Ramos" class="member-img">
+                            <img src="Picture/a2.png" alt="Harra Lou Ramos" class="member-img">
                         </div>
                         <div class="member-info">
                             <h3 class="member-name">HARRA LOU RAMOS</h3>
@@ -568,7 +568,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                     <!-- HADJARA SALEM -->
                     <div class="team-member-card">
                         <div class="member-avatar">
-                            <img src="Picture/Logo2.png" alt="Hadjara Salem" class="member-img">
+                            <img src="Picture/a3.png" alt="Hadjara Salem" class="member-img">
                         </div>
                         <div class="member-info">
                             <h3 class="member-name">HADJARA SALEM</h3>
@@ -580,7 +580,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                     <!-- JONEL 'SEI' EBOL -->
                     <div class="team-member-card mentor-card">
                         <div class="member-avatar">
-                            <img src="Picture/Logo2.png" alt="Jonel 'Sei' Ebol" class="member-img">
+                            <img src="Picture/a4.png" alt="Jonel 'Sei' Ebol" class="member-img">
                         </div>
                         <div class="member-info">
                             <h3 class="member-name">JONEL 'SEI' EBOL</h3>
