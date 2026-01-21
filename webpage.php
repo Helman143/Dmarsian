@@ -427,10 +427,10 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
     </section>
 
     <!-- CONTACTS, MAP, FOOTER -->
-    <section id="contacts" class="footer-section container-fluid">
-        <div class="footer-map-bg">
+    <section id="contacts" class="footer-section container-fluid" style="background-color: #FFFFFF !important; background-image: none !important;">
+        <!-- <div class="footer-map-bg">
             <img class="footer-map-img" src="Picture/3.png" alt="Map showing D'Marsians Taekwondo location">
-        </div>
+        </div> -->
         <div class="footer-contact-bar">
             <div class="container footer-console">
                 <div class="row gy-5">
@@ -443,7 +443,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                                 <div class="footer-console-subtitle">Taekwondo Gym</div>
                             </div>
                         </div>
-                        <p class="footer-console-mission text-white-50 mb-0">
+                        <p class="footer-console-mission mb-0">
                             Thank you for visiting D'Marsians Taekwondo Team!
                         </p>
                     </div>

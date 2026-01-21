@@ -4319,11 +4319,11 @@ body {
    ========================================= */
 
 /* 1. The 'Foundation' - Hero Section Vibe (Grid + Neon) */
-/* 1. The 'Foundation' - Hero Section Vibe (Grid + Neon) */
+/* 1. The 'Foundation' - White Mode */
 #contacts {
-    background: #f4f7f6 url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 0v40M0 1h40' stroke='%23000000' stroke-opacity='0.05' fill='none'/%3E%3C/svg%3E") repeat !important;
+    background: #FFFFFF !important;
     border-top: 4px solid #39FF14 !important;
-    color: #1A1A1A !important;
+    color: #000000 !important;
     padding-top: 60px;
     padding-bottom: 40px;
     position: relative;
@@ -4402,7 +4402,7 @@ body {
     justify-content: center;
     width: 44px;
     height: 44px;
-    background-color: #F3F4F6;
+    background-color: #E5E7EB;
     /* Light Gray Pill Default */
     border-radius: 50%;
     /* Circle/Pill shape */
