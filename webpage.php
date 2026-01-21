@@ -32,7 +32,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
     <link rel="icon" type="image/png" href="Picture/Logo2.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="Styles/webpage.css">
+    <link rel="stylesheet" href="Styles/webpage.css?v=<?php echo time(); ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Updated typography: Orbitron/Teko for headings, Montserrat for body -->
