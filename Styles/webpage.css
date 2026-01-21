@@ -4313,15 +4313,22 @@ body {
         font-size: 2rem;
     }
 }
+
 /* =========================================
    FOOTER (LIGHT MODE REDESIGN)
    ========================================= */
 
-/* 1. The 'Foundation' - White Clean Floor + Structural Green Border */
+/* 1. The 'Foundation' - Hero Section Vibe (Grid + Neon) */
 .footer-section {
-    background-color: #FFFFFF !important; /* Pure White */
-    border-top: 4px solid #047857; /* Fit Green (Emerald) Structural Border */
-    color: #4B5563; /* Medium Gray Body Text */
+    background-color: #f4f7f6 !important;
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px) !important;
+    background-size: 40px 40px !important;
+    border-top: 4px solid #39FF14 !important;
+    /* Neon Green Pop */
+    color: #1A1A1A;
+    /* Sharp Dark Text */
     padding-top: 60px;
     padding-bottom: 40px;
     position: relative;
@@ -4331,7 +4338,8 @@ body {
 /* 2. Typography - The 'Slate' Shift */
 .footer-console-title {
     font-family: 'Russo One', sans-serif;
-    color: #1F2937; /* Deep Slate (instead of black) */
+    color: #1F2937;
+    /* Deep Slate (instead of black) */
     font-size: 1.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -4340,7 +4348,8 @@ body {
 
 .footer-console-subtitle {
     font-family: 'Rajdhani', sans-serif;
-    color: #047857; /* Accent Green for 'Taekwondo Gym' */
+    color: #39FF14;
+    /* Neon Green (matching hero accent) */
     font-size: 1.1rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -4349,7 +4358,8 @@ body {
 
 .footer-console-heading {
     font-family: 'Montserrat', sans-serif;
-    color: #1F2937; /* Deep Slate Headings */
+    color: #000000;
+    /* Pure Black */
     font-size: 1.2rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -4358,7 +4368,8 @@ body {
 }
 
 .footer-console-mission {
-    color: #6B7280; /* Softer gray for mission text */
+    color: #333333;
+    /* Dark Charcoal (no more light gray) */
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
     line-height: 1.6;
@@ -4369,16 +4380,18 @@ body {
 /* 3. The 'Fit' Green Strategy - Icons & Accents */
 .footer-console-icon {
     font-size: 1.2rem;
-    color: #047857; /* Professional Emerald Green Icons */
+    color: #39FF14;
+    /* Neon Green Icons */
     width: 24px;
     text-align: center;
 }
 
-.footer-console-val, 
+.footer-console-val,
 .footer-console-value {
-    color: #374151; /* Dark Gray for actual contact info/hours */
+    color: #111111;
+    /* Almost Black */
     font-family: 'Inter', sans-serif;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 1rem;
 }
 
@@ -4389,9 +4402,12 @@ body {
     justify-content: center;
     width: 44px;
     height: 44px;
-    background-color: #F3F4F6; /* Light Gray Pill Default */
-    border-radius: 50%; /* Circle/Pill shape */
-    color: #4B5563; /* Gray Icon Default */
+    background-color: #F3F4F6;
+    /* Light Gray Pill Default */
+    border-radius: 50%;
+    /* Circle/Pill shape */
+    color: #4B5563;
+    /* Gray Icon Default */
     margin: 0 8px;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -4399,9 +4415,12 @@ body {
 }
 
 .footer-social .social-btn:hover {
-    background-color: #ECFDF5; /* Very Light Green Tint on Hover */
-    color: #047857; /* Turn Icon Emerald Green */
-    border-color: #047857; /* Add Structural Border on Hover */
+    background-color: #ECFDF5;
+    /* Very Light Green Tint on Hover */
+    color: #047857;
+    /* Turn Icon Emerald Green */
+    border-color: #047857;
+    /* Add Structural Border on Hover */
     transform: translateY(-3px);
     box-shadow: 0 4px 12px rgba(4, 120, 87, 0.15);
 }
@@ -4422,26 +4441,30 @@ body {
     height: 45px;
     width: auto;
     object-fit: contain;
-    filter: grayscale(100%); /* Start grayscale for structural look */
+    filter: grayscale(100%);
+    /* Start grayscale for structural look */
     opacity: 0.7;
     transition: all 0.3s ease;
 }
 
 .footer-badge:hover {
-    filter: grayscale(0%); /* Color on hover */
+    filter: grayscale(0%);
+    /* Color on hover */
     opacity: 1;
     transform: scale(1.05);
 }
 
 /* Divider & Copyright */
 .footer-console-divider {
-    border-color: #E5E7EB; /* Very Light Gray Divider */
+    border-color: #E5E7EB;
+    /* Very Light Gray Divider */
     opacity: 1;
     margin: 40px 0 25px;
 }
 
 .footer-console-copy {
-    color: #9CA3AF; /* Light Gray Copyright Text */
+    color: #333333;
+    /* Dark Charcoal */
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     font-weight: 400;
@@ -4454,7 +4477,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.03; /* Very faint map overlay */
+    opacity: 0.03;
+    /* Very faint map overlay */
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
@@ -4470,15 +4494,15 @@ body {
 /* Responsive Tweaks */
 @media (max-width: 768px) {
     .footer-console-mission {
-        margin: 0 auto 30px; /* Spacing on mobile */
+        margin: 0 auto 30px;
+        /* Spacing on mobile */
     }
-    
+
     .footer-console-heading {
         margin-top: 20px;
     }
-    
+
     .footer-badges {
         justify-content: center !important;
     }
 }
-
