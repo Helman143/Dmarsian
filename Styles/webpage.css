@@ -2048,6 +2048,7 @@ section#offers {
 }
 
 @media (max-width: 900px) {
+
     /* Desktop header adjustments for tablets - will be hidden on mobile via 767.98px breakpoint */
     .main-header {
         flex-direction: column;
@@ -4028,6 +4029,7 @@ body {
         backdrop-filter: blur(4px);
     }
 }
+
 /* =========================================
    TEAM PROFILE MODAL (DISKAR-TECH)
    ========================================= */
@@ -4083,18 +4085,16 @@ body {
     background: rgba(20, 20, 20, 0.6);
     border: 1px solid rgba(57, 255, 20, 0.3);
     border-radius: 20px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 
-                inset 0 0 30px rgba(57, 255, 20, 0.05);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5),
+        inset 0 0 30px rgba(57, 255, 20, 0.05);
     overflow-y: auto;
     overflow-x: hidden;
     transform: scale(0.95);
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     /* Sci-fi tech corners */
-    clip-path: polygon(
-        0 20px, 20px 0, 
-        100% 0, 100% calc(100% - 20px), 
-        calc(100% - 20px) 100%, 0 100%
-    );
+    clip-path: polygon(0 20px, 20px 0,
+            100% 0, 100% calc(100% - 20px),
+            calc(100% - 20px) 100%, 0 100%);
 }
 
 .team-modal-overlay.open .team-modal-dialog {
@@ -4193,7 +4193,7 @@ body {
 
 /* Mentor Card Special Styling */
 .team-member-card.mentor-card {
-    grid-column: 1 / -1; /* Spans full width on most layouts if needed, or adjust */
+    /* grid-column: 1 / -1; removed to allow side-by-side layout */
     border-color: rgba(255, 215, 0, 0.3);
     background: radial-gradient(circle at top right, rgba(255, 215, 0, 0.05), transparent);
 }
@@ -4204,7 +4204,8 @@ body {
 }
 
 .mentor-card .highlight-text {
-    color: #FFD700 !important; /* Gold */
+    color: #FFD700 !important;
+    /* Gold */
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
@@ -4278,7 +4279,8 @@ body {
 
     .team-header {
         margin-bottom: 30px;
-        margin-top: 40px; /* Space for close button */
+        margin-top: 40px;
+        /* Space for close button */
     }
 
     .team-name {
@@ -4286,7 +4288,7 @@ body {
     }
 
     .team-member-card.mentor-card {
-        grid-column: auto; /* Reset span on mobile */
+        grid-column: auto;
+        /* Reset span on mobile */
     }
 }
-
