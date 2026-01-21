@@ -1,0 +1,10 @@
+If you can see this, the server is responding.
+This is a plain text file to test if the server is working at all.
+
+
+
+
+
+
+
+

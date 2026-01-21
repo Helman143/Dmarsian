@@ -1,0 +1,61 @@
+===========================================
+DIGITAL OCEAN APP PLATFORM - EMAIL SETUP
+===========================================
+
+Go to: https://cloud.digitalocean.com/apps
+Select: dmarsians-taekwondo
+Settings → App-Level Environment Variables → Edit
+
+ADD THESE VARIABLES:
+
+1. SMTP2GO_API_KEY
+   Value: api-DB88D1F1E4B74779BDB77FC2895D8325
+   Scope: RUN_TIME
+
+2. SMTP2GO_SENDER_EMAIL
+   Value: helmandashelle.dacuma@sccpag.edu.ph
+   Scope: RUN_TIME
+
+3. SMTP2GO_SENDER_NAME
+   Value: D'Marsians Taekwondo Gym
+   Scope: RUN_TIME
+
+4. ADMIN_BCC_EMAIL (optional)
+   Value: helmandacuma5@gmail.com
+   Scope: RUN_TIME
+
+5. APP_ENV (optional, but recommended)
+   Value: production
+   Scope: RUN_TIME
+
+===========================================
+AFTER ADDING:
+1. Click SAVE
+2. Wait for redeployment (2-5 minutes)
+3. Check check_env.php again to verify
+4. Test email sending
+===========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

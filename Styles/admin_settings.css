@@ -1,0 +1,681 @@
+:root {
+    --sidebar-width: 250px;
+    --emerald-1: #00ff6a;
+    --emerald-2: #00cc55;
+    --emerald-dark: #001a0d;
+    --emerald-mid: #004d26;
+    --glass-dark: rgba(0, 20, 10, 0.6);
+    --glass-card: rgba(255, 255, 255, 0.05);
+    --text-main: #ffffff;
+    --text-sub: #8ee8b6;
+    --primary-color: #00ff6a;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--emerald-dark);
+    background-image:
+        radial-gradient(ellipse at center, var(--emerald-mid) 0%, var(--emerald-dark) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 106, 0.08) 2px, rgba(0, 255, 106, 0.08) 4px);
+    color: var(--text-main);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Circuit / hex texture */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(30deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(60deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px),
+        repeating-linear-gradient(120deg, transparent, transparent 35px, rgba(0, 255, 106, 0.08) 35px, rgba(0, 255, 106, 0.08) 36px);
+    background-size: 200px 200px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure the entire left column behind the sidebar is black on desktop */
+@media (min-width: 768px) {
+    body::before {
+        width: var(--sidebar-width);
+        background: transparent;
+        mix-blend-mode: screen;
+    }
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container-fluid {
+    min-height: 100vh;
+}
+
+/* Mobile topbar styles - ensure all accents use site primary green */
+.mobile-topbar {
+    background: #111;
+}
+.mobile-topbar .btn {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+.mobile-topbar .btn i { color: var(--primary-color); }
+.mobile-topbar .text-success { color: var(--primary-color) !important; }
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: clamp(12px, 2.4vw, 20px);
+    position: relative;
+    z-index: 1;
+    background: none;
+    min-height: 100vh;
+    max-width: calc(100vw - var(--sidebar-width));
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+.admin-settings-title {
+    color: var(--text-main);
+    font-size: clamp(1.25rem, 3.2vw, 2rem);
+    margin: 0 0 clamp(16px, 2.6vw, 30px) 0;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 106, 0.35);
+}
+
+.settings-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 255, 106, 0.25);
+    border-radius: clamp(10px, 1.6vw, 12px);
+    padding: clamp(14px, 2.2vw, 20px);
+    margin: 0 auto;
+    max-width: 1100px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+}
+
+.settings-card:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 106, 0.4);
+    border-color: var(--emerald-1);
+}
+
+.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: clamp(12px, 2vw, 18px);
+}
+
+.tab-btn {
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--text-main);
+    border: 1px solid rgba(0, 255, 106, 0.3);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: clamp(8px, 1.2vw, 10px) clamp(20px, 3vw, 32px);
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 2px;
+    outline: none;
+    transition: all 0.2s;
+    position: relative;
+    z-index: 2;
+}
+
+.tab-btn:hover {
+    background: rgba(0, 255, 106, 0.1);
+    color: var(--emerald-1);
+}
+
+.tab-btn.active, .tab-btn:focus {
+    background: rgba(0, 255, 106, 0.15);
+    color: var(--emerald-1);
+    border-color: var(--emerald-1);
+    border-bottom: 1px solid rgba(0, 255, 106, 0.15);
+    box-shadow: 0 0 12px rgba(0, 255, 106, 0.35);
+}
+
+.tab-content {
+    background: transparent;
+    border-radius: 0 0 8px 8px;
+    padding: 0;
+    min-height: 300px;
+}
+
+/* Activity Table */
+.activity-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    color: var(--text-main);
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    margin-top: 0;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 255, 106, 0.25);
+}
+
+.activity-table th, .activity-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: clamp(8px, 1.6vw, 12px) clamp(8px, 1.2vw, 10px);
+    text-align: left;
+}
+
+.activity-table th {
+    background: rgba(0, 255, 106, 0.15);
+    color: var(--emerald-1);
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 255, 106, 0.25);
+    font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+    letter-spacing: 1px;
+}
+
+.activity-table td {
+    background: rgba(255, 255, 255, 0.03);
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+}
+
+.activity-table tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.activity-table tr:hover td {
+    background: rgba(0, 255, 106, 0.1);
+}
+
+.empty-tab {
+    color: var(--text-sub);
+    text-align: center;
+    padding: 60px 0;
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+}
+
+/* Admin Account Form */
+.admin-account-form {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: clamp(10px, 1.6vw, 12px);
+    border: 1px solid rgba(0, 255, 106, 0.25);
+    padding: clamp(14px, 2.2vw, 24px) clamp(14px, 2.2vw, 18px) clamp(10px, 1.6vw, 10px) clamp(14px, 2.2vw, 18px);
+    margin-bottom: clamp(16px, 2.4vw, 24px);
+    max-width: 100%;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-account-form:hover {
+    border-color: var(--emerald-1);
+    box-shadow: 0 0 20px rgba(0, 255, 106, 0.3);
+}
+
+.form-row {
+    display: flex;
+    gap: clamp(16px, 2.4vw, 32px);
+    margin-bottom: clamp(12px, 1.8vw, 18px);
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    color: var(--emerald-1);
+    font-weight: bold;
+    margin-bottom: 2px;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+    letter-spacing: 1px;
+}
+
+.form-group input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 106, 0.3);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+    padding: clamp(6px, 1vw, 8px) clamp(10px, 1.4vw, 12px);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--emerald-1);
+    box-shadow: 0 0 8px rgba(0, 255, 106, 0.4);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.form-group small {
+    color: var(--text-sub);
+    font-size: clamp(0.75rem, 1vw, 0.85rem);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: clamp(20px, 3vw, 36px);
+    margin: clamp(12px, 1.8vw, 18px) 0 0 0;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+    min-width: clamp(60px, 8vw, 70px);
+}
+
+.action-btn i {
+    font-size: clamp(1.6rem, 2.8vw, 2rem);
+    margin-bottom: 4px;
+    transition: all 0.2s;
+}
+
+.action-btn.save i, .action-btn.export i {
+    color: var(--emerald-1);
+}
+
+.action-btn.save span, .action-btn.export span {
+    color: var(--emerald-1);
+}
+
+.action-btn:hover {
+    color: var(--emerald-1);
+    transform: translateY(-2px);
+}
+
+.action-btn:hover i {
+    color: var(--emerald-1);
+    text-shadow: 0 0 8px rgba(0, 255, 106, 0.6);
+}
+
+.action-btn.clear i {
+    color: var(--text-main);
+}
+
+.action-btn.update i {
+    color: var(--text-main);
+}
+
+.action-btn span {
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Admin Table */
+.admin-table-wrapper {
+    margin-top: clamp(12px, 1.8vw, 18px);
+    background: transparent;
+    border-radius: clamp(10px, 1.6vw, 12px);
+    border: 1px solid rgba(0, 255, 106, 0.25);
+    padding: clamp(6px, 1vw, 8px) clamp(6px, 1vw, 8px) 0 clamp(6px, 1vw, 8px);
+    overflow: hidden;
+}
+
+.admin-table-wrapper:hover {
+    border-color: var(--emerald-1);
+    box-shadow: 0 0 15px rgba(0, 255, 106, 0.2);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: transparent;
+    color: var(--text-main);
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.admin-table th, .admin-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: clamp(12px, 1.8vw, 16px) clamp(8px, 1.2vw, 10px);
+    text-align: left;
+}
+
+.admin-table th {
+    background: rgba(0, 255, 106, 0.15);
+    color: var(--emerald-1);
+    font-weight: bold;
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    border-bottom: 1px solid rgba(0, 255, 106, 0.25);
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.admin-table td {
+    background: rgba(255, 255, 255, 0.03);
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    text-align: center;
+}
+
+.admin-table tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tr:hover td {
+    background: rgba(0, 255, 106, 0.1);
+}
+
+/* Password toggle functionality */
+.password-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.password-masked, .password-actual {
+    flex: 1;
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+.toggle-password-btn {
+    background: none;
+    border: none;
+    color: var(--emerald-1);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: clamp(0.8rem, 1.1vw, 14px);
+}
+
+.toggle-password-btn:hover {
+    background: rgba(0, 255, 106, 0.15);
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(0, 255, 106, 0.4);
+}
+
+.toggle-password-btn:active {
+    transform: scale(0.95);
+}
+
+.toggle-password-btn i {
+    transition: color 0.3s ease;
+}
+
+.toggle-password-btn:hover i {
+    color: #fff;
+}
+
+.reset-password-btn {
+    background: none;
+    border: none;
+    color: #ff6b35;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-size: clamp(0.8rem, 1.1vw, 14px);
+    margin-left: 4px;
+}
+
+.reset-password-btn:hover {
+    background: rgba(255, 107, 53, 0.15);
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(255, 107, 53, 0.4);
+}
+
+.reset-password-btn:active {
+    transform: scale(0.95);
+}
+
+.reset-password-btn i {
+    transition: color 0.3s ease;
+}
+
+.reset-password-btn:hover i {
+    color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .main-content {
+        padding: clamp(12px, 2vw, 20px);
+    }
+    .settings-card {
+        max-width: 98vw;
+        padding: clamp(10px, 1.6vw, 12px) clamp(10px, 2vw, 2vw) clamp(10px, 1.6vw, 12px) clamp(10px, 2vw, 2vw);
+    }
+}
+
+@media (max-width: 900px) {
+    .form-row {
+        flex-direction: column;
+        gap: clamp(12px, 1.8vw, 18px);
+    }
+    .form-actions {
+        flex-wrap: wrap;
+        gap: clamp(16px, 2.4vw, 24px);
+    }
+    .admin-account-form {
+        padding: clamp(12px, 1.8vw, 15px);
+    }
+    .admin-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .admin-table {
+        min-width: 600px;
+    }
+    .admin-table th, .admin-table td {
+        padding: clamp(8px, 1.2vw, 12px) clamp(6px, 1vw, 8px);
+        font-size: clamp(0.75rem, 1vw, 0.85rem);
+    }
+}
+
+@media (max-width: 767.98px) {
+    /* Mobile topbar positioning */
+    .mobile-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: #111;
+        border-bottom: 1px solid rgba(0, 255, 106, 0.2);
+    }
+    
+    /* Offcanvas handles positioning on mobile; main content should occupy full width */
+    .main-content {
+        margin-left: 0;
+        max-width: 100vw;
+        padding-top: clamp(8px, 1.2vw, 12px);
+    }
+    
+    .admin-settings-title {
+        font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+        margin-bottom: clamp(12px, 2vw, 20px);
+        padding: 0 clamp(8px, 1.6vw, 12px);
+    }
+    
+    .settings-card {
+        padding: clamp(10px, 1.6vw, 14px) clamp(8px, 1.4vw, 12px);
+        margin: 0 clamp(4px, 1vw, 8px);
+        border-radius: clamp(8px, 1.2vw, 12px);
+    }
+    
+    /* Tab buttons - better mobile layout */
+    .tabs {
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: clamp(10px, 1.6vw, 14px);
+    }
+    
+    .tab-btn {
+        flex: 1;
+        min-width: calc(50% - 2px);
+        padding: clamp(8px, 1.4vw, 10px) clamp(8px, 1.6vw, 12px);
+        font-size: clamp(0.75rem, 1.1vw, 0.9rem);
+        white-space: nowrap;
+        text-align: center;
+    }
+    
+    /* Activity table wrapper for horizontal scroll */
+    .activity-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -8px;
+        padding: 0 8px;
+    }
+    
+    .activity-table {
+        min-width: 600px;
+        font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+    }
+    
+    .activity-table th, .activity-table td {
+        padding: clamp(6px, 1vw, 8px) clamp(4px, 0.8vw, 6px);
+        font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+        white-space: nowrap;
+    }
+    
+    .activity-table th:first-child,
+    .activity-table td:first-child {
+        position: sticky;
+        left: 0;
+        background: rgba(0, 255, 106, 0.15);
+        z-index: 1;
+    }
+    
+    .activity-table td:first-child {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .activity-table tr:hover td:first-child {
+        background: rgba(0, 255, 106, 0.1);
+    }
+    
+    /* Admin account form mobile improvements */
+    .admin-account-form {
+        padding: clamp(10px, 1.6vw, 14px);
+        margin-bottom: clamp(12px, 1.8vw, 18px);
+    }
+    
+    .form-group input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: clamp(8px, 1.2vw, 10px) clamp(10px, 1.4vw, 12px);
+    }
+    
+    .form-group label {
+        font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+    }
+    
+    .form-group small {
+        font-size: clamp(0.7rem, 0.95vw, 0.8rem);
+    }
+    
+    /* Action buttons mobile layout */
+    .form-actions {
+        gap: clamp(12px, 2vw, 20px);
+        margin-top: clamp(10px, 1.6vw, 14px);
+    }
+    
+    .action-btn {
+        min-width: clamp(55px, 7vw, 65px);
+    }
+    
+    .action-btn i {
+        font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+    }
+    
+    .action-btn span {
+        font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+    }
+    
+    /* Admin table mobile improvements */
+    .admin-table-wrapper {
+        margin-top: clamp(10px, 1.6vw, 14px);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-left: -8px;
+        margin-right: -8px;
+        padding: 0 8px;
+    }
+    
+    .admin-table {
+        min-width: 600px;
+    }
+    
+    .admin-table th, .admin-table td {
+        padding: clamp(8px, 1.2vw, 10px) clamp(6px, 1vw, 8px);
+        font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+    }
+    
+    .admin-table th {
+        font-size: clamp(0.75rem, 1vw, 0.9rem);
+    }
+    
+    /* Password toggle buttons mobile */
+    .toggle-password-btn,
+    .reset-password-btn {
+        padding: clamp(3px, 0.6vw, 5px) clamp(6px, 1vw, 8px);
+        font-size: clamp(0.7rem, 0.95vw, 0.85rem);
+    }
+}
+
+@media (min-width: 768px) {
+    /* Desktop: fixed sidebar and spaced main content */
+    .main-content {
+        margin-left: var(--sidebar-width);
+        /* Constrain content width on large screens for better readability */
+        max-width: 1200px;
+    }
+    /* Create visible gaps by drawing borders inside the padding */
+    .settings-card,
+    .admin-account-form,
+    .admin-table-wrapper {
+        position: relative;
+        border: none;
+        background: transparent !important;
+        overflow: hidden;
+    }
+    .settings-card::before,
+    .admin-account-form::before,
+    .admin-table-wrapper::before {
+        content: "";
+        position: absolute;
+        inset: 12px; /* inner offset creates clear separation */
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        background: transparent; /* only show ring, no fill */
+        pointer-events: none;
+    }
+    .admin-table-wrapper::before {
+        inset: 8px;
+    }
+}

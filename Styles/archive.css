@@ -1,0 +1,317 @@
+/* =========================
+   ARCHIVE: "Holographic Data Vault" (Light Crystal)
+   ========================= */
+
+body.archive-page {
+  background-color: #f4f7f6;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: #111;
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+.archive-shell {
+  position: relative;
+  padding-top: 92px; /* room for fixed back button */
+  padding-bottom: 60px;
+}
+
+/* Back button: glass circle */
+.archive-back-btn {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  border-radius: 999px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(57, 255, 20, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  color: #0b0f12;
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.archive-back-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(57, 255, 20, 0.9);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.16);
+}
+.archive-back-btn i { font-size: 1.1rem; }
+
+/* Title */
+.archive-title {
+  font-family: 'Russo One', 'Montserrat', sans-serif;
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: #111;
+}
+.archive-title::after {
+  content: "";
+  display: block;
+  width: 84px;
+  height: 3px;
+  background: #39FF14;
+  border-radius: 999px;
+  margin: 12px auto 0;
+}
+
+/* Filter Deck: long glass bar */
+.filter-deck {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 10px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+.filter-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  min-width: 0;
+}
+.filter-field label {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: rgba(0,0,0,0.65);
+  margin: 0;
+  white-space: nowrap;
+}
+.filter-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(0,0,0,0.10);
+}
+
+.filter-deck select,
+.filter-deck input[type="text"] {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #111;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-width: 0;
+}
+.filter-deck input::placeholder { color: rgba(0,0,0,0.45); }
+
+.filter-search {
+  flex: 1;
+}
+
+.filter-search-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 0;
+  background: #39FF14;
+  color: #0b0f12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 26px rgba(57,255,20,0.25);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.filter-search-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgba(57,255,20,0.3); }
+.filter-search-btn i { font-size: 1rem; }
+
+/* Focus state: active scanning */
+.filter-deck:focus-within {
+  border-color: rgba(57,255,20,0.7);
+  box-shadow: 0 0 0 4px rgba(57,255,20,0.18), 0 18px 50px rgba(0,0,0,0.10);
+}
+.filter-deck.is-typing .filter-search-btn {
+  animation: scanPulse .55s ease-in-out infinite;
+}
+@keyframes scanPulse {
+  0%, 100% { transform: translateY(0); box-shadow: 0 12px 26px rgba(57,255,20,0.25); }
+  50% { transform: translateY(-1px); box-shadow: 0 18px 34px rgba(57,255,20,0.35); }
+}
+
+/* Cards: Memory Crystals */
+.archive-card {
+  position: relative;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.12);
+  overflow: hidden;
+  transform: translateY(22px);
+  opacity: 0;
+  animation: vaultIn 560ms ease-out both;
+  animation-delay: calc((var(--i, 0) * 90ms) + 80ms);
+}
+
+@keyframes vaultIn {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.is-filtering .archive-card {
+  animation: vaultOut 180ms ease-in both;
+}
+@keyframes vaultOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.92); }
+}
+
+.archive-media {
+  position: relative;
+  overflow: hidden;
+  background: #e9ecef;
+}
+.archive-media img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  transform: scale(1);
+  transition: transform .35s ease;
+}
+.archive-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('../Picture/Logo2.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 160px 160px;
+  opacity: 0.06;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.archive-date-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  color: #39FF14;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.archive-body {
+  padding: 14px 14px 16px;
+}
+.archive-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.archive-post-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  font-size: 1.05rem;
+  margin: 0;
+  color: #111;
+  line-height: 1.15;
+}
+.archive-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(57,255,20,0.7);
+  color: #00a81a;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.archive-desc {
+  margin-top: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: rgba(0,0,0,0.72);
+  line-height: 1.55;
+}
+
+/* Hover: holographic lift + glow + sheen sweep */
+.archive-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 0 2px rgba(57,255,20,0.45) inset, 0 0 22px rgba(57,255,20,0.18);
+  transition: opacity .25s ease;
+}
+.archive-card::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -60%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(60deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+  transform: rotate(10deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.archive-card:hover {
+  transform: translateY(-10px);
+}
+.archive-card:hover::before { opacity: 1; }
+.archive-card:hover .archive-media img { transform: scale(1.1); }
+.archive-card:hover::after {
+  opacity: 1;
+  animation: sheen 550ms ease-out;
+}
+@keyframes sheen {
+  from { transform: translateX(0) rotate(10deg); }
+  to { transform: translateX(220%) rotate(10deg); }
+}
+
+/* Click flash */
+.archive-card:active {
+  filter: brightness(1.08);
+}
+
+@media (max-width: 768px) {
+  .archive-shell { padding-top: 84px; }
+  .filter-deck { border-radius: 20px; flex-wrap: wrap; padding: 10px; }
+  .filter-divider { display: none; }
+  .filter-field { width: 100%; justify-content: space-between; }
+  .filter-search { width: 100%; }
+  .filter-search-btn { margin-left: auto; }
+  .archive-media img { height: 200px; }
+}
+
