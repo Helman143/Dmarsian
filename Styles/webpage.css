@@ -4292,3 +4292,100 @@ body {
         /* Reset span on mobile */
     }
 }
+/* =========================================
+   CUSTOM PREMIUM CURSOR
+   ========================================= */
+
+body {
+    cursor: none; /* Hide default cursor generally, but manage carefully */
+}
+
+/* Re-enable default cursor for touch devices or if script fails */
+@media (hover: none) and (pointer: coarse) {
+    body {
+        cursor: auto;
+    }
+    .custom-cursor {
+        display: none !important;
+    }
+}
+
+.custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(57, 255, 20, 0.4);
+    background: rgba(57, 255, 20, 0.05);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%); /* Start centered on coordinate */
+    transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+                height 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+                background-color 0.3s ease,
+                border-color 0.3s ease;
+    mix-blend-mode: difference; /* Adds a premium tech feel over light/dark bg */
+    backdrop-filter: blur(2px);
+    will-change: transform, width, height;
+}
+
+/* Center Dot */
+.custom-cursor::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #39FF14;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+}
+
+/* Hover State - Scale Up */
+.custom-cursor.hovered {
+    width: 50px;
+    height: 50px;
+    background: rgba(57, 255, 20, 0.1);
+    border-color: rgba(57, 255, 20, 0.6);
+    mix-blend-mode: normal; /* Better visibility for glow */
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+}
+
+/* Click State - Compress */
+.custom-cursor.clicking {
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(57, 255, 20, 0.2);
+}
+
+/* Text Tag (Optional: Team Member) */
+.cursor-text {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #39FF14;
+    font-size: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+
+.custom-cursor.hovered .cursor-text {
+    opacity: 1;
+    top: -35px; /* Float up slightly */
+}
+
+/* Ensure interactive elements verify the cursor */
+a, button, input, .clickable-logo, .team-member-card {
+    cursor: none; /* Enforce custom cursor */
+}
+
