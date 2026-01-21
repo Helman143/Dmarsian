@@ -4319,20 +4319,20 @@ body {
    ========================================= */
 
 /* 1. The 'Foundation' - Hero Section Vibe (Grid + Neon) */
-#contacts.footer-section {
-    background-color: #f4f7f6 !important;
-    background-image:
-        linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px) !important;
-    background-size: 40px 40px !important;
+/* 1. The 'Foundation' - Hero Section Vibe (Grid + Neon) */
+#contacts {
+    background: #f4f7f6 url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 0v40M0 1h40' stroke='%23000000' stroke-opacity='0.05' fill='none'/%3E%3C/svg%3E") repeat !important;
     border-top: 4px solid #39FF14 !important;
-    /* Neon Green Pop */
-    color: #1A1A1A;
-    /* Sharp Dark Text */
+    color: #1A1A1A !important;
     padding-top: 60px;
     padding-bottom: 40px;
     position: relative;
-    z-index: 10;
+    z-index: 100;
+}
+
+/* Hide the map overlay potentially causing dark tint */
+.footer-map-bg {
+    display: none !important;
 }
 
 /* 2. Typography - The 'Slate' Shift */
