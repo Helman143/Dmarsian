@@ -4403,14 +4403,14 @@ body {
 }
 
 /* Social Media Pills - Modern & Clean */
-.footer-social .social-btn {
+#contacts .footer-social .social-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 44px;
     height: 44px;
-    background-color: #E5E7EB !important;
-    /* Light Gray Pill Default */
+    background-color: #e5e7eb !important;
+    /* Visible Gray Pill */
     border-radius: 50%;
     /* Circle/Pill shape */
     color: #4B5563;
@@ -4448,16 +4448,12 @@ body {
     height: 45px;
     width: auto;
     object-fit: contain;
-    filter: grayscale(100%);
-    /* Start grayscale for structural look */
-    opacity: 0.7;
+    /* Removed grayscale filter -> Original Color */
+    opacity: 1;
     transition: all 0.3s ease;
 }
 
 .footer-badge:hover {
-    filter: grayscale(0%);
-    /* Color on hover */
-    opacity: 1;
     transform: scale(1.05);
 }
 
