@@ -491,6 +491,8 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.classList.remove('open');
             modal.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
+            // Return focus to the trigger to fix aria-hidden warning and improve a11y
+            logo.focus();
         };
 
         // Open triggers
