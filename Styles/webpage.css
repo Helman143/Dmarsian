@@ -4031,8 +4031,9 @@ body {
 }
 
 
+
 /* =========================================
-   TEAM PROFILE MODAL (DISKAR-TECH - LIGHT FROSTED GLASS)
+   TEAM PROFILE MODAL (DISKAR-TECH - REAL FROSTED GLASS)
    ========================================= */
 
 /* Clickable Footer Logo */
@@ -4059,9 +4060,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4); /* Lighter dim for light mode */
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.4); /* Dimmed background */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -4077,18 +4078,22 @@ body {
     visibility: visible;
 }
 
-/* Modal Dialog - Frosted Glass Light Mode */
+/* Modal Dialog - Real Frosted Glass (High Definition) */
 .team-modal-dialog {
     position: relative;
     width: 100%;
     max-width: 900px;
     max-height: 90vh;
-    background: rgba(255, 255, 255, 0.85); /* 85% opacity white */
-    backdrop-filter: blur(16px); /* Strong blur for frosted effect */
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.6); /* Subtle light border */
+    /* Creamy semi-transparent white */
+    background: rgba(255, 255, 255, 0.65); 
+    /* High Blur for depth */
+    backdrop-filter: blur(30px); 
+    -webkit-backdrop-filter: blur(30px);
+    /* Solid 1px border for definition */
+    border: 1px solid rgba(255, 255, 255, 0.5); 
     border-radius: 24px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12); /* Soft, premium shadow */
+    /* Soft but deep shadow */
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15); 
     overflow-y: auto;
     overflow-x: hidden;
     transform: scale(0.95);
@@ -4097,6 +4102,7 @@ body {
 
 .team-modal-overlay.open .team-modal-dialog {
     transform: scale(1);
+    /* Optional: Subtle texture if supported, omitted for clean look unless requested */
 }
 
 /* Close Button */
@@ -4104,12 +4110,12 @@ body {
     position: absolute;
     top: 20px;
     right: 25px;
-    background: rgba(0, 0, 0, 0.05); /* Slight circle bg */
+    background: rgba(0, 0, 0, 0.05);
     border-radius: 50%;
     width: 40px;
     height: 40px;
     border: none;
-    color: #333; /* Dark close icon */
+    color: #333;
     font-size: 1.8rem;
     line-height: 1;
     cursor: pointer;
@@ -4121,7 +4127,7 @@ body {
 }
 
 .team-modal-close:hover {
-    background: #39FF14; /* Neon green accent on hover */
+    background: #39FF14;
     color: #000;
     transform: rotate(90deg);
 }
@@ -4147,20 +4153,19 @@ body {
 
 .team-name {
     font-family: 'Russo One', sans-serif;
-    color: #1a1a1a; /* Dark Grey/Black Headline */
+    color: #1a1a1a;
     font-size: 2.5rem;
     margin: 0;
     letter-spacing: 2px;
     text-transform: uppercase;
-    /* Reverting gradient text for solid crisp dark text */
     background: none;
     -webkit-text-fill-color: initial;
 }
 
 .team-description {
     font-family: 'Rajdhani', sans-serif;
-    color: #39FF14; /* Neon Green Accent */
-    text-shadow: 0 0 1px rgba(0,0,0,0.1); /* Slight boost for readability against white */
+    color: #39FF14;
+    text-shadow: 0 0 1px rgba(0,0,0,0.1);
     font-size: 1.2rem;
     margin-top: 5px;
     font-weight: 600;
@@ -4175,10 +4180,11 @@ body {
     gap: 30px;
 }
 
-/* Member Card - Clean White Card Style */
+/* Member Card - The 'Cutout' Look (Contrast Fix) */
 .team-member-card {
-    background: #FFFFFF; /* Solid white card */
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Light Grey background to contrast with the glass modal */
+    background: #F3F4F6; 
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: 16px;
     padding: 30px 20px;
     display: flex;
@@ -4188,29 +4194,32 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Lifted shadow */
+    /* Soft shadow to lift it off the glass */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); 
 }
 
 .team-member-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(57, 255, 20, 0.15); /* Green glowy shadow on hover */
+    background: #FFFFFF; /* Brighten to pure white on hover */
+    box-shadow: 0 20px 40px rgba(57, 255, 20, 0.15);
     border-color: rgba(57, 255, 20, 0.3);
 }
 
 /* Mentor Card Special Styling */
 .team-member-card.mentor-card {
-    /* grid-column: 1 / -1; removed to allow side-by-side layout */
-    border-color: rgba(255, 215, 0, 0.2);
-    background: linear-gradient(135deg, #fff 0%, #fffbe6 100%); /* Subtle gold tint */
+    border-color: rgba(255, 215, 0, 0.3);
+    /* Slightly warmer grey/tint for mentor */
+    background: linear-gradient(135deg, #F9FAFB 0%, #FFFBE6 100%);
 }
 
 .team-member-card.mentor-card:hover {
     border-color: rgba(255, 215, 0, 0.6);
     box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+    background: #FFF;
 }
 
 .mentor-card .highlight-text {
-    color: #d4b200 !important; /* Darker Gold for visibility on white */
+    color: #d4b200 !important;
     text-shadow: none;
     font-weight: 800;
 }
@@ -4221,16 +4230,17 @@ body {
     height: 120px;
     border-radius: 50%;
     padding: 0;
-    /* Pale green circle background behind image */
     background: rgba(57, 255, 20, 0.1); 
     margin-bottom: 20px;
     position: relative;
     transition: all 0.3s ease;
     overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
 }
 
 .team-member-card:hover .member-avatar {
     transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
 }
 
 .member-img {
@@ -4238,14 +4248,13 @@ body {
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    /* Removed background #202020 to be transparent/clean */
 }
 
 /* Member Info */
 .member-name {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    color: #1a1a1a; /* Black/Dark Gray Names */
+    color: #1a1a1a;
     font-size: 1.3rem;
     margin: 0 0 5px;
     letter-spacing: 0.5px;
@@ -4260,19 +4269,18 @@ body {
 }
 
 .highlight-text {
-    color: #008f06; /* Darker Green for better contrast on white, or retain neon if preferred */
-    color: #00c008; /* Slightly vibrant green */
+    color: #00c008;
     text-shadow: none;
 }
 
 .team-member-card:hover .highlight-text {
-   color: #39FF14; /* Pop to neon on hover */
+   color: #39FF14;
    text-shadow: 0 0 10px rgba(57,255,20,0.4);
 }
 
 .member-desc {
     font-family: 'Inter', sans-serif;
-    color: #555; /* Medium Gray for description */
+    color: #555;
     font-size: 0.95rem;
     line-height: 1.6;
     margin: 0;
