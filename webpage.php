@@ -129,11 +129,6 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                 <a href="#register" class="btn-reactor hero-btn">REGISTER NOW</a>
             </div>
         </div>
-        <div class="stats-ticker">
-            <div class="stat-item"><span>200+</span> STUDENTS</div>
-            <div class="stat-item"><span>10+</span> YEARS EXP</div>
-            <div class="stat-item"><span>5</span> BLACK BELT COACHES</div>
-        </div>
     </section>
 
     <!-- ACHIEVEMENTS SLIDER -->
