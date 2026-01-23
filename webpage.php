@@ -189,27 +189,7 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                                     Certified Taekwondo 3rd Dan Black Belt with 23 years of experience — building discipline, confidence, and champions on and off the mat.
                                 </p>
 
-                                <!-- Stats Row (nested grid) -->
-                                <div class="row g-0 instructor-stats-grid">
-                                    <div class="col-4 stat-col stat-col-divider">
-                                        <div class="stat-counter">
-                                            <div class="stat-number" data-target="23">0</div>
-                                            <div class="stat-label">Years Exp.</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 stat-col stat-col-divider">
-                                        <div class="stat-counter">
-                                            <div class="stat-number" data-target="3">0</div>
-                                            <div class="stat-label">Dan Rank</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 stat-col">
-                                        <div class="stat-counter">
-                                            <div class="stat-number" data-target="5">0</div>
-                                            <div class="stat-label">Black Belts</div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>

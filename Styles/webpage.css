@@ -4089,21 +4089,22 @@ body {
 }
 
 /* Modal Dialog - Real Frosted Glass (High Definition) */
+/* Modal Dialog - Real Frosted Glass (High Definition - Dark Mode) */
 .team-modal-dialog {
     position: relative;
     width: 100%;
     max-width: 900px;
     max-height: 90vh;
-    /* Creamy semi-transparent white */
-    background: rgba(255, 255, 255, 0.65);
+    /* Dark semi-transparent background */
+    background: rgba(20, 20, 20, 0.9);
     /* High Blur for depth */
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     /* Solid 1px border for definition */
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(57, 255, 20, 0.3);
     border-radius: 24px;
     /* Soft but deep shadow */
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
     overflow-y: auto;
     overflow-x: hidden;
     transform: scale(0.95);
@@ -4120,12 +4121,12 @@ body {
     position: absolute;
     top: 20px;
     right: 25px;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     width: 40px;
     height: 40px;
     border: none;
-    color: #333;
+    color: #FFF;
     font-size: 1.8rem;
     line-height: 1;
     cursor: pointer;
@@ -4158,24 +4159,25 @@ body {
     height: 100px;
     object-fit: contain;
     margin-bottom: 15px;
-    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.2));
 }
 
 .team-name {
     font-family: 'Russo One', sans-serif;
-    color: #1a1a1a;
+    color: #FFFFFF;
     font-size: 2.5rem;
     margin: 0;
     letter-spacing: 2px;
     text-transform: uppercase;
     background: none;
     -webkit-text-fill-color: initial;
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
 }
 
 .team-description {
     font-family: 'Rajdhani', sans-serif;
     color: #39FF14;
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 0 5px rgba(57, 255, 20, 0.4);
     font-size: 1.2rem;
     margin-top: 5px;
     font-weight: 600;
@@ -4192,9 +4194,9 @@ body {
 
 /* Member Card - The 'Cutout' Look (Contrast Fix) */
 .team-member-card {
-    /* Light Grey background to contrast with the glass modal */
-    background: #F3F4F6;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    /* Dark Grey background to contrast with the glass modal */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 30px 20px;
     display: flex;
@@ -4205,33 +4207,33 @@ body {
     position: relative;
     overflow: hidden;
     /* Soft shadow to lift it off the glass */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .team-member-card:hover {
     transform: translateY(-8px);
-    background: #FFFFFF;
-    /* Brighten to pure white on hover */
+    background: rgba(255, 255, 255, 0.08);
+    /* Slightly lighter on hover */
     box-shadow: 0 20px 40px rgba(57, 255, 20, 0.15);
-    border-color: rgba(57, 255, 20, 0.3);
+    border-color: rgba(57, 255, 20, 0.5);
 }
 
 /* Mentor Card Special Styling */
 .team-member-card.mentor-card {
     border-color: rgba(255, 215, 0, 0.3);
-    /* Slightly warmer grey/tint for mentor */
-    background: linear-gradient(135deg, #F9FAFB 0%, #FFFBE6 100%);
+    /* Dark Gold Gradient */
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(20, 20, 20, 0.8) 100%);
 }
 
 .team-member-card.mentor-card:hover {
-    border-color: rgba(255, 215, 0, 0.6);
+    border-color: rgba(255, 215, 0, 0.8);
     box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
-    background: #FFF;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(30, 30, 30, 0.9) 100%);
 }
 
 .mentor-card .highlight-text {
-    color: #d4b200 !important;
-    text-shadow: none;
+    color: #FFD700 !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
     font-weight: 800;
 }
 
@@ -4246,12 +4248,14 @@ body {
     position: relative;
     transition: all 0.3s ease;
     overflow: hidden;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+    border: 2px solid rgba(57, 255, 20, 0.3);
 }
 
 .team-member-card:hover .member-avatar {
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.4);
+    border-color: #39FF14;
 }
 
 .member-img {
@@ -4265,7 +4269,7 @@ body {
 .member-name {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #FFFFFF;
     font-size: 1.3rem;
     margin: 0 0 5px;
     letter-spacing: 0.5px;
@@ -4280,18 +4284,18 @@ body {
 }
 
 .highlight-text {
-    color: #00c008;
-    text-shadow: none;
+    color: #39FF14;
+    text-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
 }
 
 .team-member-card:hover .highlight-text {
     color: #39FF14;
-    text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+    text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
 }
 
 .member-desc {
     font-family: 'Inter', sans-serif;
-    color: #555;
+    color: #CCCCCC;
     font-size: 0.95rem;
     line-height: 1.6;
     margin: 0;
