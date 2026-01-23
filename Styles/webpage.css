@@ -2753,12 +2753,8 @@ section#offers {
 }
 
 .social-btn i {
-    color: transparent;
-    background: linear-gradient(90deg, #39FF14, #00F0FF);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-stroke: 0.6px rgba(57, 255, 20, 0.35);
-    filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.25));
+    color: #337418;
+    transition: color 0.3s ease;
 }
 
 .social-btn:hover {
