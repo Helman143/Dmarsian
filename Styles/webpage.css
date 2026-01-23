@@ -2757,6 +2757,13 @@ section#offers {
     transition: color 0.3s ease;
 }
 
+/* Enforce neon green for these specific icons globally */
+.fa-solid.fa-phone,
+.fa-solid.fa-envelope,
+.fa-brands.fa-facebook-f {
+    color: #39FF14;
+}
+
 .social-btn:hover {
     transform: translateY(-2px);
     border-color: rgba(0, 240, 255, 0.8);
