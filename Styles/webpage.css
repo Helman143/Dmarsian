@@ -4564,4 +4564,15 @@ body {
     .footer-badges {
         justify-content: center !important;
     }
+
+    /* Fix Contact Row Alignment on Mobile */
+    .footer-console-row {
+        justify-content: center;
+        /* Keep the group centered */
+    }
+
+    .footer-console-value {
+        text-align: left;
+        /* Ensure text block reads naturally next to icon */
+    }
 }
