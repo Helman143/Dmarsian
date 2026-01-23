@@ -2816,12 +2816,12 @@ section#offers {
 .footer-badge {
     height: 56px;
     width: auto;
-    filter: grayscale(1) brightness(0.95) opacity(0.75);
+    filter: brightness(0.95) opacity(0.75);
     transition: filter .2s ease, transform .2s ease;
 }
 
 .footer-badge:hover {
-    filter: grayscale(0) brightness(1) opacity(1);
+    filter: brightness(1) opacity(1);
     transform: translateY(-2px);
 }
 
