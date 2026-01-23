@@ -907,6 +907,15 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         // Mark as initialized immediately to prevent race conditions
         slider.dataset.coverflowInitialized = 'true';
         
+        // Handle Single Post Scenario
+        if (cards.length === 1) {
+            cards[0].classList.add('active');
+            cards[0].style.zIndex = '10';
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+            return;
+        }
+
         // Ensure buttons are enabled
         nextBtn.disabled = false;
         prevBtn.disabled = false;
