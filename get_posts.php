@@ -34,7 +34,20 @@ try {
     $currentYear = date('Y');
     $previousYear = $currentYear - 1;
     
-    $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND status = 'active' AND (show_in_slider = 1 OR show_in_slider IS NULL)";
+    // Check if show_in_slider column exists
+    $columnExists = false;
+    $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
+    if ($checkColumn && mysqli_num_rows($checkColumn) > 0) {
+        $columnExists = true;
+    }
+    
+    // Build base query - only filter by show_in_slider if column exists
+    if ($columnExists) {
+        $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND status = 'active' AND (show_in_slider = 1 OR show_in_slider IS NULL)";
+    } else {
+        // Column doesn't exist yet - show all active posts (restore images)
+        $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND status = 'active'";
+    }
     $params = [$currentYear, $previousYear];
     $types = "ii";
 
