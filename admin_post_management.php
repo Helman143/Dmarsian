@@ -488,6 +488,17 @@ mysqli_close($conn);
     
     // Override toggleSliderVisibility if feature is not available
     if (!SHOW_IN_SLIDER_AVAILABLE) {
+        // Remove any remove-slider-btn buttons that might exist (safety measure)
+        document.addEventListener('DOMContentLoaded', function() {
+            const removeButtons = document.querySelectorAll('.remove-slider-btn');
+            removeButtons.forEach(btn => {
+                btn.style.display = 'none';
+                btn.removeAttribute('onclick');
+                btn.onclick = null;
+            });
+        });
+        
+        // Override the function to prevent any calls
         window.toggleSliderVisibility = function() {
             alert('This feature requires a database migration.\n\nPlease visit run_migration.php to enable the "Remove from Slider" feature.');
             return Promise.resolve();
