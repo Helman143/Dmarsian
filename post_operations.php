@@ -373,7 +373,8 @@ function toggleSliderVisibility() {
             mysqli_close($conn);
             echo json_encode([
                 'success' => false, 
-                'message' => 'Database migration required. Please run migrate_add_show_in_slider.php first.'
+                'message' => 'Database migration required. Please visit run_migration.php to run the migration first.',
+                'migration_required' => true
             ]);
             return;
         }

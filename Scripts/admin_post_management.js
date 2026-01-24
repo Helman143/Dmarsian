@@ -489,7 +489,18 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
             }
         } else {
             const errorMsg = data.message || 'Failed to toggle slider visibility';
-            alert('Error: ' + errorMsg);
+            
+            // If migration is required, show helpful message with link
+            if (data.migration_required) {
+                const migrationMsg = errorMsg + '\n\nWould you like to run the migration now?';
+                if (confirm(migrationMsg)) {
+                    window.location.href = 'run_migration.php';
+                    return;
+                }
+            } else {
+                alert('Error: ' + errorMsg);
+            }
+            
             console.error('Toggle failed:', data);
             // Re-enable button on error
             button.disabled = false;

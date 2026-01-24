@@ -44,6 +44,13 @@ $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
+// Check if show_in_slider column exists (for conditional button display)
+$showInSliderColumnExists = false;
+$checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
+if ($checkColumn && mysqli_num_rows($checkColumn) > 0) {
+    $showInSliderColumnExists = true;
+}
+
 // Base query: exclude archived posts and filter by year
 // Status is ENUM('active','archived'), so it cannot be NULL - only check for 'active'
 $sql = "SELECT * FROM posts WHERE status = 'active' AND YEAR(post_date) = ?";
@@ -383,11 +390,13 @@ mysqli_close($conn);
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <?php if ($showInSliderColumnExists): ?>
                                     <button class="remove-slider-btn <?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'active' : ''; ?>" 
                                             onclick="toggleSliderVisibility(<?php echo $post['id']; ?>, <?php echo isset($post['show_in_slider']) ? (int)$post['show_in_slider'] : 1; ?>)"
                                             title="<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'Show in Slider' : 'Remove from Slider'; ?>">
                                         <i class="fas fa-<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'eye' : 'eye-slash'; ?>"></i>
                                     </button>
+                                    <?php endif; ?>
                                     <button class="archive-post-btn" onclick="archivePost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-archive"></i>
                                     </button>
