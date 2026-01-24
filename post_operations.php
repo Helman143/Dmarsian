@@ -368,8 +368,13 @@ function toggleSliderVisibility() {
         }
         
         // Check if show_in_slider column exists
+        $columnExists = false;
         $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-        if (mysqli_num_rows($checkColumn) == 0) {
+        if ($checkColumn !== false) {
+            $columnExists = mysqli_num_rows($checkColumn) > 0;
+        }
+        
+        if (!$columnExists) {
             mysqli_close($conn);
             echo json_encode([
                 'success' => false, 

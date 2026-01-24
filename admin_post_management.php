@@ -46,9 +46,15 @@ $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_
 
 // Check if show_in_slider column exists (for conditional button display)
 $showInSliderColumnExists = false;
-$checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-if ($checkColumn && mysqli_num_rows($checkColumn) > 0) {
-    $showInSliderColumnExists = true;
+try {
+    $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
+    if ($checkColumn !== false && mysqli_num_rows($checkColumn) > 0) {
+        $showInSliderColumnExists = true;
+    }
+} catch (Exception $e) {
+    // If check fails, assume column doesn't exist (safer default)
+    $showInSliderColumnExists = false;
+    error_log("Error checking show_in_slider column: " . $e->getMessage());
 }
 
 // Base query: exclude archived posts and filter by year

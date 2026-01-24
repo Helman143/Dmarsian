@@ -412,8 +412,15 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
     // Get the button for this specific post only
     const button = postCard.querySelector('.remove-slider-btn');
     if (!button) {
-        alert('Error: Remove slider button not found');
-        console.error('Button not found for post ID:', postId);
+        // Button doesn't exist - migration probably not run yet
+        alert('This feature requires a database migration. Please visit run_migration.php to enable it.');
+        console.warn('Remove slider button not found - migration may not be run yet');
+        return;
+    }
+    
+    // Additional safety check: if button is disabled or hidden, don't proceed
+    if (button.style.display === 'none' || button.disabled || button.offsetParent === null) {
+        console.warn('Button is disabled or hidden');
         return;
     }
     
