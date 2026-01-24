@@ -440,7 +440,8 @@ mysqli_close($conn);
                                     <?php if ($showInSliderColumnExists): ?>
                                     <button class="remove-slider-btn <?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'active' : ''; ?>" 
                                             onclick="toggleSliderVisibility(<?php echo $post['id']; ?>, <?php echo isset($post['show_in_slider']) ? (int)$post['show_in_slider'] : 1; ?>)"
-                                            title="<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'Show in Slider' : 'Remove from Slider'; ?>">
+                                            title="<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'Show in Slider' : 'Remove from Slider'; ?>"
+                                            data-post-id="<?php echo $post['id']; ?>">
                                         <i class="fas fa-<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'eye' : 'eye-slash'; ?>"></i>
                                     </button>
                                     <?php endif; ?>
@@ -545,11 +546,13 @@ mysqli_close($conn);
             return Promise.resolve();
         };
     } else {
-        // Feature is available - ensure buttons are visible
+        // Feature is available - ensure buttons are visible and log for debugging
         document.addEventListener('DOMContentLoaded', function() {
             const removeButtons = document.querySelectorAll('.remove-slider-btn');
+            console.log('Remove slider buttons found:', removeButtons.length);
             removeButtons.forEach(btn => {
                 btn.style.display = 'flex'; // Ensure it's visible
+                console.log('Button visible for post:', btn.getAttribute('data-post-id'));
             });
         });
     }
