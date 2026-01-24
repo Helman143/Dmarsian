@@ -80,15 +80,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                             <label for="discount">Discount</label>
                             <input type="number" id="discount" name="discount" step="0.01" value="0.00" readonly>
                         </div>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select id="status" name="status" required>
-                                <option value="">Select Status</option>
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                                <option value="Freeze">Freeze</option>
-                            </select>
-                        </div>
                     </div>
 
                     <div class="form-actions">
