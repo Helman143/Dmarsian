@@ -171,6 +171,7 @@ try {
     <div class="container">
         <div class="card">
             <h1 class="mb-4">Database Migration: Add show_in_slider Column</h1>
+            <p class="text-muted mb-3"><small>If you're accessing this page, the file is working correctly. The migration will add the <code>show_in_slider</code> column to enable the "Remove from Slider" feature.</small></p>
             
             <div class="mb-4">
                 <h3>Current Status: 
@@ -196,7 +197,7 @@ try {
                 </div>
             <?php endif; ?>
             
-            <?php if (!$columnExists): ?>
+            <?php if (!$columnExists || isset($_GET['force'])): ?>
                 <div class="alert alert-info">
                     <strong>Migration Required</strong><br>
                     The <code>show_in_slider</code> column does not exist in the <code>posts</code> table.
