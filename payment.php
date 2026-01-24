@@ -81,6 +81,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         </div>
                     </div>
 
+                    <!-- Hidden status field that auto-populates from student data -->
+                    <input type="hidden" id="status" name="status" value="">
+
                     <div class="form-actions">
                         <button type="submit" class="btn-save">
                             <i class="fas fa-save"></i> SAVE

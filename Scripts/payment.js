@@ -212,6 +212,7 @@ function handlePaymentSubmit(event) {
             event.target.reset();
             document.getElementById('amount_paid').value = '0.00';
             document.getElementById('discount').value = '0.00';
+            document.getElementById('status').value = '';
             
             // Broadcast payment update event for cross-page communication
             try {
@@ -326,12 +327,13 @@ function populateDiscountTables(students, searchNonDiscount, searchDiscount) {
     }
 }
 
-// Auto-fill discount when STD No. or Full Name is entered
+// Auto-fill discount and status when STD No. or Full Name is entered
 function fetchStudentDiscount() {
     let jejaNo = document.getElementById('jeja_no').value.trim();
     if (!jejaNo) {
         document.getElementById('discount').value = '0.00';
         document.getElementById('full_name').value = '';
+        document.getElementById('status').value = '';
         return;
     }
     // Prepend STD- and pad to 5 digits if not present
@@ -348,10 +350,24 @@ function fetchStudentDiscount() {
                     if (document.getElementById('full_name')) {
                         document.getElementById('full_name').value = student.full_name;
                     }
+                    // Auto-populate status from student's current status
+                    if (document.getElementById('status')) {
+                        let status = (student.status || '').trim();
+                        const statusLower = status.toLowerCase();
+                        if (statusLower === 'active' || statusLower === 'inactive' || statusLower === 'freeze') {
+                            status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                            document.getElementById('status').value = status;
+                        } else {
+                            document.getElementById('status').value = '';
+                        }
+                    }
                 } else {
                     document.getElementById('discount').value = '0.00';
                     if (document.getElementById('full_name')) {
                         document.getElementById('full_name').value = '';
+                    }
+                    if (document.getElementById('status')) {
+                        document.getElementById('status').value = '';
                     }
                 }
             }
