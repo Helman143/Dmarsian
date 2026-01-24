@@ -34,7 +34,7 @@ try {
     $currentYear = date('Y');
     $previousYear = $currentYear - 1;
     
-    $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND status = 'active'";
+    $sql = "SELECT * FROM posts WHERE (YEAR(post_date) = ? OR YEAR(post_date) = ?) AND status = 'active' AND (show_in_slider = 1 OR show_in_slider IS NULL)";
     $params = [$currentYear, $previousYear];
     $types = "ii";
 

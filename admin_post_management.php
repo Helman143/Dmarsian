@@ -383,6 +383,11 @@ mysqli_close($conn);
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button class="remove-slider-btn <?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'active' : ''; ?>" 
+                                            onclick="toggleSliderVisibility(<?php echo $post['id']; ?>, <?php echo isset($post['show_in_slider']) ? (int)$post['show_in_slider'] : 1; ?>)"
+                                            title="<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'Show in Slider' : 'Remove from Slider'; ?>">
+                                        <i class="fas fa-<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'eye' : 'eye-slash'; ?>"></i>
+                                    </button>
                                     <button class="archive-post-btn" onclick="archivePost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-archive"></i>
                                     </button>

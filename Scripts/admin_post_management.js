@@ -390,6 +390,69 @@ async function archivePost(postId) {
     }
 }
 
+async function toggleSliderVisibility(postId, currentShowInSlider) {
+    const actionText = currentShowInSlider == 0 ? 'show in slider' : 'remove from slider';
+    if (!confirm(`Are you sure you want to ${actionText} this post?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('post_operations.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=toggle_slider_visibility&id=${postId}`
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update button state immediately
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postCard) {
+                const button = postCard.querySelector('.remove-slider-btn');
+                const icon = button ? button.querySelector('i') : null;
+                
+                if (button && icon) {
+                    const newValue = data.show_in_slider;
+                    
+                    // Update button class
+                    if (newValue == 0) {
+                        button.classList.add('active');
+                        button.title = 'Show in Slider';
+                        icon.className = 'fas fa-eye';
+                    } else {
+                        button.classList.remove('active');
+                        button.title = 'Remove from Slider';
+                        icon.className = 'fas fa-eye-slash';
+                    }
+                }
+            }
+            
+            // Show success message
+            alert(data.message);
+            
+            // Broadcast update for real-time slider refresh
+            if (typeof BroadcastChannel !== 'undefined') {
+                const postUpdateChannel = new BroadcastChannel('post-updates');
+                postUpdateChannel.postMessage({
+                    type: 'post-slider-toggled',
+                    category: data.category,
+                    postId: data.post_id,
+                    showInSlider: data.show_in_slider
+                });
+                postUpdateChannel.close();
+            }
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error toggling slider visibility:', error);
+        alert('Error toggling slider visibility');
+    }
+}
+
 async function archiveCurrentPost() {
     if (!currentPostId) {
         alert('No post selected to archive');

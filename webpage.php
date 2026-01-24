@@ -1163,6 +1163,21 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                     refreshSlider('achievements-slider', category);
                     refreshSlider('events-slider', category);
                 }
+            } else if (type === 'post-slider-toggled') {
+                // Refresh sliders when post visibility is toggled
+                // If post was hidden (showInSlider = 0), it should be removed from sliders
+                // If post was shown (showInSlider = 1), it should be added to sliders
+                if (category === 'achievement' || category === 'achievement_event') {
+                    refreshSlider('achievements-slider', category);
+                }
+                if (category === 'event' || category === 'achievement_event') {
+                    refreshSlider('events-slider', category);
+                }
+                // If achievement_event, refresh both
+                if (category === 'achievement_event') {
+                    refreshSlider('achievements-slider', category);
+                    refreshSlider('events-slider', category);
+                }
             } else if (category === 'achievement') {
                 // Refresh achievements slider only
                 refreshSlider('achievements-slider', category);

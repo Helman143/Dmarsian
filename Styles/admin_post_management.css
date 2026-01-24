@@ -473,6 +473,35 @@ nav a,
     color: #fff;
 }
 
+.remove-slider-btn {
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    color: #fff;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.remove-slider-btn:hover {
+    background: #ffa500;
+    color: #000;
+}
+
+.remove-slider-btn.active {
+    background: rgba(255, 165, 0, 0.8);
+    color: #000;
+}
+
+.remove-slider-btn.active:hover {
+    background: #ffa500;
+    color: #000;
+}
+
 .no-posts {
     text-align: center;
     padding: 60px 20px;
@@ -886,7 +915,8 @@ nav a,
 }
 
 .edit-post-btn,
-.archive-post-btn {
+.archive-post-btn,
+.remove-slider-btn {
     width: clamp(32px, 4vw, 36px);
     height: clamp(32px, 4vw, 36px);
 }

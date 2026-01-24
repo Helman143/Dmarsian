@@ -34,6 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'delete':
             deletePost();
             break;
+        case 'toggle_slider_visibility':
+            toggleSliderVisibility();
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
@@ -92,8 +95,8 @@ function createPost() {
     // Use empty string for image_path if no image was uploaded (database will store as NULL if column allows)
     $image_path_value = $image_path !== null ? $image_path : '';
     
-    $sql = "INSERT INTO posts (title, description, image_path, category, post_date, status) 
-            VALUES (?, ?, ?, ?, ?, 'active')";
+    $sql = "INSERT INTO posts (title, description, image_path, category, post_date, status, show_in_slider) 
+            VALUES (?, ?, ?, ?, ?, 'active', 1)";
     
     $stmt = mysqli_prepare($conn, $sql);
     mysqli_stmt_bind_param($stmt, "sssss", $title, $description, $image_path_value, $category, $post_date);
@@ -345,6 +348,79 @@ function archivePost() {
         mysqli_stmt_close($stmt);
         mysqli_close($conn);
         echo json_encode(['success' => false, 'message' => 'Error archiving post: ' . $error]);
+    }
+}
+
+function toggleSliderVisibility() {
+    $conn = connectDB();
+    
+    $id = (int)$_POST['id'];
+    
+    // First, verify the post exists and get current show_in_slider value and category
+    $check_sql = "SELECT id, show_in_slider, category FROM posts WHERE id = ?";
+    $check_stmt = mysqli_prepare($conn, $check_sql);
+    mysqli_stmt_bind_param($check_stmt, "i", $id);
+    mysqli_stmt_execute($check_stmt);
+    $check_result = mysqli_stmt_get_result($check_stmt);
+    $post = mysqli_fetch_assoc($check_result);
+    mysqli_stmt_close($check_stmt);
+    
+    if (!$post) {
+        mysqli_close($conn);
+        echo json_encode(['success' => false, 'message' => 'Post not found']);
+        return;
+    }
+    
+    // Get current value (default to 1 if column doesn't exist yet or is NULL)
+    $current_value = isset($post['show_in_slider']) ? (int)$post['show_in_slider'] : 1;
+    $category = $post['category'];
+    
+    // Toggle the value (1 ↔ 0)
+    $new_value = $current_value == 1 ? 0 : 1;
+    
+    // Update the post
+    $sql = "UPDATE posts SET show_in_slider = ? WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "ii", $new_value, $id);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $affected_rows = mysqli_stmt_affected_rows($stmt);
+        
+        if ($affected_rows > 0) {
+            // Log activity
+            $admin_account = getAdminAccountName($conn);
+            $action_type = 'Post Slider Toggle';
+            $student_id = '';
+            $action_text = $new_value == 0 ? 'Removed from slider' : 'Added to slider';
+            $details = $action_text . ' - Post ID: ' . $id;
+            $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
+            $log_stmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
+            $log_stmt->execute();
+            $log_stmt->close();
+            
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
+            
+            echo json_encode([
+                'success' => true, 
+                'message' => $new_value == 0 ? 'Post removed from slider' : 'Post added to slider',
+                'category' => $category,
+                'post_id' => $id,
+                'show_in_slider' => $new_value
+            ]);
+        } else {
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Failed to toggle slider visibility. Please try again.'
+            ]);
+        }
+    } else {
+        $error = mysqli_error($conn);
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+        echo json_encode(['success' => false, 'message' => 'Error toggling slider visibility: ' . $error]);
     }
 }
 
