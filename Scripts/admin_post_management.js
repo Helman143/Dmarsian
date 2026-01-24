@@ -391,12 +391,45 @@ async function archivePost(postId) {
 }
 
 async function toggleSliderVisibility(postId, currentShowInSlider) {
-    const actionText = currentShowInSlider == 0 ? 'show in slider' : 'remove from slider';
-    if (!confirm(`Are you sure you want to ${actionText} this post?`)) {
+    // Validate postId - ensure it's a valid number
+    postId = parseInt(postId);
+    currentShowInSlider = parseInt(currentShowInSlider);
+    
+    if (!postId || isNaN(postId) || postId <= 0) {
+        alert('Error: Invalid post ID');
+        console.error('Invalid postId:', postId);
+        return;
+    }
+    
+    // Find the specific post card - ensure we're targeting only this post
+    const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+    if (!postCard) {
+        alert('Error: Post not found in DOM');
+        console.error('Post card not found for ID:', postId);
+        return;
+    }
+    
+    // Get the button for this specific post only
+    const button = postCard.querySelector('.remove-slider-btn');
+    if (!button) {
+        alert('Error: Remove slider button not found');
+        console.error('Button not found for post ID:', postId);
+        return;
+    }
+    
+    const actionText = currentShowInSlider === 0 ? 'show in slider' : 'remove from slider';
+    const confirmMessage = `Are you sure you want to ${actionText} this post?\n\nThis will ${currentShowInSlider === 0 ? 'restore' : 'hide'} the post from Achievement and Event sliders on the homepage.\n\nThe post will remain visible in the archive and admin panel.`;
+    if (!confirm(confirmMessage)) {
         return;
     }
     
     try {
+        // Show loading state - disable only this specific button
+        button.disabled = true;
+        button.style.opacity = '0.6';
+        button.style.cursor = 'not-allowed';
+        
+        // Make the API call with the specific post ID
         const response = await fetch('post_operations.php', {
             method: 'POST',
             headers: {
@@ -405,51 +438,71 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
             body: `action=toggle_slider_visibility&id=${postId}`
         });
         
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
-        if (data.success) {
-            // Update button state immediately
-            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
-            if (postCard) {
-                const button = postCard.querySelector('.remove-slider-btn');
-                const icon = button ? button.querySelector('i') : null;
-                
-                if (button && icon) {
-                    const newValue = data.show_in_slider;
-                    
-                    // Update button class
-                    if (newValue == 0) {
-                        button.classList.add('active');
-                        button.title = 'Show in Slider';
-                        icon.className = 'fas fa-eye';
-                    } else {
-                        button.classList.remove('active');
-                        button.title = 'Remove from Slider';
-                        icon.className = 'fas fa-eye-slash';
-                    }
+        if (data.success && parseInt(data.post_id) === postId) {
+            // Verify we got the correct post back
+            const newValue = parseInt(data.show_in_slider);
+            const icon = button.querySelector('i');
+            
+            if (icon) {
+                // Update button state - only for this specific post
+                if (newValue === 0) {
+                    button.classList.add('active');
+                    button.title = 'Show in Slider';
+                    button.setAttribute('onclick', `toggleSliderVisibility(${postId}, 0)`);
+                    icon.className = 'fas fa-eye';
+                } else {
+                    button.classList.remove('active');
+                    button.title = 'Remove from Slider';
+                    button.setAttribute('onclick', `toggleSliderVisibility(${postId}, 1)`);
+                    icon.className = 'fas fa-eye-slash';
                 }
             }
             
-            // Show success message
-            alert(data.message);
+            // Re-enable button
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
             
-            // Broadcast update for real-time slider refresh
+            // Show success message
+            const statusMessage = newValue === 0 
+                ? 'Post removed from Achievement and Event sliders. It will remain visible in the archive and admin panel.'
+                : 'Post added to Achievement and Event sliders.';
+            alert(statusMessage);
+            
+            // Broadcast update for real-time slider refresh on webpage.php
+            // This only affects sliders, not archive or admin panel
             if (typeof BroadcastChannel !== 'undefined') {
                 const postUpdateChannel = new BroadcastChannel('post-updates');
                 postUpdateChannel.postMessage({
                     type: 'post-slider-toggled',
                     category: data.category,
-                    postId: data.post_id,
-                    showInSlider: data.show_in_slider
+                    postId: postId,
+                    showInSlider: newValue
                 });
                 postUpdateChannel.close();
             }
         } else {
-            alert('Error: ' + data.message);
+            const errorMsg = data.message || 'Failed to toggle slider visibility';
+            alert('Error: ' + errorMsg);
+            console.error('Toggle failed:', data);
+            // Re-enable button on error
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.style.cursor = 'pointer';
         }
     } catch (error) {
-        console.error('Error toggling slider visibility:', error);
-        alert('Error toggling slider visibility');
+        console.error('Error toggling slider visibility for post', postId, ':', error);
+        alert('Error toggling slider visibility: ' + error.message);
+        // Re-enable button on error
+        button.disabled = false;
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
     }
 }
 
