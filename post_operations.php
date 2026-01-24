@@ -352,123 +352,166 @@ function archivePost() {
 }
 
 function toggleSliderVisibility() {
-    $conn = connectDB();
-    
-    $id = (int)$_POST['id'];
-    
-    // First, verify the post exists and get current show_in_slider value and category
-    $check_sql = "SELECT id, show_in_slider, category FROM posts WHERE id = ?";
-    $check_stmt = mysqli_prepare($conn, $check_sql);
-    mysqli_stmt_bind_param($check_stmt, "i", $id);
-    mysqli_stmt_execute($check_stmt);
-    $check_result = mysqli_stmt_get_result($check_stmt);
-    $post = mysqli_fetch_assoc($check_result);
-    mysqli_stmt_close($check_stmt);
-    
-    if (!$post) {
-        mysqli_close($conn);
-        echo json_encode(['success' => false, 'message' => 'Post not found']);
-        return;
-    }
-    
-    // Get current value (default to 1 if column doesn't exist yet or is NULL)
-    $current_value = isset($post['show_in_slider']) ? (int)$post['show_in_slider'] : 1;
-    $category = $post['category'];
-    
-    // Toggle the value (1 ↔ 0)
-    $new_value = $current_value == 1 ? 0 : 1;
-    
-    // Update ONLY the specific post by ID - ensure we're targeting exactly one post
-    $sql = "UPDATE posts SET show_in_slider = ? WHERE id = ? AND status = 'active'";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "ii", $new_value, $id);
-    
-    if (mysqli_stmt_execute($stmt)) {
-        $affected_rows = mysqli_stmt_affected_rows($stmt);
+    try {
+        $conn = connectDB();
         
-        if ($affected_rows === 1) {
-            // Verify only one row was affected - double check by querying the updated post
-            $verify_sql = "SELECT id, show_in_slider, category FROM posts WHERE id = ?";
-            $verify_stmt = mysqli_prepare($conn, $verify_sql);
-            mysqli_stmt_bind_param($verify_stmt, "i", $id);
-            mysqli_stmt_execute($verify_stmt);
-            $verify_result = mysqli_stmt_get_result($verify_stmt);
-            $updated_post = mysqli_fetch_assoc($verify_result);
-            mysqli_stmt_close($verify_stmt);
-            
-            if ($updated_post && (int)$updated_post['show_in_slider'] === $new_value) {
-                // Log activity
-                $admin_account = getAdminAccountName($conn);
-                $action_type = 'Post Slider Toggle';
-                $student_id = '';
-                $action_text = $new_value == 0 ? 'Removed from slider' : 'Added to slider';
-                $details = $action_text . ' - Post ID: ' . $id . ' (Category: ' . $category . ')';
-                $log_stmt = $conn->prepare("INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
-                $log_stmt->bind_param('ssss', $action_type, $admin_account, $student_id, $details);
-                $log_stmt->execute();
-                $log_stmt->close();
-                
-                mysqli_stmt_close($stmt);
-                mysqli_close($conn);
-                
-                echo json_encode([
-                    'success' => true, 
-                    'message' => $new_value == 0 ? 'Post removed from slider successfully' : 'Post added to slider successfully',
-                    'category' => $category,
-                    'post_id' => $id,
-                    'show_in_slider' => $new_value
-                ]);
-            } else {
-                // Verification failed
-                mysqli_stmt_close($stmt);
-                mysqli_close($conn);
-                error_log("Slider toggle verification failed: Post ID {$id} show_in_slider is '{$updated_post['show_in_slider']}' instead of '{$new_value}'");
-                echo json_encode([
-                    'success' => false, 
-                    'message' => 'Failed to verify slider visibility change. Please refresh and try again.'
-                ]);
-            }
-        } elseif ($affected_rows === 0) {
-            // No rows affected - post might not exist or already has the target value
-            mysqli_stmt_close($stmt);
-            
-            // Check if post exists
-            $check_exists = mysqli_prepare($conn, "SELECT id, status FROM posts WHERE id = ?");
-            mysqli_stmt_bind_param($check_exists, "i", $id);
-            mysqli_stmt_execute($check_exists);
-            $exists_result = mysqli_stmt_get_result($check_exists);
-            $exists_post = mysqli_fetch_assoc($exists_result);
-            mysqli_stmt_close($check_exists);
-            
+        if (!$conn) {
+            throw new Exception('Database connection failed');
+        }
+        
+        $id = (int)$_POST['id'];
+        
+        if ($id <= 0) {
             mysqli_close($conn);
+            echo json_encode(['success' => false, 'message' => 'Invalid post ID']);
+            return;
+        }
+        
+        // Check if show_in_slider column exists
+        $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
+        if (mysqli_num_rows($checkColumn) == 0) {
+            mysqli_close($conn);
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Database migration required. Please run migrate_add_show_in_slider.php first.'
+            ]);
+            return;
+        }
+        
+        // First, verify the post exists and get current show_in_slider value and category
+        $check_sql = "SELECT id, show_in_slider, category, status FROM posts WHERE id = ?";
+        $check_stmt = mysqli_prepare($conn, $check_sql);
+        if (!$check_stmt) {
+            mysqli_close($conn);
+            echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($conn)]);
+            return;
+        }
+        
+        mysqli_stmt_bind_param($check_stmt, "i", $id);
+        mysqli_stmt_execute($check_stmt);
+        $check_result = mysqli_stmt_get_result($check_stmt);
+        $post = mysqli_fetch_assoc($check_result);
+        mysqli_stmt_close($check_stmt);
+        
+        if (!$post) {
+            mysqli_close($conn);
+            echo json_encode(['success' => false, 'message' => 'Post not found']);
+            return;
+        }
+        
+        // Get current value (default to 1 if column doesn't exist yet or is NULL)
+        $current_value = isset($post['show_in_slider']) && $post['show_in_slider'] !== null ? (int)$post['show_in_slider'] : 1;
+        $category = $post['category'];
+        
+        // Toggle the value (1 ↔ 0)
+        $new_value = $current_value == 1 ? 0 : 1;
+        
+        // Update ONLY the specific post by ID - ensure we're targeting exactly one post
+        $sql = "UPDATE posts SET show_in_slider = ? WHERE id = ? AND status = 'active'";
+        $stmt = mysqli_prepare($conn, $sql);
+        if (!$stmt) {
+            mysqli_close($conn);
+            echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($conn)]);
+            return;
+        }
+        
+        mysqli_stmt_bind_param($stmt, "ii", $new_value, $id);
+        
+        if (mysqli_stmt_execute($stmt)) {
+            $affected_rows = mysqli_stmt_affected_rows($stmt);
             
-            if (!$exists_post) {
-                echo json_encode(['success' => false, 'message' => 'Post not found']);
-            } elseif ($exists_post['status'] !== 'active') {
-                echo json_encode(['success' => false, 'message' => 'Cannot toggle slider visibility for archived posts']);
+            if ($affected_rows === 1) {
+                // Verify only one row was affected - double check by querying the updated post
+                $verify_sql = "SELECT id, show_in_slider, category FROM posts WHERE id = ?";
+                $verify_stmt = mysqli_prepare($conn, $verify_sql);
+                mysqli_stmt_bind_param($verify_stmt, "i", $id);
+                mysqli_stmt_execute($verify_stmt);
+                $verify_result = mysqli_stmt_get_result($verify_stmt);
+                $updated_post = mysqli_fetch_assoc($verify_result);
+                mysqli_stmt_close($verify_stmt);
+                
+                if ($updated_post && (int)$updated_post['show_in_slider'] === $new_value) {
+                    // Log activity using mysqli_prepare (not $conn->prepare which is PDO)
+                    $admin_account = getAdminAccountName($conn);
+                    $action_type = 'Post Slider Toggle';
+                    $student_id = '';
+                    $action_text = $new_value == 0 ? 'Removed from slider' : 'Added to slider';
+                    $details = $action_text . ' - Post ID: ' . $id . ' (Category: ' . $category . ')';
+                    $log_stmt = mysqli_prepare($conn, "INSERT INTO activity_log (action_type, datetime, admin_account, student_id, details) VALUES (?, NOW(), ?, ?, ?)");
+                    if ($log_stmt) {
+                        mysqli_stmt_bind_param($log_stmt, 'ssss', $action_type, $admin_account, $student_id, $details);
+                        mysqli_stmt_execute($log_stmt);
+                        mysqli_stmt_close($log_stmt);
+                    }
+                    
+                    mysqli_stmt_close($stmt);
+                    mysqli_close($conn);
+                    
+                    echo json_encode([
+                        'success' => true, 
+                        'message' => $new_value == 0 ? 'Post removed from slider successfully' : 'Post added to slider successfully',
+                        'category' => $category,
+                        'post_id' => $id,
+                        'show_in_slider' => $new_value
+                    ]);
+                } else {
+                    // Verification failed
+                    mysqli_stmt_close($stmt);
+                    mysqli_close($conn);
+                    error_log("Slider toggle verification failed: Post ID {$id} show_in_slider is '{$updated_post['show_in_slider']}' instead of '{$new_value}'");
+                    echo json_encode([
+                        'success' => false, 
+                        'message' => 'Failed to verify slider visibility change. Please refresh and try again.'
+                    ]);
+                }
+            } elseif ($affected_rows === 0) {
+                // No rows affected - post might not exist or already has the target value
+                mysqli_stmt_close($stmt);
+                
+                // Check if post exists
+                $check_exists = mysqli_prepare($conn, "SELECT id, status FROM posts WHERE id = ?");
+                mysqli_stmt_bind_param($check_exists, "i", $id);
+                mysqli_stmt_execute($check_exists);
+                $exists_result = mysqli_stmt_get_result($check_exists);
+                $exists_post = mysqli_fetch_assoc($exists_result);
+                mysqli_stmt_close($check_exists);
+                
+                mysqli_close($conn);
+                
+                if (!$exists_post) {
+                    echo json_encode(['success' => false, 'message' => 'Post not found']);
+                } elseif ($exists_post['status'] !== 'active') {
+                    echo json_encode(['success' => false, 'message' => 'Cannot toggle slider visibility for archived posts']);
+                } else {
+                    // Post exists and is active, but value might already be set
+                    echo json_encode([
+                        'success' => false, 
+                        'message' => 'No changes made. The post may already have this slider visibility setting.'
+                    ]);
+                }
             } else {
-                // Post exists and is active, but value might already be set
+                // More than one row affected - this should never happen with WHERE id = ?
+                mysqli_stmt_close($stmt);
+                mysqli_close($conn);
+                error_log("CRITICAL: Multiple rows affected when toggling slider visibility for post ID {$id}");
                 echo json_encode([
                     'success' => false, 
-                    'message' => 'No changes made. The post may already have this slider visibility setting.'
+                    'message' => 'Error: Multiple posts were affected. Please contact support.'
                 ]);
             }
         } else {
-            // More than one row affected - this should never happen with WHERE id = ?
+            $error = mysqli_error($conn);
             mysqli_stmt_close($stmt);
             mysqli_close($conn);
-            error_log("CRITICAL: Multiple rows affected when toggling slider visibility for post ID {$id}");
-            echo json_encode([
-                'success' => false, 
-                'message' => 'Error: Multiple posts were affected. Please contact support.'
-            ]);
+            error_log("Database error toggling slider visibility for post ID {$id}: {$error}");
+            echo json_encode(['success' => false, 'message' => 'Error toggling slider visibility: ' . $error]);
         }
-    } else {
-        $error = mysqli_error($conn);
-        mysqli_stmt_close($stmt);
-        mysqli_close($conn);
-        error_log("Database error toggling slider visibility for post ID {$id}: {$error}");
-        echo json_encode(['success' => false, 'message' => 'Error toggling slider visibility: ' . $error]);
+    } catch (Exception $e) {
+        if (isset($conn)) {
+            mysqli_close($conn);
+        }
+        error_log("Exception in toggleSliderVisibility: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
 
