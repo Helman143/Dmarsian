@@ -111,59 +111,8 @@ function fetchDashboardStats() {
                     });
                 }
             }
-            // Update Active vs. Inactive Students chart
-            const active = Number(data.activePayments) || 0;
-            const inactive = Number(data.inactivePayments) || 0;
-            const chartActive = (active === 0 && inactive === 0) ? 0.0001 : active;
-            const chartInactive = (active === 0 && inactive === 0) ? 0.0001 : inactive;
-            const activeInactiveCanvas = document.getElementById('activeInactiveChart');
-            if (activeInactiveCanvas && window.Chart) {
-                const ctx = activeInactiveCanvas.getContext('2d');
-                if (
-                    window.activeInactiveChart &&
-                    window.activeInactiveChart.data &&
-                    window.activeInactiveChart.data.datasets &&
-                    window.activeInactiveChart.data.datasets[0]
-                ) {
-                    window.activeInactiveChart.data.datasets[0].data = [chartActive, chartInactive];
-                    window.activeInactiveChart.update();
-                } else {
-                    window.activeInactiveChart = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Active', 'Inactive'],
-                            datasets: [{
-                                data: [chartActive, chartInactive],
-                                backgroundColor: ['#00ff6a', 'rgba(255,255,255,0.2)'],
-                                borderColor: ['#00ff6a', 'rgba(255,255,255,0.4)'],
-                                borderWidth: 2,
-                                hoverOffset: 8
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: '60%',
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                    labels: {
-                                        color: '#fff',
-                                        padding: 10,
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return context.label + ': ' + context.raw + ' students';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            }
+            // Update Active vs. Inactive Students chart (use dedicated function for accurate student status counts)
+            fetchAndRenderActiveInactiveChart();
         }
     })
     .catch(error => {
@@ -704,8 +653,12 @@ function fetchAndRenderActiveInactiveChart() {
         .then(counts => {
             const active = counts.active || 0;
             const inactive = counts.inactive || 0;
-            const chartActive = (active === 0 && inactive === 0) ? 0.0001 : active;
-            const chartInactive = (active === 0 && inactive === 0) ? 0.0001 : inactive;
+            const freeze = counts.freeze || 0;
+            // Ensure at least one value is non-zero for chart rendering
+            const total = active + inactive + freeze;
+            const chartActive = (total === 0) ? 0.0001 : active;
+            const chartInactive = (total === 0) ? 0.0001 : inactive;
+            const chartFreeze = (total === 0) ? 0.0001 : freeze;
             const activeInactiveCanvas = document.getElementById('activeInactiveChart');
             if (activeInactiveCanvas && window.Chart) {
                 const ctx = activeInactiveCanvas.getContext('2d');
@@ -716,11 +669,11 @@ function fetchAndRenderActiveInactiveChart() {
                 window.activeInactiveChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Active', 'Inactive'],
+                        labels: ['Active', 'Inactive', 'Freeze'],
                         datasets: [{
-                            data: [chartActive, chartInactive],
-                            backgroundColor: ['#00ff6a', 'rgba(255,255,255,0.2)'],
-                            borderColor: ['#00ff6a', 'rgba(255,255,255,0.4)'],
+                            data: [chartActive, chartInactive, chartFreeze],
+                            backgroundColor: ['#00ff6a', '#ff0000', '#87CEEB'],
+                            borderColor: ['#00ff6a', '#ff0000', '#87CEEB'],
                             borderWidth: 2,
                             hoverOffset: 8
                         }]
@@ -740,7 +693,8 @@ function fetchAndRenderActiveInactiveChart() {
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return context.label + ': ' + context.raw + ' students';
+                                        const value = context.raw === 0.0001 ? 0 : context.raw;
+                                        return context.label + ': ' + value + ' students';
                                     }
                                 }
                             }
@@ -824,6 +778,9 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchAndRenderPaymentsChart();
             fetchAndPopulateDues();
             fetchAndRenderActiveInactiveChart();
+        } else if (event.key === 'student-status-update-trigger') {
+            console.log('Student status update received via localStorage, refreshing chart...');
+            fetchAndRenderActiveInactiveChart();
         }
     });
     
@@ -836,6 +793,24 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchDashboardStats();
         fetchAndRenderPaymentsChart();
         fetchAndPopulateDues();
+        fetchAndRenderActiveInactiveChart();
+    });
+    
+    // Listen for student status updates from other pages/tabs
+    // Method 1: BroadcastChannel (modern browsers)
+    if (typeof BroadcastChannel !== 'undefined') {
+        const studentStatusChannel = new BroadcastChannel('student-status-updates');
+        studentStatusChannel.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'student-status-updated') {
+                console.log('Student status update received via BroadcastChannel, refreshing chart...');
+                fetchAndRenderActiveInactiveChart();
+            }
+        });
+    }
+    
+    // Method 3: Custom event (for same-tab updates)
+    window.addEventListener('student-status-updated', (event) => {
+        console.log('Student status update received via custom event, refreshing chart...');
         fetchAndRenderActiveInactiveChart();
     });
     
@@ -875,14 +850,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.studentOverviewChart.data.datasets[0].data = [data.todayEnrollees, data.weeklyEnrollees];
                         window.studentOverviewChart.update();
                     }
-                    if (window.activeInactiveChart) {
-                        const active = Number(data.activePayments) || 0;
-                        const inactive = Number(data.inactivePayments) || 0;
-                        const chartActive = (active === 0 && inactive === 0) ? 0.0001 : active;
-                        const chartInactive = (active === 0 && inactive === 0) ? 0.0001 : inactive;
-                        window.activeInactiveChart.data.datasets[0].data = [chartActive, chartInactive];
-                        window.activeInactiveChart.update();
-                    }
+                    // Update Active vs. Inactive Students chart (use dedicated function for accurate student status counts)
+                    fetchAndRenderActiveInactiveChart();
                 }
             })
             .catch(error => {
