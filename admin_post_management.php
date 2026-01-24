@@ -158,6 +158,25 @@ mysqli_close($conn);
                 <h1>POST MANAGEMENT</h1>
                 <button class="add-post-btn" onclick="openModal()"><i class="fas fa-edit"></i></button>
             </div>
+            
+            <?php if (!$showInSliderColumnExists): ?>
+            <div class="migration-notice" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin: 20px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <strong style="color: #856404; display: block; margin-bottom: 5px;">
+                        <i class="fas fa-info-circle"></i> Database Migration Required
+                    </strong>
+                    <p style="color: #856404; margin: 0; font-size: 14px;">
+                        To enable the "Remove from Slider" feature, you need to run the database migration first.
+                    </p>
+                </div>
+                <a href="run_migration.php" style="background: #ffc107; color: #000; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; white-space: nowrap; transition: background 0.3s;" 
+                   onmouseover="this.style.background='#ffb300'" 
+                   onmouseout="this.style.background='#ffc107'">
+                    <i class="fas fa-database"></i> Run Migration
+                </a>
+            </div>
+            <?php endif; ?>
+            
             <div class="filters">
                 <div class="filter-dropdown">
                     <select id="year-filter" onchange="filterPosts()">
