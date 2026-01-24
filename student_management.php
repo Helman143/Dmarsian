@@ -269,6 +269,32 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 alert(result.message);
                 loadStudents(); // Reload the students table
                 form.reset(); // Clear the form
+                
+                // Broadcast student status update events for real-time chart updates
+                // Method 1: BroadcastChannel (works across tabs/windows)
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const channel = new BroadcastChannel('student-status-updates');
+                    channel.postMessage({ type: 'student-status-updated', timestamp: Date.now() });
+                    channel.close();
+                }
+                
+                // Method 2: localStorage event (works across tabs/windows)
+                try {
+                    localStorage.setItem('student-status-update-trigger', Date.now().toString());
+                    // Remove it immediately to allow same value triggers
+                    setTimeout(() => {
+                        localStorage.removeItem('student-status-update-trigger');
+                    }, 100);
+                } catch (e) {
+                    console.warn('localStorage not available for student status updates:', e);
+                }
+                
+                // Method 3: Custom event (works in same tab)
+                if (typeof window.dispatchEvent !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('student-status-updated', {
+                        detail: { timestamp: Date.now() }
+                    }));
+                }
             } else {
                 alert('Error: ' + result.message);
             }
