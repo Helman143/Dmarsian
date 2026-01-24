@@ -391,6 +391,12 @@ async function archivePost(postId) {
 }
 
 async function toggleSliderVisibility(postId, currentShowInSlider) {
+    // Check if feature is available (set by PHP in admin_post_management.php)
+    if (typeof SHOW_IN_SLIDER_AVAILABLE !== 'undefined' && !SHOW_IN_SLIDER_AVAILABLE) {
+        alert('This feature requires a database migration.\n\nPlease visit run_migration.php to enable the "Remove from Slider" feature.');
+        return;
+    }
+    
     // Validate postId - ensure it's a valid number
     postId = parseInt(postId);
     currentShowInSlider = parseInt(currentShowInSlider);

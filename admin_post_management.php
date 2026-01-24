@@ -483,6 +483,18 @@ mysqli_close($conn);
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
+    // Global flag to indicate if show_in_slider feature is available
+    const SHOW_IN_SLIDER_AVAILABLE = <?php echo $showInSliderColumnExists ? 'true' : 'false'; ?>;
+    
+    // Override toggleSliderVisibility if feature is not available
+    if (!SHOW_IN_SLIDER_AVAILABLE) {
+        window.toggleSliderVisibility = function() {
+            alert('This feature requires a database migration.\n\nPlease visit run_migration.php to enable the "Remove from Slider" feature.');
+            return Promise.resolve();
+        };
+    }
+    </script>
+    <script>
     // Mobile-safe dropdown: avoid touch+click double-trigger
     (function(){
         const dropdown = document.querySelector('.sidebar .dropdown');
