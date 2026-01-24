@@ -47,9 +47,29 @@ $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_
 // Check if show_in_slider column exists (for conditional button display)
 $showInSliderColumnExists = false;
 try {
-    $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-    if ($checkColumn !== false && mysqli_num_rows($checkColumn) > 0) {
-        $showInSliderColumnExists = true;
+    // Use a more reliable check - query the information_schema
+    $checkSql = "SELECT COUNT(*) as col_count FROM information_schema.COLUMNS 
+                 WHERE TABLE_SCHEMA = DATABASE() 
+                 AND TABLE_NAME = 'posts' 
+                 AND COLUMN_NAME = 'show_in_slider'";
+    $checkResult = mysqli_query($conn, $checkSql);
+    if ($checkResult !== false) {
+        $checkRow = mysqli_fetch_assoc($checkResult);
+        if ($checkRow && isset($checkRow['col_count']) && (int)$checkRow['col_count'] > 0) {
+            $showInSliderColumnExists = true;
+        }
+        mysqli_free_result($checkResult);
+    }
+    
+    // Fallback to SHOW COLUMNS if information_schema doesn't work
+    if (!$showInSliderColumnExists) {
+        $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
+        if ($checkColumn !== false && mysqli_num_rows($checkColumn) > 0) {
+            $showInSliderColumnExists = true;
+        }
+        if ($checkColumn) {
+            mysqli_free_result($checkColumn);
+        }
     }
 } catch (Exception $e) {
     // If check fails, assume column doesn't exist (safer default)
@@ -175,6 +195,8 @@ mysqli_close($conn);
                     <i class="fas fa-database"></i> Run Migration
                 </a>
             </div>
+            <?php else: ?>
+            <!-- Debug: Column exists, button should be visible -->
             <?php endif; ?>
             
             <div class="filters">
@@ -522,6 +544,14 @@ mysqli_close($conn);
             alert('This feature requires a database migration.\n\nPlease visit run_migration.php to enable the "Remove from Slider" feature.');
             return Promise.resolve();
         };
+    } else {
+        // Feature is available - ensure buttons are visible
+        document.addEventListener('DOMContentLoaded', function() {
+            const removeButtons = document.querySelectorAll('.remove-slider-btn');
+            removeButtons.forEach(btn => {
+                btn.style.display = 'flex'; // Ensure it's visible
+            });
+        });
     }
     </script>
     <script>
