@@ -288,6 +288,7 @@ require_once 'config.php';
         <div class="mt-4">
             <a href="admin_dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
             <a href="test_email_config.php" class="btn btn-primary">Advanced Email Test</a>
+            <a href="diagnose_gmail_delivery.php" class="btn btn-info"><i class="fas fa-stethoscope"></i> Gmail Delivery Diagnostic</a>
         </div>
     </div>
 </body>

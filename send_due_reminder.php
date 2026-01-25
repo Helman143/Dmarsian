@@ -363,6 +363,28 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
         'text_body' => $textBody,
         'html_body' => $htmlBody
     ];
+    
+    // Add custom headers for better deliverability (SMTP2Go API format)
+    $unsubscribeEmail = (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL) ? ADMIN_BCC_EMAIL : SMTP2GO_SENDER_EMAIL;
+    $payload['custom_headers'] = [
+        [
+            'header' => 'X-Mailer',
+            'value' => "D'Marsians Taekwondo System"
+        ],
+        [
+            'header' => 'X-Priority',
+            'value' => '3' // Normal priority
+        ],
+        [
+            'header' => 'List-Unsubscribe',
+            'value' => '<mailto:' . $unsubscribeEmail . '?subject=Unsubscribe>'
+        ],
+        [
+            'header' => 'Precedence',
+            'value' => 'bulk' // Indicate this is a bulk email
+        ]
+    ];
+    ];
     if (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL) {
         $payload['bcc'] = [ADMIN_BCC_EMAIL];
     }
@@ -529,7 +551,27 @@ if ($mode === 'bulk') {
     $failedCount = 0;
     $skippedCount = 0;
     
-    foreach ($dues as $item) {
+    // Rate limiting: Send emails in batches with delays to avoid Gmail filtering
+    $batchSize = 5; // Send 5 emails at a time
+    $delayBetweenBatches = 2; // Wait 2 seconds between batches
+    $delayBetweenEmails = 0.5; // Wait 0.5 seconds between individual emails
+    
+    $totalDues = count($dues);
+    $batchNumber = 0;
+    
+    foreach ($dues as $index => $item) {
+        // Add delay between individual emails (except first one)
+        if ($index > 0) {
+            usleep($delayBetweenEmails * 1000000); // Convert seconds to microseconds
+        }
+        
+        // Add delay between batches
+        if ($index > 0 && $index % $batchSize === 0) {
+            $batchNumber++;
+            error_log("Bulk send: Completed batch {$batchNumber}, pausing {$delayBetweenBatches} seconds...");
+            sleep($delayBetweenBatches);
+        }
+        
         $result = sendReminderForStudent($conn, $item);
         $results[] = [
             'jeja_no' => $item['jeja_no'],
@@ -543,6 +585,11 @@ if ($mode === 'bulk') {
             $skippedCount++;
         } else {
             $failedCount++;
+        }
+        
+        // Log progress for large batches
+        if (($index + 1) % 10 === 0) {
+            error_log("Bulk send progress: " . ($index + 1) . "/{$totalDues} processed");
         }
     }
     
