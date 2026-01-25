@@ -486,6 +486,26 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         </div>
     </div>
 
+    <!-- OTP Verification Modal -->
+    <div class="popup-overlay" id="otpModal" style="display: none;">
+        <div class="popup-modal">
+            <h3>Verify Your Email</h3>
+            <p>We've sent a 6-digit OTP code to your email address. Please enter it below to verify your email and complete your registration.</p>
+            <div class="input-group" style="margin: 20px 0;">
+                <input type="text" id="otpInput" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" placeholder=" " required style="width: 100%; padding: 12px; font-size: 18px; text-align: center; letter-spacing: 8px;">
+                <label>Enter 6-digit OTP</label>
+            </div>
+            <div id="otpError" style="color: #ff4444; margin: 10px 0; display: none;"></div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="popup-close-btn" onclick="verifyOTP()" id="verifyOtpBtn">VERIFY</button>
+                <button class="popup-close-btn" onclick="closeOTPModal()" style="background: #666;">CANCEL</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 12px; color: #888;">
+                Didn't receive the code? <a href="#" onclick="resendOTP(); return false;" style="color: #00D01D;">Resend OTP</a>
+            </p>
+        </div>
+    </div>
+
     <!-- Post Details Modal -->
     <div class="postmodal-overlay" id="postModal" aria-hidden="true">
         <div class="postmodal-dialog" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
@@ -1290,76 +1310,211 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
         }
     });
 
+    // OTP Verification Functions
+    let pendingFormData = null;
+    let pendingEndpoint = null;
+
+    function verifyOTP() {
+        const otpInput = document.getElementById('otpInput');
+        const otp = otpInput.value.replace(/\D/g, ''); // Remove non-digits
+        const form = document.getElementById('registerForm');
+        const email = form.elements['email'].value;
+        const verifyBtn = document.getElementById('verifyOtpBtn');
+        const errorDiv = document.getElementById('otpError');
+        
+        if (otp.length !== 6) {
+            errorDiv.textContent = 'Please enter a 6-digit OTP code';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'VERIFYING...';
+        errorDiv.style.display = 'none';
+        
+        fetch('verify_registration_otp.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ 
+                email: email,
+                otp: otp
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                // Add verification token to form data
+                pendingFormData.append('verification_token', result.verification_token);
+                
+                // Submit the actual registration
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.classList.add('loading');
+                submitButton.textContent = 'SUBMITTING...';
+                
+                fetch(pendingEndpoint, {
+                    method: 'POST',
+                    body: pendingFormData
+                })
+                .then(response => response.json())
+                .then(submitResult => {
+                    submitButton.classList.remove('loading');
+                    submitButton.textContent = 'CONFIRM REGISTRATION';
+                    
+                    if (submitResult.status === 'success') {
+                        closeOTPModal();
+                        showPopup();
+                        form.reset();
+                        pendingFormData = null;
+                        pendingEndpoint = null;
+                    } else {
+                        alert('Error: ' + submitResult.message);
+                    }
+                })
+                .catch(error => {
+                    submitButton.classList.remove('loading');
+                    submitButton.textContent = 'CONFIRM REGISTRATION';
+                    alert('Error submitting form: ' + error.message);
+                });
+            } else {
+                errorDiv.textContent = result.message;
+                errorDiv.style.display = 'block';
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'VERIFY';
+            }
+        })
+        .catch(error => {
+            errorDiv.textContent = 'Error verifying OTP: ' + error.message;
+            errorDiv.style.display = 'block';
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = 'VERIFY';
+        });
+    }
+    
+    function closeOTPModal() {
+        document.getElementById('otpModal').style.display = 'none';
+        document.getElementById('otpInput').value = '';
+        document.getElementById('otpError').style.display = 'none';
+        pendingFormData = null;
+        pendingEndpoint = null;
+    }
+    
+    function resendOTP() {
+        const form = document.getElementById('registerForm');
+        const email = form.elements['email'].value;
+        
+        if (!email) {
+            alert('Please enter your email address first');
+            return;
+        }
+        
+        fetch('send_registration_otp.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ email: email })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                alert('OTP resent successfully. Please check your email.');
+            } else {
+                alert('Error: ' + result.message);
+            }
+        })
+        .catch(error => {
+            alert('Error resending OTP: ' + error.message);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('registerForm');
         if (form) {
             form.addEventListener('submit', function (e) {
                 const enrollType = form.elements['enroll_type'].value;
                 const submitButton = form.querySelector('button[type="submit"]');
+                const email = form.elements['email'].value;
                 
-                if (enrollType === 'Enroll') {
+                if (enrollType === 'Enroll' || enrollType === 'Trial Session') {
                     e.preventDefault();
                     
-                    // Add loading state to button
-                    submitButton.classList.add('loading');
-                    submitButton.textContent = 'SUBMITTING...';
+                    // Validate email
+                    if (!email || !email.includes('@')) {
+                        alert('Please enter a valid email address');
+                        return;
+                    }
                     
-                    const formData = new FormData(form);
-                    fetch('submit_enrollment_request.php', {
+                    // Store form data for later submission
+                    pendingFormData = new FormData(form);
+                    pendingEndpoint = enrollType === 'Enroll' ? 'submit_enrollment_request.php' : 'register_trial_session.php';
+                    
+                    // Send OTP first
+                    submitButton.classList.add('loading');
+                    submitButton.textContent = 'SENDING OTP...';
+                    
+                    fetch('send_registration_otp.php', {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({ email: email })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        // Check if response is OK
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok: ' + response.status);
+                        }
+                        return response.json();
+                    })
                     .then(result => {
-                        // Remove loading state
                         submitButton.classList.remove('loading');
-                        submitButton.textContent = 'SUBMIT';
+                        submitButton.textContent = 'CONFIRM REGISTRATION';
                         
-                        if (result.status === 'success') {
-                            // Show popup instead of alert
-                            showPopup();
-                            form.reset();
+                        // Log for debugging
+                        console.log('OTP send response:', result);
+                        
+                        if (result && result.status === 'success') {
+                            // Show OTP modal
+                            const otpModal = document.getElementById('otpModal');
+                            if (otpModal) {
+                                otpModal.style.display = 'flex';
+                                const otpInput = document.getElementById('otpInput');
+                                if (otpInput) {
+                                    otpInput.focus();
+                                }
+                            } else {
+                                console.error('OTP modal not found!');
+                                alert('OTP sent successfully! Please check your email. (Modal error - contact support)');
+                            }
                         } else {
-                            alert('Error: ' + result.message);
+                            const errorMsg = result && result.message ? result.message : 'Unknown error occurred';
+                            alert('Error: ' + errorMsg);
                         }
                     })
                     .catch(error => {
-                        // Remove loading state
                         submitButton.classList.remove('loading');
-                        submitButton.textContent = 'SUBMIT';
-                        alert('Error submitting form: ' + error.message);
-                    });
-                } else if (enrollType === 'Trial Session') {
-                    e.preventDefault();
-                    // Add loading state to button
-                    submitButton.classList.add('loading');
-                    submitButton.textContent = 'SUBMITTING...';
-                    const formData = new FormData(form);
-                    fetch('register_trial_session.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        // Remove loading state
-                        submitButton.classList.remove('loading');
-                        submitButton.textContent = 'SUBMIT';
-                        if (result.status === 'success') {
-                            // Show popup instead of alert
-                            showPopup();
-                            form.reset();
-                        } else {
-                            alert('Error: ' + result.message);
-                        }
-                    })
-                    .catch(error => {
-                        // Remove loading state
-                        submitButton.classList.remove('loading');
-                        submitButton.textContent = 'SUBMIT';
-                        alert('Error submitting form: ' + error.message);
+                        submitButton.textContent = 'CONFIRM REGISTRATION';
+                        console.error('OTP send error:', error);
+                        alert('Error sending OTP: ' + error.message);
                     });
                 }
                 // If no enroll type selected, let the form submit as normal
+            });
+        }
+        
+        // Auto-format OTP input
+        const otpInput = document.getElementById('otpInput');
+        if (otpInput) {
+            otpInput.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+            });
+            
+            otpInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyOTP();
+                }
             });
         }
     });

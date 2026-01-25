@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once 'config.php';
+require_once 'db_connect.php';
 
 function sendEmailViaSMTP2GO(array $payload): array {
     $ch = curl_init('https://api.smtp2go.com/v3/email/send');
@@ -19,6 +20,41 @@ function sendEmailViaSMTP2GO(array $payload): array {
 $file = 'trial_requests.json';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify OTP token if provided
+    if (isset($_POST['verification_token'])) {
+        $token = $_POST['verification_token'];
+        $email = isset($_POST['email']) ? trim(strtolower($_POST['email'])) : '';
+        
+        if ($conn && !$conn->connect_error) {
+            if ($stmt = $conn->prepare("SELECT id FROM registration_verifications WHERE verification_token = ? AND email = ? AND token_expires_at > NOW()")) {
+                $stmt->bind_param('ss', $token, $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if (!$result || $result->num_rows === 0) {
+                    echo json_encode(['status' => 'error', 'message' => 'Invalid or expired verification token. Please verify your email again.']);
+                    exit();
+                }
+                
+                // Delete used token (one-time use)
+                $stmt->close();
+                $stmt = $conn->prepare("DELETE FROM registration_verifications WHERE verification_token = ?");
+                $stmt->bind_param('s', $token);
+                $stmt->execute();
+                $stmt->close();
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Database error during token verification.']);
+                exit();
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Database connection failed.']);
+            exit();
+        }
+    } else {
+        // For backward compatibility, log warning but allow processing
+        error_log("Trial session registration submitted without OTP verification token");
+    }
+    
     // Collect form data
     $request = [
         'student_name' => $_POST['student_name'] ?? '',

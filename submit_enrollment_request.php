@@ -19,6 +19,36 @@ function sendEmailViaSMTP2GO(array $payload): array {
     return ['http_code' => $httpCode, 'body' => $response, 'error' => $curlErr];
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify OTP token if provided
+    if (isset($_POST['verification_token'])) {
+        $token = $_POST['verification_token'];
+        $email = isset($_POST['email']) ? trim(strtolower($_POST['email'])) : '';
+        
+        if ($stmt = $conn->prepare("SELECT id FROM registration_verifications WHERE verification_token = ? AND email = ? AND token_expires_at > NOW()")) {
+            $stmt->bind_param('ss', $token, $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if (!$result || $result->num_rows === 0) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid or expired verification token. Please verify your email again.']);
+                exit();
+            }
+            
+            // Delete used token (one-time use)
+            $stmt->close();
+            $stmt = $conn->prepare("DELETE FROM registration_verifications WHERE verification_token = ?");
+            $stmt->bind_param('s', $token);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Database error during token verification.']);
+            exit();
+        }
+    } else {
+        // For backward compatibility, log warning but allow processing
+        error_log("Registration submitted without OTP verification token");
+    }
+    
     $full_name = $_POST['student_name'] ?? '';
     $address = $_POST['address'] ?? '';
     $parent_name = $_POST['parent_name'] ?? ($_POST['parents_name'] ?? '');
