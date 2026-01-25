@@ -384,7 +384,6 @@ function sendReminderForStudent(mysqli $conn, array $dueItem): array {
             'value' => 'bulk' // Indicate this is a bulk email
         ]
     ];
-    ];
     if (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL) {
         $payload['bcc'] = [ADMIN_BCC_EMAIL];
     }
