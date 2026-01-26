@@ -41,6 +41,62 @@
     return false;
   }
   
+  // PREVENT BACKDROP CREATION AT SOURCE - Override Bootstrap's backdrop creation
+  if (typeof window.bootstrap !== 'undefined' && window.bootstrap.Offcanvas) {
+    const Offcanvas = window.bootstrap.Offcanvas;
+    const originalGetOrCreateInstance = Offcanvas.getOrCreateInstance;
+    
+    // Override getOrCreateInstance to prevent backdrop on desktop
+    Offcanvas.getOrCreateInstance = function(element, config) {
+      const instance = originalGetOrCreateInstance.call(this, element, config);
+      
+      if (isDesktop() && instance && instance._element && instance._element.id === 'sidebar') {
+        // Override the _getBackdrop method to return null on desktop
+        if (instance._getBackdrop) {
+          const originalGetBackdrop = instance._getBackdrop.bind(instance);
+          instance._getBackdrop = function() {
+            if (isDesktop()) {
+              return null; // Prevent backdrop creation
+            }
+            return originalGetBackdrop();
+          };
+        }
+        
+        // Override backdrop property
+        if (instance._backdrop) {
+          Object.defineProperty(instance, '_backdrop', {
+            get: function() {
+              return isDesktop() ? null : this._backdrop;
+            },
+            set: function(value) {
+              if (!isDesktop()) {
+                this._backdrop = value;
+              }
+            },
+            configurable: true
+          });
+        }
+      }
+      
+      return instance;
+    };
+    
+    // Intercept existing instances
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarEl = document.getElementById('sidebar');
+      if (sidebarEl && isDesktop()) {
+        try {
+          const instance = Offcanvas.getInstance(sidebarEl) || Offcanvas.getOrCreateInstance(sidebarEl);
+          if (instance && instance._backdrop) {
+            instance._backdrop = null;
+          }
+        } catch(e) {
+          // Ignore errors
+        }
+      }
+    });
+  }
+  
   // Remove immediately if it exists
   removeBackdrop();
   
@@ -52,6 +108,26 @@
     }
   }
   requestAnimationFrame(checkAndRemove);
+  
+  // INTERCEPT DOM APPEND OPERATIONS - Prevent backdrop from being added to document.body
+  if (isDesktop() && document.body) {
+    const bodyAppendChild = document.body.appendChild.bind(document.body);
+    const bodyInsertBefore = document.body.insertBefore.bind(document.body);
+    
+    document.body.appendChild = function(child) {
+      if (isDesktop() && child && child.classList && child.classList.contains('offcanvas-backdrop')) {
+        return child; // Don't append backdrop to body on desktop
+      }
+      return bodyAppendChild(child);
+    };
+    
+    document.body.insertBefore = function(newNode, referenceNode) {
+      if (isDesktop() && newNode && newNode.classList && newNode.classList.contains('offcanvas-backdrop')) {
+        return newNode; // Don't insert backdrop to body on desktop
+      }
+      return bodyInsertBefore(newNode, referenceNode);
+    };
+  }
   
   // Watch for backdrop creation using MutationObserver (most efficient)
   const observer = new MutationObserver(function(mutations) {
