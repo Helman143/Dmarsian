@@ -167,26 +167,12 @@
 	}
 }
 
-/* Bootstrap offcanvas backdrop: "success" neon tint */
-/* Offcanvas backdrop: make it "success" themed (green tint like Bootstrap success). */
-.offcanvas-backdrop.backdrop-success,
-.offcanvas-backdrop.bg-success,
-.offcanvas-backdrop.show,
-.offcanvas-backdrop.fade.show {
-	/* override Bootstrap's opacity-based backdrop so tint is obvious */
-	opacity: 1 !important;
-	background: rgba(25, 135, 84, 0.52) !important;
-	backdrop-filter: blur(4px);
-	-webkit-backdrop-filter: blur(4px);
-}
-
-/* Add neon texture only when we tagged it (keeps other backdrops clean) */
-.offcanvas-backdrop.backdrop-success.show,
-.offcanvas-backdrop.backdrop-success.fade.show {
-	background:
-		radial-gradient(1100px circle at 18% 12%, rgba(0, 255, 106, 0.65), transparent 58%),
-		radial-gradient(900px circle at 86% 88%, rgba(0, 255, 106, 0.40), transparent 62%),
-		rgba(25, 135, 84, 0.52) !important;
+/* Bootstrap offcanvas backdrop: removed - backdrop is disabled */
+/* Hide any offcanvas backdrop that might appear */
+.offcanvas-backdrop {
+	display: none !important;
+	visibility: hidden !important;
+	opacity: 0 !important;
 }
 
 /* Admin Student Management: neon squircle sidebar toggle
