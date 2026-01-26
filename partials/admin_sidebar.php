@@ -1,5 +1,5 @@
 <?php // Usage: $active = 'dashboard'|'student'|'collection'|'payment'|'posts'|'enroll'|'trial'|'settings'|'profile'; ?>
-<div class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" role="navigation" aria-label="Main Sidebar">
+<div class="sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebar" role="navigation" aria-label="Main Sidebar" data-bs-backdrop="false">
   <div class="logo d-flex align-items-center gap-2">
     <img src="Picture/Logo2.png" alt="D'MARSIANS Logo" class="logo-img img-fluid" style="max-width:56px;height:auto;">
     <h2 class="m-0">D'MARSIANS<br>TAEKWONDO<br>SYSTEM</h2>
@@ -25,5 +25,45 @@
   </div>
 </div>
 
-
-
+<script>
+// Aggressively remove offcanvas backdrop if it appears
+(function() {
+  function removeBackdrop() {
+    const backdrop = document.querySelector('.offcanvas-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+  }
+  
+  // Remove immediately if it exists
+  removeBackdrop();
+  
+  // Watch for backdrop creation using MutationObserver
+  const observer = new MutationObserver(function(mutations) {
+    removeBackdrop();
+  });
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  // Also listen to Bootstrap events
+  document.addEventListener('show.bs.offcanvas', function(e) {
+    if (e && e.target && e.target.id === 'sidebar') {
+      setTimeout(removeBackdrop, 0);
+      setTimeout(removeBackdrop, 10);
+      setTimeout(removeBackdrop, 50);
+    }
+  });
+  
+  document.addEventListener('shown.bs.offcanvas', function(e) {
+    if (e && e.target && e.target.id === 'sidebar') {
+      removeBackdrop();
+    }
+  });
+  
+  // Periodic check as fallback
+  setInterval(removeBackdrop, 100);
+})();
+</script>

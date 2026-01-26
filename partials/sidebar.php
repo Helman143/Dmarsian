@@ -23,5 +23,45 @@
   </div>
 </div>
 
-
-
+<script>
+// Aggressively remove offcanvas backdrop if it appears
+(function() {
+  function removeBackdrop() {
+    const backdrop = document.querySelector('.offcanvas-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+  }
+  
+  // Remove immediately if it exists
+  removeBackdrop();
+  
+  // Watch for backdrop creation using MutationObserver
+  const observer = new MutationObserver(function(mutations) {
+    removeBackdrop();
+  });
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  // Also listen to Bootstrap events
+  document.addEventListener('show.bs.offcanvas', function(e) {
+    if (e && e.target && e.target.id === 'sidebar') {
+      setTimeout(removeBackdrop, 0);
+      setTimeout(removeBackdrop, 10);
+      setTimeout(removeBackdrop, 50);
+    }
+  });
+  
+  document.addEventListener('shown.bs.offcanvas', function(e) {
+    if (e && e.target && e.target.id === 'sidebar') {
+      removeBackdrop();
+    }
+  });
+  
+  // Periodic check as fallback
+  setInterval(removeBackdrop, 100);
+})();
+</script>
