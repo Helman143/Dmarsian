@@ -293,9 +293,9 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                     <div class="stat-card h-100" data-icon="💰">
                         <h3><span class="icon">&#128181;</span> Membership Price</h3>
                         <ul>
-                            <li><span class="stat-label">Enrollment Fee:</span> 700.00</li>
-                            <li><span class="stat-label">Monthly Fee:</span> 700.00</li>
-                            <li><span class="stat-label">Trial Session:</span> 150.00</li>
+                            <li><span class="stat-label">Enrollment Fee:</span> 1,800</li>
+                            <li><span class="stat-label">Monthly Fee:</span> 1,500</li>
+                            <li><span class="stat-label">Trial Session:</span> 200</li>
                         </ul>
                     </div>
                 </div>
