@@ -1919,7 +1919,7 @@ section#offers {
     font-weight: 600;
     color: #333;
     background: rgba(255, 255, 255, 0.78);
-    border: 1px solid rgba(0, 0, 0, 0.14);
+    border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 10px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
     outline: none;
@@ -2929,27 +2929,27 @@ section#offers {
 }
 
 .popup-modal {
-    background: #181818;
-    border: 3px solid #0f0;
+    background: #FFFFFF;
+    border: 3px solid #337418;
     border-radius: 15px;
     padding: 40px;
     text-align: center;
     max-width: 500px;
     width: 90%;
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 30px rgba(51, 116, 24, 0.2);
     animation: slideIn 0.4s ease-out;
     position: relative;
 }
 
 .popup-modal h3 {
-    color: #0f0;
+    color: #337418;
     font-size: 1.8rem;
     margin-bottom: 20px;
     font-weight: bold;
 }
 
 .popup-modal p {
-    color: #fff;
+    color: #585858;
     font-size: 1.1rem;
     line-height: 1.5;
     margin-bottom: 30px;
@@ -2960,7 +2960,7 @@ section#offers {
     height: 80px;
     margin: 0 auto 20px auto;
     border-radius: 50%;
-    background: #0f0;
+    background: #337418;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2968,14 +2968,14 @@ section#offers {
 }
 
 .check-icon {
-    color: #000;
+    color: #fff;
     font-size: 2.5rem;
     animation: checkMark 0.8s ease-in-out 0.2s both;
 }
 
 .popup-close-btn {
-    background: #0f0;
-    color: #000;
+    background: #337418;
+    color: #fff;
     border: none;
     padding: 12px 30px;
     border-radius: 25px;

@@ -492,16 +492,16 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             <h3>Verify Your Email</h3>
             <p>We've sent a 6-digit OTP code to your email address. Please enter it below to verify your email and complete your registration.</p>
             <div class="input-group" style="margin: 20px 0;">
-                <input type="text" id="otpInput" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" placeholder=" " required style="width: 100%; padding: 12px; font-size: 18px; text-align: center; letter-spacing: 8px;">
-                <label>Enter 6-digit OTP</label>
+                <input type="text" id="otpInput" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" placeholder=" " required style="width: 100%; padding: 12px; font-size: 18px; text-align: center; letter-spacing: 8px; border: 1px solid #ccc; border-radius: 4px; color: #1A1A1A;">
+                <label style="color: #666;">Enter 6-digit OTP</label>
             </div>
             <div id="otpError" style="color: #ff4444; margin: 10px 0; display: none;"></div>
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button class="popup-close-btn" onclick="verifyOTP()" id="verifyOtpBtn">VERIFY</button>
-                <button class="popup-close-btn" onclick="closeOTPModal()" style="background: #666;">CANCEL</button>
+                <button class="popup-close-btn" onclick="closeOTPModal()" style="background: #e0e0e0; color: #333;">CANCEL</button>
             </div>
             <p style="margin-top: 15px; font-size: 12px; color: #888;">
-                Didn't receive the code? <a href="#" onclick="resendOTP(); return false;" style="color: #00D01D;">Resend OTP</a>
+                Didn't receive the code? <a href="#" onclick="resendOTP(); return false;" style="color: #337418; font-weight: bold;">Resend OTP</a>
             </p>
         </div>
     </div>
