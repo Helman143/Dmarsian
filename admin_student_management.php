@@ -136,9 +136,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                                 <label>Schedule</label>
                                 <select name="schedule" required>
                                     <option value="">Select</option>
-                                    <option value="MWF-AM">MWF Morning</option>
                                     <option value="MWF-PM">MWF Afternoon</option>
-                                    <option value="TTS-AM">TTS Morning</option>
                                     <option value="TTS-PM">TTS Afternoon</option>
                                 </select>
                             </div>
@@ -175,15 +173,15 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
             <!-- Student Table -->
             <!-- Mobile toolbar (hidden on md and up) -->
-            <div class="d-flex gap-2 align-items-center mb-2 d-md-none" id="adminEnrolleesToolbar">
-                <input class="form-control form-control-sm" id="adminEnrolleesSearch" placeholder="Search...">
-                <select class="form-select form-select-sm" id="adminEnrolleesFilter">
-                    <option value="">All</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+			<div class="d-flex gap-2 align-items-center mb-2 d-md-none" id="enrolleesToolbar">
+				<input class="form-control form-control-sm" id="enrolleesSearch" placeholder="Search...">
+				<select class="form-select form-select-sm" id="enrolleesFilter">
+					<option value="">All</option>
+					<option value="Active">Active</option>
+					<option value="Inactive">Inactive</option>
                     <option value="Freeze">Freeze</option>
-                </select>
-            </div>
+				</select>
+			</div>
 
             <!-- Mobile card list (visible on xs/sm only) -->
             <div id="adminStudentCardList" class="student-card-list d-md-none"></div>
@@ -191,7 +189,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             <!-- Table Header with Search -->
             <div class="table-header-section d-none d-md-flex justify-content-end align-items-center mb-3">
                 <div class="search-container">
-                    <input type="text" id="adminStudentSearchBox" placeholder="Search students...">
+                    <input type="text" id="studentSearchBox" placeholder="Search students...">
                     <i class="fas fa-search search-icon"></i>
                 </div>
             </div>
@@ -436,9 +434,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                     }
                 });
                 // Re-apply active desktop search filter after reload
-                const desktopSearch = document.getElementById('adminStudentSearchBox');
+                const desktopSearch = document.getElementById('studentSearchBox');
                 if (desktopSearch && desktopSearch.value) {
-                    applyAdminDesktopSearch(desktopSearch.value);
+                    applyStudentSearch(desktopSearch.value);
                 }
             }
         } catch (error) {
@@ -557,7 +555,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     }
 
     // Desktop search: filter by STD No., Name, Gender, or Status
-    function applyAdminDesktopSearch(term) {
+    function applyStudentSearch(term) {
         const searchTerm = (term || '').toLowerCase();
         const tbody = document.getElementById('studentTableBody');
         if (!tbody) return;
@@ -574,20 +572,20 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         });
     }
 
-    // Initialize desktop search box (admin)
+    // Initialize desktop search box
     document.addEventListener('DOMContentLoaded', function(){
-        const desktopSearch = document.getElementById('adminStudentSearchBox');
+        const desktopSearch = document.getElementById('studentSearchBox');
         if (desktopSearch) {
             desktopSearch.addEventListener('input', function(){
-                applyAdminDesktopSearch(desktopSearch.value);
+                applyStudentSearch(desktopSearch.value);
             });
         }
     });
 
-    // Client-side search/filter for table and mobile cards (admin)
-    (function setupAdminEnrolleesToolbar(){
-        const searchInput = document.getElementById('adminEnrolleesSearch');
-        const filterSelect = document.getElementById('adminEnrolleesFilter');
+    // Client-side search/filter for mobile toolbar
+    (function setupEnrolleesToolbar(){
+        const searchInput = document.getElementById('enrolleesSearch');
+        const filterSelect = document.getElementById('enrolleesFilter');
         if(!searchInput || !filterSelect) return;
 
         function applyFilters(){
