@@ -26,44 +26,106 @@
 </div>
 
 <script>
-// Aggressively remove offcanvas backdrop if it appears
+// Aggressively remove offcanvas backdrop on desktop only (real-time removal)
 (function() {
+  function isDesktop() {
+    return window.innerWidth >= 768;
+  }
+  
   function removeBackdrop() {
+    if (!isDesktop()) return; // Only remove on desktop
+    
     const backdrop = document.querySelector('.offcanvas-backdrop');
     if (backdrop) {
       backdrop.remove();
+      return true;
     }
+    return false;
   }
   
   // Remove immediately if it exists
   removeBackdrop();
   
-  // Watch for backdrop creation using MutationObserver
+  // Real-time removal using requestAnimationFrame for instant detection
+  function checkAndRemove() {
+    if (isDesktop()) {
+      removeBackdrop();
+      requestAnimationFrame(checkAndRemove);
+    }
+  }
+  requestAnimationFrame(checkAndRemove);
+  
+  // Watch for backdrop creation using MutationObserver (most efficient)
   const observer = new MutationObserver(function(mutations) {
-    removeBackdrop();
+    if (!isDesktop()) return;
+    
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if (node.nodeType === 1) { // Element node
+          if (node.classList && node.classList.contains('offcanvas-backdrop')) {
+            node.remove();
+          }
+          // Also check children
+          const backdrop = node.querySelector && node.querySelector('.offcanvas-backdrop');
+          if (backdrop) {
+            backdrop.remove();
+          }
+        }
+      });
+    });
   });
   
   observer.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: false,
+    characterData: false
   });
   
-  // Also listen to Bootstrap events
+  // Intercept Bootstrap events for immediate removal
   document.addEventListener('show.bs.offcanvas', function(e) {
-    if (e && e.target && e.target.id === 'sidebar') {
+    if (e && e.target && e.target.id === 'sidebar' && isDesktop()) {
+      // Remove immediately and repeatedly
+      removeBackdrop();
+      requestAnimationFrame(() => removeBackdrop());
       setTimeout(removeBackdrop, 0);
+      setTimeout(removeBackdrop, 1);
+      setTimeout(removeBackdrop, 5);
       setTimeout(removeBackdrop, 10);
+      setTimeout(removeBackdrop, 20);
       setTimeout(removeBackdrop, 50);
     }
   });
   
   document.addEventListener('shown.bs.offcanvas', function(e) {
-    if (e && e.target && e.target.id === 'sidebar') {
+    if (e && e.target && e.target.id === 'sidebar' && isDesktop()) {
+      removeBackdrop();
+      requestAnimationFrame(() => removeBackdrop());
+    }
+  });
+  
+  document.addEventListener('hide.bs.offcanvas', function(e) {
+    if (e && e.target && e.target.id === 'sidebar' && isDesktop()) {
       removeBackdrop();
     }
   });
   
-  // Periodic check as fallback
-  setInterval(removeBackdrop, 100);
+  // Handle window resize
+  let resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      if (isDesktop()) {
+        removeBackdrop();
+      }
+    }, 100);
+  });
+  
+  // Periodic check as fallback (faster interval for desktop)
+  setInterval(function() {
+    if (isDesktop()) {
+      removeBackdrop();
+    }
+  }, 50); // Check every 50ms on desktop
 })();
 </script>
