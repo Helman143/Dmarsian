@@ -167,19 +167,21 @@
 	}
 }
 
-/* Bootstrap offcanvas backdrop: removed - backdrop is disabled */
-/* Aggressively hide and remove any offcanvas backdrop that might appear */
-.offcanvas-backdrop {
-	display: none !important;
-	visibility: hidden !important;
-	opacity: 0 !important;
-	pointer-events: none !important;
-	position: fixed !important;
-	top: -9999px !important;
-	left: -9999px !important;
-	width: 0 !important;
-	height: 0 !important;
-	z-index: -9999 !important;
+/* Bootstrap offcanvas backdrop: hide on desktop only, allow on mobile */
+/* Aggressively hide and remove any offcanvas backdrop that might appear on desktop */
+@media (min-width: 768px) {
+	.offcanvas-backdrop {
+		display: none !important;
+		visibility: hidden !important;
+		opacity: 0 !important;
+		pointer-events: none !important;
+		position: fixed !important;
+		top: -9999px !important;
+		left: -9999px !important;
+		width: 0 !important;
+		height: 0 !important;
+		z-index: -9999 !important;
+	}
 }
 
 /* Admin Student Management: neon squircle sidebar toggle
