@@ -7,7 +7,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset(
     header("Location: index.php");
     exit();
 }
-
 require_once 'db_connect.php';
 
 // Get user's name from session
@@ -45,7 +44,6 @@ $lastDayThisMonth = date('Y-m-t');
             <span class="text-success fw-bold">D'MARSIANS</span>
             <span></span>
         </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <div class="welcome-header">
@@ -119,7 +117,6 @@ $lastDayThisMonth = date('Y-m-t');
                     </div>
                 </div>
             </div>
-
             <!-- Dues Table -->
             <div class="dues-container">
                 <div class="d-flex align-items-center justify-content-between">
