@@ -44,59 +44,106 @@
   }
   
   // PREVENT BACKDROP CREATION AT SOURCE - Override Bootstrap's backdrop creation
-  if (typeof window.bootstrap !== 'undefined' && window.bootstrap.Offcanvas) {
+  function setupBootstrapOverride() {
+    if (typeof window.bootstrap === 'undefined' || !window.bootstrap.Offcanvas) {
+      // Bootstrap not loaded yet, try again later
+      setTimeout(setupBootstrapOverride, 50);
+      return;
+    }
+    
     const Offcanvas = window.bootstrap.Offcanvas;
     const originalGetOrCreateInstance = Offcanvas.getOrCreateInstance;
     
     // Override getOrCreateInstance to prevent backdrop on desktop
     Offcanvas.getOrCreateInstance = function(element, config) {
+      // Force backdrop to false on desktop for sidebar
+      if (isDesktop() && element && element.id === 'sidebar') {
+        config = config || {};
+        config.backdrop = false;
+      }
+      
       const instance = originalGetOrCreateInstance.call(this, element, config);
       
       if (isDesktop() && instance && instance._element && instance._element.id === 'sidebar') {
-        // Override the _getBackdrop method to return null on desktop
+        // Override _backdrop property BEFORE it's set
+        let backdropValue = null;
+        Object.defineProperty(instance, '_backdrop', {
+          get: function() {
+            return isDesktop() ? null : backdropValue;
+          },
+          set: function(value) {
+            if (!isDesktop()) {
+              backdropValue = value;
+            } else {
+              backdropValue = null;
+              // Immediately remove if Bootstrap tries to set it
+              if (value && value._element) {
+                try {
+                  value._element.remove();
+                } catch(e) {}
+              }
+            }
+          },
+          configurable: true,
+          enumerable: true
+        });
+        
+        // Override the _getBackdrop method
         if (instance._getBackdrop) {
           const originalGetBackdrop = instance._getBackdrop.bind(instance);
           instance._getBackdrop = function() {
             if (isDesktop()) {
-              return null; // Prevent backdrop creation
+              return null;
             }
             return originalGetBackdrop();
           };
         }
         
-        // Override backdrop property
-        if (instance._backdrop) {
-          Object.defineProperty(instance, '_backdrop', {
-            get: function() {
-              return isDesktop() ? null : this._backdrop;
-            },
-            set: function(value) {
-              if (!isDesktop()) {
-                this._backdrop = value;
+        // Override show method to prevent backdrop
+        if (instance.show) {
+          const originalShow = instance.show.bind(instance);
+          instance.show = function() {
+            if (isDesktop()) {
+              // Temporarily set backdrop config
+              const originalBackdrop = this._config ? this._config.backdrop : undefined;
+              if (this._config) {
+                this._config.backdrop = false;
               }
-            },
-            configurable: true
-          });
+              originalShow();
+              if (this._config && originalBackdrop !== undefined) {
+                this._config.backdrop = originalBackdrop;
+              }
+            } else {
+              originalShow();
+            }
+          };
         }
       }
       
       return instance;
     };
     
-    // Intercept existing instances
-    document.addEventListener('DOMContentLoaded', function() {
-      const sidebarEl = document.getElementById('sidebar');
-      if (sidebarEl && isDesktop()) {
-        try {
-          const instance = Offcanvas.getInstance(sidebarEl) || Offcanvas.getOrCreateInstance(sidebarEl);
-          if (instance && instance._backdrop) {
-            instance._backdrop = null;
+    // Intercept existing instances immediately
+    const sidebarEl = document.getElementById('sidebar');
+    if (sidebarEl && isDesktop()) {
+      try {
+        const instance = Offcanvas.getInstance(sidebarEl);
+        if (instance) {
+          instance._backdrop = null;
+          if (instance._backdrop && instance._backdrop._element) {
+            instance._backdrop._element.remove();
           }
-        } catch(e) {
-          // Ignore errors
         }
+      } catch(e) {
+        // Ignore errors
       }
-    });
+    }
+  }
+  
+  // Try to setup immediately and also on DOMContentLoaded
+  setupBootstrapOverride();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupBootstrapOverride);
   }
   
   // Remove immediately if it exists
@@ -111,6 +158,19 @@
   }
   requestAnimationFrame(checkAndRemove);
   
+  // ENSURE data-bs-backdrop="false" is always set on desktop
+  function enforceBackdropAttribute() {
+    if (isDesktop()) {
+      const sidebarEl = document.getElementById('sidebar');
+      if (sidebarEl) {
+        sidebarEl.setAttribute('data-bs-backdrop', 'false');
+        sidebarEl.dataset.bsBackdrop = 'false';
+      }
+    }
+  }
+  enforceBackdropAttribute();
+  setInterval(enforceBackdropAttribute, 100);
+  
   // INTERCEPT DOM APPEND OPERATIONS - Prevent backdrop from being added to document.body
   if (isDesktop() && document.body) {
     const bodyAppendChild = document.body.appendChild.bind(document.body);
@@ -118,6 +178,7 @@
     
     document.body.appendChild = function(child) {
       if (isDesktop() && child && child.classList && child.classList.contains('offcanvas-backdrop')) {
+        child.remove(); // Remove immediately
         return child; // Don't append backdrop to body on desktop
       }
       return bodyAppendChild(child);
@@ -125,6 +186,7 @@
     
     document.body.insertBefore = function(newNode, referenceNode) {
       if (isDesktop() && newNode && newNode.classList && newNode.classList.contains('offcanvas-backdrop')) {
+        newNode.remove(); // Remove immediately
         return newNode; // Don't insert backdrop to body on desktop
       }
       return bodyInsertBefore(newNode, referenceNode);
@@ -201,7 +263,29 @@
   setInterval(function() {
     if (isDesktop()) {
       removeBackdrop();
+      // Also check all offcanvas-backdrop elements and remove them
+      document.querySelectorAll('.offcanvas-backdrop').forEach(function(backdrop) {
+        backdrop.remove();
+      });
     }
-  }, 50); // Check every 50ms on desktop
+  }, 10); // Check every 10ms on desktop for maximum responsiveness
+  
+  // Additional aggressive removal - check immediately on any DOM change
+  const aggressiveObserver = new MutationObserver(function() {
+    if (isDesktop()) {
+      const backdrops = document.querySelectorAll('.offcanvas-backdrop');
+      backdrops.forEach(function(backdrop) {
+        backdrop.remove();
+      });
+    }
+  });
+  
+  if (document.body) {
+    aggressiveObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: false
+    });
+  }
 })();
 </script>
