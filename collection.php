@@ -32,9 +32,12 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <!-- Sidebar -->
         <?php $active = 'collection'; include 'partials/sidebar.php'; ?>
 
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
         <!-- Mobile topbar with toggle button -->
         <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between p-2">
-            <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Open sidebar">
+            <button id="mobileSidebarToggle" class="btn btn-sm btn-outline-success" type="button" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
             <span class="text-success fw-bold">D'MARSIANS</span>
@@ -137,27 +140,55 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     })();
     </script>
     <script>
-    // Export the Collection Trend chart as PNG
+    // Export the Collection Trend chart data to CSV (Excel compatible)
     document.addEventListener('DOMContentLoaded', function(){
         const exportBtn = document.getElementById('exportChartBtn');
-        const canvas = document.getElementById('collectionTrendChart');
-        if(!exportBtn || !canvas) return;
+        if(!exportBtn) return;
+        
         exportBtn.addEventListener('click', function(){
             try {
-                const dataUrl = canvas.toDataURL('image/png', 1.0);
+                // Retrieve the chart instance
+                const chart = Chart.getChart("collectionTrendChart");
+                if (!chart) {
+                    alert('Chart data not currently available.');
+                    return;
+                }
+                
+                const labels = chart.data.labels;
+                const data = chart.data.datasets[0].data;
+                const period = document.getElementById('trendPeriod')?.value || 'Trend';
+                
+                // Construct CSV content with BOM for Excel UTF-8 recognition
+                let csvContent = "\uFEFF"; 
+                csvContent += "Period,Amount (PHP)\n"; // Header
+                
+                labels.forEach((label, index) => {
+                    const amount = data[index] !== undefined ? data[index] : 0;
+                    // Escape quotes if present
+                    const safeLabel = label.toString().includes(',') ? `"${label}"` : label;
+                    const safeAmount = amount.toString(); // Keep raw number for Excel math
+                    csvContent += `${safeLabel},${safeAmount}\n`;
+                });
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 const date = new Date().toISOString().slice(0,10);
-                link.download = 'collection-trend-' + date + '.png';
-                link.href = dataUrl;
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `collection_trend_${period}_${date}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
             } catch (err) {
                 console.error(err);
-                alert('Unable to export the chart.');
+                alert('Unable to export the chart data.');
             }
         });
     });
     </script>
+    <script src="Scripts/sidebar.js?v=2"></script>
 </body>
 </html> 
