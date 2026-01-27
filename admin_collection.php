@@ -140,34 +140,76 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     })();
     </script>
     <script>
-    // Export the Collection Trend chart data to CSV (Excel compatible)
+    // Export the Payment Transaction History and Summary Stats to CSV (Excel compatible)
     document.addEventListener('DOMContentLoaded', function(){
         const exportBtn = document.getElementById('exportChartBtn');
         if(!exportBtn) return;
         
         exportBtn.addEventListener('click', function(){
             try {
-                // Retrieve the chart instance
-                const chart = Chart.getChart("collectionTrendChart");
-                if (!chart) {
-                    alert('Chart data not currently available.');
+                const dataToExport = (typeof paymentsData !== 'undefined') ? paymentsData : [];
+                
+                if (!dataToExport || dataToExport.length === 0) {
+                    alert('No payment transaction history available to export.');
                     return;
                 }
                 
-                const labels = chart.data.labels;
-                const data = chart.data.datasets[0].data;
-                const period = document.getElementById('trendPeriod')?.value || 'Trend';
+                // Calculate Monthly and Yearly Stats (Mirroring logic in admin_collection.js)
+                const now = new Date();
+                let monthlyTotal = 0;
+                let yearlyTotal = 0;
                 
+                dataToExport.forEach(payment => {
+                    if (payment.date_paid) {
+                        const paidDate = new Date(payment.date_paid);
+                        if (!isNaN(paidDate.getTime()) && paidDate.getFullYear() === now.getFullYear()) {
+                            yearlyTotal += parseFloat(payment.amount_paid || 0);
+                            if (paidDate.getMonth() === now.getMonth()) {
+                                monthlyTotal += parseFloat(payment.amount_paid || 0);
+                            }
+                        }
+                    }
+                });
+
                 // Construct CSV content with BOM for Excel UTF-8 recognition
-                let csvContent = "\uFEFF"; 
-                csvContent += "Period,Amount (PHP)\n"; // Header
+                let csvContent = "\uFEFF";
                 
-                labels.forEach((label, index) => {
-                    const amount = data[index] !== undefined ? data[index] : 0;
-                    // Escape quotes if present
-                    const safeLabel = label.toString().includes(',') ? `"${label}"` : label;
-                    const safeAmount = amount.toString(); // Keep raw number for Excel math
-                    csvContent += `${safeLabel},${safeAmount}\n`;
+                // Add Summary Stats at the top
+                csvContent += "COLLECTION SUMMARY\n";
+                csvContent += `Monthly Collected Amount (PHP),${monthlyTotal.toFixed(2)}\n`;
+                csvContent += `Yearly Collected Amount (PHP),${yearlyTotal.toFixed(2)}\n`;
+                csvContent += "\n"; // Spacer line
+                
+                // Add Table Headers
+                csvContent += "PAYMENT TRANSACTION HISTORY\n";
+                csvContent += "Transaction ID,Date,Reference,Total Paid,Amount Paid,Payment Type,Discount,Total Amount,Status\n"; 
+                
+                // Add Table Data
+                dataToExport.forEach(payment => {
+                    const amountPaid = parseFloat(payment.amount_paid || 0);
+                    const discount = parseFloat(payment.discount || 0);
+                    const totalAmount = amountPaid - discount;
+                    
+                    const escape = (val) => {
+                        if (val === null || val === undefined) return '';
+                        const str = String(val);
+                        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                            return `"${str.replace(/"/g, '""')}"`;
+                        }
+                        return str;
+                    };
+
+                    csvContent += [
+                        escape(payment.id),
+                        escape(payment.date_paid),
+                        escape(payment.jeja_no),
+                        amountPaid.toFixed(2),
+                        amountPaid.toFixed(2),
+                        escape(payment.payment_type),
+                        discount.toFixed(2),
+                        totalAmount.toFixed(2),
+                        escape(payment.status)
+                    ].join(',') + "\n";
                 });
                 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -176,7 +218,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 const date = new Date().toISOString().slice(0,10);
                 
                 link.setAttribute('href', url);
-                link.setAttribute('download', `collection_trend_${period}_${date}.csv`);
+                link.setAttribute('download', `collection_report_${date}.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -184,7 +226,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 
             } catch (err) {
                 console.error(err);
-                alert('Unable to export the chart data.');
+                alert('Unable to export the report.');
             }
         });
     });
