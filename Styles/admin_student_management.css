@@ -201,7 +201,7 @@
     border: 1.5px solid rgba(0, 255, 106, 0.85) !important;
     background: rgba(0, 0, 0, 0.25) !important;
     color: rgba(0, 255, 106, 0.95) !important;
-    display: inline-flex !important;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     box-shadow:
