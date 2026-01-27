@@ -148,11 +148,19 @@
     font-weight: 600;
     display: flex;
     align-items: center;
-    margin-bottom: 0;
+    margin-bottom: 8px;
+    /* Ensure spacing below label */
+    gap: 10px;
+    /* Clean spacing between icon and text */
 }
 
 .form-label i {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    /* Standard readable size */
+    margin-right: 0 !important;
+    /* Rely on gap */
+    display: inline-block;
+    /* No background, no shadow, no border */
 }
 
 .profile-input {
