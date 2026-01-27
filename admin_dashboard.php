@@ -35,9 +35,13 @@ $lastDayThisMonth = date('Y-m-t');
     <div class="container-fluid">
         <!-- Sidebar -->
         <?php $active = 'dashboard'; include 'partials/admin_sidebar.php'; ?>
+        
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
         <!-- Mobile topbar with toggle button -->
         <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between p-2">
-            <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Open sidebar">
+            <button id="mobileSidebarToggle" class="btn btn-sm btn-outline-success" type="button" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
             <span class="text-success fw-bold">D'MARSIANS</span>
@@ -157,5 +161,6 @@ $lastDayThisMonth = date('Y-m-t');
     <script src="Scripts/admin_dashboard.js?v=20251030"></script>
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="Scripts/sidebar.js?v=2"></script>
 </body>
 </html> 

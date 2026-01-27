@@ -26,13 +26,20 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <!-- Sidebar -->
         <?php $active = 'student'; include 'partials/admin_sidebar.php'; ?>
 
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Mobile menu button (visible on small screens only) -->
-            <button class="btn btn-outline-primary d-md-none mb-3 neon-menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Open sidebar menu">
-                <span class="neon-hamburger" aria-hidden="true"></span>
-            </button>
-            <h1 class="page-title">STUDENT MANAGEMENT</h1>
+            <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between p-2 mb-3">
+                <button id="mobileSidebarToggle" class="btn btn-sm btn-outline-success" type="button" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title m-0 fs-4">STUDENT MANAGEMENT</h1>
+            </div>
+            
+            <h1 class="page-title d-none d-md-block">STUDENT MANAGEMENT</h1>
             
             <div class="student-form-container">
                 <form class="student-form" id="studentForm" onsubmit="return handleFormSubmit(event)">
@@ -226,8 +233,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     </div>
 
     
-    <script src="Scripts/sidebar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="Scripts/sidebar.js?v=2"></script>
     <script>
     // Map numeric belt ranks to labels and pass-through existing labels
     function mapBeltRankToLabel(value) {

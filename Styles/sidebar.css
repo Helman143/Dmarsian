@@ -17,7 +17,8 @@
 	position: fixed;
 	top: 0;
 	left: 0;
-	padding: 0 20px 60px 20px; /* no top gap */
+	padding: 0 20px 60px 20px;
+	/* no top gap */
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
@@ -64,7 +65,7 @@
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	color: rgba(255,255,255,0.7);
+	color: rgba(255, 255, 255, 0.7);
 	text-decoration: none;
 	padding: 15px 20px;
 	border-radius: 12px;
@@ -78,7 +79,10 @@
 	color: #ffffff;
 	transform: translateX(5px);
 }
-.sidebar nav a:hover i { color: #ffffff; }
+
+.sidebar nav a:hover i {
+	color: #ffffff;
+}
 
 .sidebar nav a.active,
 .sidebar .dropdown-content a.active {
@@ -90,10 +94,17 @@
 }
 
 .sidebar nav a.active i,
-.sidebar .dropdown-content a.active i { color: #ffffff !important; }
+.sidebar .dropdown-content a.active i {
+	color: #ffffff !important;
+}
 
-.sidebar .dropdown { position: relative; }
-.sidebar .dropdown .arrow { margin-left: auto; }
+.sidebar .dropdown {
+	position: relative;
+}
+
+.sidebar .dropdown .arrow {
+	margin-left: auto;
+}
 
 .sidebar .dropdown-content {
 	display: none;
@@ -101,10 +112,22 @@
 	padding-left: 10px;
 }
 
-.sidebar .dropdown:hover .dropdown-content { display: block; }
+.sidebar .dropdown:hover .dropdown-content {
+	display: block;
+}
 
-.sidebar .logout-container { margin-top: auto; padding: 10px 12px; margin-bottom: 40px; }
-.sidebar .logout { color: var(--text); display: flex; align-items: center; gap: 10px; }
+.sidebar .logout-container {
+	margin-top: auto;
+	padding: 10px 12px;
+	margin-bottom: 40px;
+}
+
+.sidebar .logout {
+	color: var(--text);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
 
 /* Submenu indentation and hierarchy */
 .sidebar .dropdown-content a {
@@ -114,23 +137,84 @@
 }
 
 /* Desktop: fixed sidebar + push content to the right */
+/* Sidebar Backdrop */
+.sidebar-backdrop {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(3px);
+	z-index: 1040;
+	/* Below sidebar (1045/1050), above content */
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.active {
+	display: block;
+	opacity: 1;
+}
+
+/* Desktop: fixed sidebar + push content to the right */
 @media (min-width: 768px) {
 	.sidebar {
 		position: fixed;
 		top: 0;
 		left: 0;
 		height: 100vh;
+		transform: translateX(0) !important;
+		/* Always visible */
+		width: var(--sidebar-width);
+		z-index: 1045;
 	}
+
 	/* Works even when a topbar sits between sidebar and main-content */
-	.sidebar ~ .main-content {
+	.sidebar~.main-content {
 		margin-left: var(--sidebar-width) !important;
+	}
+
+	.sidebar-backdrop {
+		display: none !important;
+	}
+
+	.mobile-topbar {
+		display: none !important;
 	}
 }
 
-/* Mobile: sidebar becomes offcanvas drawer; content must be full width */
+/* Mobile: sidebar becomes offcanvas drawer */
 @media (max-width: 767.98px) {
-	/* Turn the full-width mobile "topbar" into a small floating sidebar toggle.
-	   This keeps the UI as a true sidebar experience (not a top header strip). */
+
+	/* Main Content takes full width */
+	.sidebar~.main-content {
+		margin-left: 0 !important;
+		width: 100%;
+	}
+
+	/* Sidebar Drawer Logic */
+	.sidebar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100vh;
+		width: 260px;
+		/* Standard width */
+		max-width: 85vw;
+		transform: translateX(-100%);
+		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		z-index: 1050;
+		/* Above backdrop */
+		box-shadow: 5px 0 25px rgba(0, 255, 106, 0.15);
+	}
+
+	.sidebar.active {
+		transform: translateX(0);
+	}
+
+	/* Turn the full-width mobile "topbar" into a small floating sidebar toggle. */
 	.mobile-topbar {
 		position: fixed;
 		top: 14px;
@@ -139,48 +223,43 @@
 		background: transparent !important;
 		padding: 0 !important;
 		border: 0;
-		z-index: 1055;
+		z-index: 1030;
+		/* Below backdrop when active, but accessible */
 	}
-	.mobile-topbar span { display: none !important; }
+
+	.mobile-topbar span {
+		display: none !important;
+	}
+
 	.mobile-topbar .btn {
-		background: rgba(0, 0, 0, 0.35);
+		background: rgba(0, 20, 10, 0.85);
+		/* Dark background for visibility */
 		backdrop-filter: blur(10px);
 		-webkit-backdrop-filter: blur(10px);
 		border: 1px solid rgba(0, 255, 106, 0.65) !important;
 		color: var(--primary-color) !important;
-		padding: 10px 10px;
-		border-radius: 12px;
-		box-shadow: 0 0 18px rgba(0, 255, 106, 0.18);
+		padding: 8px 12px;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 	}
-	.mobile-topbar .btn i { color: var(--primary-color) !important; font-size: 1.1rem; }
+
+	.mobile-topbar .btn:active {
+		transform: scale(0.95);
+	}
+
+	.mobile-topbar .btn i {
+		color: var(--primary-color) !important;
+		font-size: 1.2rem;
+	}
 
 	/* Provide room so the floating button doesn't overlap the page title */
-	.mobile-topbar + .main-content { padding-top: 78px !important; }
-
-	.sidebar {
-		height: 100vh;
-		/* prevent the offcanvas from feeling too wide on very small screens */
-		max-width: 92vw;
+	.mobile-topbar+.main-content {
+		padding-top: 80px !important;
 	}
-	.sidebar ~ .main-content {
-		margin-left: 0 !important;
-	}
-}
 
-/* Bootstrap offcanvas backdrop: hide on desktop only, allow on mobile */
-/* Aggressively hide and remove any offcanvas backdrop that might appear on desktop */
-@media (min-width: 768px) {
+	/* Hide offcanvas backdrop from bootstrap if present */
 	.offcanvas-backdrop {
 		display: none !important;
-		visibility: hidden !important;
-		opacity: 0 !important;
-		pointer-events: none !important;
-		position: fixed !important;
-		top: -9999px !important;
-		left: -9999px !important;
-		width: 0 !important;
-		height: 0 !important;
-		z-index: -9999 !important;
 	}
 }
 
@@ -189,7 +268,8 @@
 @media (max-width: 767.98px) {
 	button.neon-menu-btn.btn.btn-outline-primary.d-md-none.mb-3 {
 		width: clamp(44px, 12vw, 56px) !important;
-		height: clamp(54px, 14vw, 68px) !important; /* vertical squircle */
+		height: clamp(54px, 14vw, 68px) !important;
+		/* vertical squircle */
 		padding: 0 !important;
 		border-radius: 18px !important;
 		border: 1.5px solid rgba(0, 255, 106, 0.92) !important;
@@ -246,5 +326,3 @@
 			0 0 26px rgba(0, 255, 106, 0.35) !important;
 	}
 }
-
-

@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D'MARSIANS Taekwondo System - Admin Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjIS5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Match style include order used by other admin pages -->
     <link rel="stylesheet" href="Styles/admin_dashboard.css">
     <link rel="stylesheet" href="Styles/admin_profile.css">
@@ -108,9 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container-fluid">
         <!-- Sidebar -->
         <?php $active = 'profile'; include 'partials/admin_sidebar.php'; ?>
+        
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
         <!-- Mobile topbar with toggle button -->
         <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between p-2">
-            <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Open sidebar">
+            <button id="mobileSidebarToggle" class="btn btn-sm btn-outline-success" type="button" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
             <span class="text-success fw-bold">D'MARSIANS</span>
@@ -191,23 +195,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-    (function(){
-        const dropdown = document.querySelector('.sidebar .dropdown');
-        const toggle = dropdown ? dropdown.querySelector('.dropdown-toggle') : null;
-        if(!dropdown || !toggle) return;
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dropdown Logic (Existing)
+        (function(){
+            const dropdown = document.querySelector('.sidebar .dropdown');
+            const toggle = dropdown ? dropdown.querySelector('.dropdown-toggle') : null;
+            if(!dropdown || !toggle) return;
 
-        function open(){ dropdown.classList.add('open'); }
-        function close(){ dropdown.classList.remove('open'); }
+            function open(){ dropdown.classList.add('open'); }
+            function close(){ dropdown.classList.remove('open'); }
 
-        toggle.addEventListener('click', function(e){
-            e.preventDefault();
-            dropdown.classList.toggle('open');
-        });
-        toggle.addEventListener('touchstart', function(e){ e.preventDefault(); open(); }, {passive:false});
-        dropdown.addEventListener('mouseenter', open);
-        dropdown.addEventListener('mouseleave', close);
-        document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
-    })();
+            toggle.addEventListener('click', function(e){
+                e.preventDefault();
+                dropdown.classList.toggle('open');
+            });
+            toggle.addEventListener('touchstart', function(e){ e.preventDefault(); open(); }, {passive:false});
+            dropdown.addEventListener('mouseenter', open);
+            dropdown.addEventListener('mouseleave', close);
+            document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
+        })();
+
+        // Mobile Sidebar Toggle Logic (New)
+        (function() {
+            const toggleBtn = document.getElementById('mobileSidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            function toggleSidebar() {
+                if (!sidebar) return;
+                sidebar.classList.toggle('active');
+                if (backdrop) backdrop.classList.toggle('active');
+            }
+
+            function closeSidebar() {
+                if (sidebar) sidebar.classList.remove('active');
+                if (backdrop) backdrop.classList.remove('active');
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', closeSidebar);
+            }
+
+            if (sidebar) {
+                const links = sidebar.querySelectorAll('a');
+                links.forEach(link => {
+                    link.addEventListener('click', closeSidebar);
+                });
+            }
+        })();
+    });
     </script>
 </body>
 </html> 
