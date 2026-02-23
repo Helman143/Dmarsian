@@ -8,7 +8,7 @@ if (file_exists(__DIR__ . '/env-loader.php')) {
 $servername = getenv('DB_HOST') ?: 'localhost';
 $username   = getenv('DB_USER') ?: 'root';
 $password   = getenv('DB_PASS') ?: '';
-$database   = getenv('DB_NAME') ?: 'capstone_db';
+$database   = getenv('DB_NAME') ?: 'defaultdb';
 $portStr    = getenv('DB_PORT') ?: '3306';
 $port       = (int)$portStr;
 
