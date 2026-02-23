@@ -12,8 +12,8 @@ require_once 'db_connect.php';
 // Get user's name from session
 $userName = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin';
 
-// Assume Super Admin has id=1
-$admin_id = 1;
+// Get user ID from session
+$admin_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
 
 // Initialize variables
 $email = '';
@@ -40,48 +40,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_email = trim($_POST['email']);
     $new_username = trim($_POST['username']);
     $new_password = $_POST['password'];
-    $update_password = false;
-
+    
     // Validate input (basic)
-    if (empty($new_email) || empty($new_username) || (!$admin_exists && empty($new_password))) {
-        $error = 'Email, Username, and Password cannot be empty.';
+    if (empty($new_email) || empty($new_username)) {
+        $error = 'Email and Username cannot be empty.';
     } else {
-        if ($admin_exists) {
-            // Check if password changed
-            if (!empty($new_password) && !password_verify($new_password, $hashed_password)) {
-                $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
-                $update_password = true;
-            } else {
-                $hashed_new_password = $hashed_password;
-            }
-            // Update DB
-            $stmt = $conn->prepare('UPDATE admin_accounts SET email=?, username=?, password=? WHERE id=?');
-            $stmt->bind_param('sssi', $new_email, $new_username, $hashed_new_password, $admin_id);
-            if ($stmt->execute()) {
-                $success = 'Profile updated successfully!';
-                $email = $new_email;
-                $username = $new_username;
-                $hashed_password = $hashed_new_password;
-            } else {
-                $error = 'Failed to update profile.';
-            }
-            $stmt->close();
+        // Check for duplicate username or email (excluding current user)
+        $dup_check = $conn->prepare("SELECT id FROM admin_accounts WHERE (username = ? OR email = ?) AND id != ?");
+        $dup_check->bind_param("ssi", $new_username, $new_email, $admin_id);
+        $dup_check->execute();
+        $dup_result = $dup_check->get_result();
+        
+        if ($dup_result->num_rows > 0) {
+            $error = 'Username or Email is already taken by another admin.';
+            $dup_check->close();
         } else {
-            // Create new admin account
-            $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare('INSERT INTO admin_accounts (id, email, username, password) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('isss', $admin_id, $new_email, $new_username, $hashed_new_password);
-            if ($stmt->execute()) {
-                $success = 'Admin account created successfully!';
-                $email = $new_email;
-                $username = $new_username;
-                $hashed_password = $hashed_new_password;
-                $admin_exists = true;
-                $error = '';
+            $dup_check->close();
+            
+            if ($admin_exists) {
+                // Determine password logic
+                if (!empty($new_password)) {
+                    $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+                } else {
+                    $hashed_new_password = $hashed_password;
+                }
+                
+                // Update DB
+                $stmt = $conn->prepare('UPDATE admin_accounts SET email=?, username=?, password=? WHERE id=?');
+                $stmt->bind_param('sssi', $new_email, $new_username, $hashed_new_password, $admin_id);
+                
+                if ($stmt->execute()) {
+                    $success = 'Profile updated successfully!';
+                    $email = $new_email;
+                    $username = $new_username;
+                    $hashed_password = $hashed_new_password;
+                    
+                    // Sync session
+                    $_SESSION['username'] = $new_username;
+                    $_SESSION['user_name'] = $new_username;
+                } else {
+                    if ($conn->errno == 1062) {
+                        $error = 'Duplicate entry error: This username or email is already in use.';
+                    } else {
+                        $error = 'Failed to update profile: ' . $conn->error;
+                    }
+                }
+                $stmt->close();
             } else {
-                $error = 'Failed to create admin account.';
+                // If account doesn't exist for this ID, just show error
+                $error = 'Cannot create account here. Use the registration page.';
             }
-            $stmt->close();
         }
     }
 }

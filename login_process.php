@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } catch (Exception $e) {
             error_log("Login error (admin): " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
-            if (isset($stmt)) {
+            if (isset($stmt) && $stmt instanceof mysqli_stmt) {
                 $stmt->close();
             }
             ob_clean();
@@ -100,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
         // If login fails
-        if (isset($stmt)) {
+        if (isset($stmt) && $stmt instanceof mysqli_stmt) {
             $stmt->close();
         }
         error_log("Admin login FAILED - Redirecting to login page with error");
@@ -140,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         } catch (Exception $e) {
             error_log("Login error (user): " . $e->getMessage());
-            if (isset($stmt)) {
+            if (isset($stmt) && $stmt instanceof mysqli_stmt) {
                 $stmt->close();
             }
             ob_clean();
@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
         // If login fails
-        if (isset($stmt)) {
+        if (isset($stmt) && $stmt instanceof mysqli_stmt) {
             $stmt->close();
         }
         ob_clean();
