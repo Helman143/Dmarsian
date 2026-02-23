@@ -19,6 +19,7 @@ foreach ($env_keys as $key) {
     }
     echo "<strong>$key</strong>: $display_val<br>";
 }
+echo "<p style='color:#666; font-size:12px;'><i>Note: If DB_NAME shows 'capstone_db', check both 'App' and 'web service' settings in DigitalOcean.</i></p>";
 
 // 2. Load Config
 echo "<h2>2. Loading Project Config</h2>";
