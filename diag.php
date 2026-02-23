@@ -1,6 +1,6 @@
 <?php
 /**
- * Database Connection Diagnostic Tool (Public Version)
+ * Database Connection Diagnostic Tool (Root Version)
  */
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -22,12 +22,11 @@ foreach ($env_keys as $key) {
 
 // 2. Load Config
 echo "<h2>2. Loading Project Config</h2>";
-$config_path = __DIR__ . '/../config.php';
-if (file_exists($config_path)) {
+if (file_exists('config.php')) {
     echo "Found config.php... loading.<br>";
-    require_once $config_path;
+    require_once 'config.php';
 } else {
-    echo "❌ Could not find config.php at $config_path<br>";
+    echo "❌ Could not find config.php in current directory (" . getcwd() . ")<br>";
 }
 
 // 3. Connection Test
