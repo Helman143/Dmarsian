@@ -1,7 +1,14 @@
-# robots.txt for Martial Arts School Management System
+# robots.txt for D'Marsians Taekwondo Gym
 
 User-agent: *
-Allow: /
+
+# Allow public-facing pages
+Allow: /$
+Allow: /webpage.php
+Allow: /archive.php
+Allow: /sitemap.xml
+
+# Block admin and private PHP files
 Disallow: /admin/
 Disallow: /api/
 Disallow: /uploads/
@@ -9,13 +16,21 @@ Disallow: /Database/
 Disallow: /PHPMailer-master/
 Disallow: /tests/
 Disallow: /vendor/
-Disallow: /*.php$
+Disallow: /index.php
+Disallow: /dashboard.php
+Disallow: /student_management.php
+Disallow: /payment.php
+Disallow: /enrollment.php
+Disallow: /collection.php
+Disallow: /post_management.php
+Disallow: /trial_session.php
+Disallow: /admin_*.php
 Disallow: /*.sql$
 Disallow: /*.env$
 Disallow: /*.log$
 
-# Sitemap (update with your actual domain)
-# Sitemap: https://yourdomain.com/sitemap.xml
+# Sitemap
+Sitemap: https://dmarsian-taekwondo-gym.com/sitemap.xml
 
 
 
