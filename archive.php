@@ -44,7 +44,11 @@ mysqli_close($conn);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCHIVE HISTORY | D'MARSIANS TAEKWONDO GYM</title>
+    <title>Archive History | D'Marsians Taekwondo Gym</title>
+    <meta name="description" content="Browse the achievements and events archive of D'Marsians Taekwondo Gym in Pagadian City.">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/png" href="Picture/Logo2.png">
+    <link rel="apple-touch-icon" href="Picture/Logo2.png">
     <link rel="stylesheet" href="Styles/webpage.css">
     <link rel="stylesheet" href="Styles/archive.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

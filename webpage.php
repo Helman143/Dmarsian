@@ -28,8 +28,12 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D'MARSIANS TAEKWONDO GYM</title>
+    <title>D'Marsians Taekwondo Gym</title>
+    <meta name="description" content="D'Marsians Taekwondo Gym in Pagadian City — offering beginner to advanced Taekwondo training, belt promotions, sparring, and self-defense classes for all ages.">
+    <meta name="keywords" content="D'Marsians Taekwondo Gym, Taekwondo Pagadian City, Taekwondo classes, martial arts gym, belt promotion, self defense">
+    <meta name="robots" content="index, follow">
     <link rel="icon" type="image/png" href="Picture/Logo2.png">
+    <link rel="apple-touch-icon" href="Picture/Logo2.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="Styles/webpage.css?v=<?php echo time(); ?>">
