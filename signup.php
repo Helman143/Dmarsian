@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - Sign Up</title>
+    <title>Sign Up | D'Marsians Taekwondo Gym</title>
+    <link rel="icon" type="image/png" href="Picture/Logo2.png">
+    <link rel="apple-touch-icon" href="Picture/Logo2.png">
     <link rel="stylesheet" href="Styles/signup.css">
 </head>
 <body>

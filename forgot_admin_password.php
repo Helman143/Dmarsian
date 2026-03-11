@@ -7,7 +7,9 @@ ini_set('display_errors', 1);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password - Super Admin</title>
+    <title>Forgot Password | D'Marsians Taekwondo Gym</title>
+    <link rel="icon" type="image/png" href="Picture/Logo2.png">
+    <link rel="apple-touch-icon" href="Picture/Logo2.png">
     <link rel="stylesheet" href="Styles/admin_login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
