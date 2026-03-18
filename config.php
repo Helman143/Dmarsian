@@ -1,7 +1,9 @@
 <?php
 // Increase default session max lifetime to 12 hours
-ini_set('session.gc_maxlifetime', 43200);
-session_set_cookie_params(43200);
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.gc_maxlifetime', 43200);
+    session_set_cookie_params(43200);
+}
 
 // Load environment variables (gracefully handle missing file)
 if (file_exists(__DIR__ . '/env-loader.php')) {
