@@ -16,20 +16,41 @@ ini_set('display_errors', 1);
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+Pro:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Styles/typography.css">
     <style>
-        /* Custom scrollbar for the info box */
-        .scrollable-info::-webkit-scrollbar {
-            width: 6px;
+        details.otp-help {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 255, 106, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            margin-top: 16px;
+            text-align: left;
         }
-        .scrollable-info::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+        details.otp-help summary {
+            color: #00ff6a;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            display: flex;
+            align-items: center;
+            list-style: none; /* remove default arrow */
         }
-        .scrollable-info::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 106, 0.3);
-            border-radius: 10px;
+        details.otp-help summary::-webkit-details-marker {
+            display: none;
         }
-        .scrollable-info::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 106, 0.5);
+        details.otp-help summary::before {
+            content: '►';
+            font-size: 10px;
+            margin-right: 8px;
+            transition: transform 0.2s ease;
+        }
+        details.otp-help[open] summary::before {
+            transform: rotate(90deg);
+        }
+        details.otp-help .help-content {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0, 255, 106, 0.2);
         }
     </style>
 </head>
@@ -47,20 +68,6 @@ ini_set('display_errors', 1);
                     </p>
                     <p style="font-size:13px;color:#555;margin:0">
                         If the account exists, an OTP has been sent to its registered email address.
-                    </p>
-                </div>
-                <div class="scrollable-info" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:12px;margin-bottom:16px;max-height:150px;overflow-y:auto;text-align:left">
-                    <p style="font-size:12px;color:#856404;margin:0 0 6px 0">
-                        <strong>📧 Didn't receive the email?</strong>
-                    </p>
-                    <ul style="font-size:11px;color:#856404;margin:0;padding-left:20px;text-align:left">
-                        <li>Check your <strong>spam/junk folder</strong> - emails may be filtered</li>
-                        <li>Wait a few minutes - email delivery can take 2-5 minutes</li>
-                        <li>Verify you entered the correct <strong>email or username</strong></li>
-                        <li>Check if you have multiple email accounts</li>
-                    </ul>
-                    <p style="font-size:11px;color:#856404;margin:8px 0 0 0">
-                        <strong>Note:</strong> You can request a new OTP after 60 seconds if needed.
                     </p>
                 </div>
             <?php elseif (isset($_GET['error'])): ?>
@@ -120,6 +127,22 @@ ini_set('display_errors', 1);
                     }
                 });
             </script>
+            <?php if (isset($_GET['sent'])): ?>
+            <details class="otp-help">
+                <summary>Didn't receive the email?</summary>
+                <div class="help-content">
+                    <ul style="font-size:12px;color:rgba(255,255,255,0.7);margin:0;padding-left:20px;line-height:1.6;text-align:left;">
+                        <li>Check your <strong style="color:#fff;">spam/junk folder</strong>.</li>
+                        <li>Wait a few minutes - delivery can take 2-5 minutes.</li>
+                        <li>Verify you entered the correct <strong style="color:#fff;">email or username</strong>.</li>
+                        <li>Check if you have multiple email accounts.</li>
+                    </ul>
+                    <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:8px 0 0 0;text-align:left;">
+                        Note: You can request a new OTP after 60 seconds if needed.
+                    </p>
+                </div>
+            </details>
+            <?php endif; ?>
             <div style="margin-top:12px;text-align:center">
                 <a href="admin_verify_otp.php" style="text-decoration:none;color:#1976d2">Already have an OTP? Verify here</a>
             </div>
