@@ -22,7 +22,7 @@ ini_set('display_errors', 1);
             </div>
             <h2>Verify OTP</h2>
             <?php if (isset($_GET['otp_sent'])): ?>
-                <div style="background:#e8f5e9;border:1px solid #4caf50;border-radius:4px;padding:12px;margin-bottom:16px;max-height:60px;overflow-y:auto;">
+                <div style="background:#e8f5e9;border:1px solid #4caf50;border-radius:4px;padding:12px;margin-bottom:16px">
                     <p style="color:#2e7d32;margin:0;font-size:14px">
                         <strong>✓ OTP sent!</strong> Check your email and enter the code below. Use the email address shown in the field.
                     </p>

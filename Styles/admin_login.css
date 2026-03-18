@@ -8,7 +8,7 @@
 body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* Removed align-items: center so it doesn't clip top content on overflow */
     min-height: 100vh;
     background: #001a0d;
     background-image: 
@@ -17,7 +17,8 @@ body {
         repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 106, 0.1) 2px, rgba(0, 255, 106, 0.1) 4px);
     background-size: 100% 100%, 40px 40px, 40px 40px;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto; /* Allow vertical scroll */
+    overflow-x: hidden;
 }
 
 /* Circuit board / Hexagon pattern overlay */
@@ -42,7 +43,8 @@ body::before {
 .login-container {
     width: 100%;
     max-width: 400px;
-    padding: 20px;
+    padding: 40px 20px; /* Add vertical padding so it's not flush to the top/bottom when scrolling */
+    margin: auto; /* Vertically centers when viewport > content, falls back to top naturally on overflow */
     position: relative;
     z-index: 1;
 }
