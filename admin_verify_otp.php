@@ -88,11 +88,9 @@ ini_set('display_errors', 1);
                 </div>
                 <button type="submit" class="login-btn">Reset Password</button>
             </form>
-            <div style="margin-top:12px;text-align:center">
-                <a href="forgot_admin_password.php" style="text-decoration:none;color:#1976d2">Need a new OTP? Request again</a>
-            </div>
-            <div style="margin-top:8px;text-align:center">
-                <a href="admin_login.php" style="text-decoration:none;color:#555">Back to Login</a>
+            <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;">
+                <a href="forgot_admin_password.php" class="secondary-btn">Need a new OTP? Request again</a>
+                <a href="admin_login.php" class="secondary-btn">Back to Login</a>
             </div>
         </div>
     </div>

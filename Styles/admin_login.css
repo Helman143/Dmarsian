@@ -393,6 +393,37 @@ h2 {
         inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
+.secondary-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 106, 0.4);
+    border-radius: 8px;
+    color: #00ff6a;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.secondary-btn:hover {
+    background: rgba(0, 255, 106, 0.1);
+    border-color: #00ff6a;
+    box-shadow: 0 0 15px rgba(0, 255, 106, 0.3);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.secondary-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 0 5px rgba(0, 255, 106, 0.2);
+}
+
 .error-message {
     color: #ff6666;
     background: rgba(255, 68, 68, 0.2);

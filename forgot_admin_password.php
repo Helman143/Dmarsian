@@ -118,11 +118,9 @@ ini_set('display_errors', 1);
                     }
                 });
             </script>
-            <div style="margin-top:12px;text-align:center">
-                <a href="admin_verify_otp.php" style="text-decoration:none;color:#1976d2">Already have an OTP? Verify here</a>
-            </div>
-            <div style="margin-top:8px;text-align:center">
-                <a href="admin_login.php" style="text-decoration:none;color:#555">Back to Login</a>
+            <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;">
+                <a href="admin_verify_otp.php" class="secondary-btn">Already have an OTP? Verify here</a>
+                <a href="admin_login.php" class="secondary-btn">Back to Login</a>
             </div>
         </div>
     </div>
