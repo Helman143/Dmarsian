@@ -61,16 +61,7 @@ ini_set('display_errors', 1);
                 <img src="Picture/Logo2.png" alt="Logo">
             </div>
             <h2>Forgot Password</h2>
-            <?php if (isset($_GET['sent'])): ?>
-                <div style="background:#e8f5e9;border:1px solid #4caf50;border-radius:4px;padding:12px;margin-bottom:16px">
-                    <p class="error-message" style="color:#2e7d32;margin:0 0 8px 0">
-                        <strong>✓ OTP Request Processed</strong>
-                    </p>
-                    <p style="font-size:13px;color:#555;margin:0">
-                        If the account exists, an OTP has been sent to its registered email address.
-                    </p>
-                </div>
-            <?php elseif (isset($_GET['error'])): ?>
+            <?php if (isset($_GET['error'])): ?>
                 <div style="background:#ffebee;border:1px solid #f44336;border-radius:4px;padding:12px;margin-bottom:16px">
                     <p class="error-message" style="margin:0">Something went wrong. Please try again.</p>
                 </div>
@@ -127,22 +118,6 @@ ini_set('display_errors', 1);
                     }
                 });
             </script>
-            <?php if (isset($_GET['sent'])): ?>
-            <details class="otp-help">
-                <summary>Didn't receive the email?</summary>
-                <div class="help-content">
-                    <ul style="font-size:12px;color:rgba(255,255,255,0.7);margin:0;padding-left:20px;line-height:1.6;text-align:left;">
-                        <li>Check your <strong style="color:#fff;">spam/junk folder</strong>.</li>
-                        <li>Wait a few minutes - delivery can take 2-5 minutes.</li>
-                        <li>Verify you entered the correct <strong style="color:#fff;">email or username</strong>.</li>
-                        <li>Check if you have multiple email accounts.</li>
-                    </ul>
-                    <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:8px 0 0 0;text-align:left;">
-                        Note: You can request a new OTP after 60 seconds if needed.
-                    </p>
-                </div>
-            </details>
-            <?php endif; ?>
             <div style="margin-top:12px;text-align:center">
                 <a href="admin_verify_otp.php" style="text-decoration:none;color:#1976d2">Already have an OTP? Verify here</a>
             </div>

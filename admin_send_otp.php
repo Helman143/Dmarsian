@@ -90,13 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Check database connection
 if (!$conn || $conn->connect_error) {
     error_log("Database connection error in admin_send_otp.php: " . ($conn->connect_error ?? 'Connection failed'));
-    header('Location: forgot_admin_password.php?sent=1');
+    $redirectUrl = 'admin_verify_otp.php?email=' . urlencode($identifier ?? '') . '&otp_sent=1';
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
 $identifier = isset($_POST['identifier']) ? trim($_POST['identifier']) : '';
 if ($identifier === '') {
-    header('Location: forgot_admin_password.php?sent=1');
+    header('Location: forgot_admin_password.php?error=missing_identifier');
     exit();
 }
 
@@ -122,7 +123,8 @@ if ($stmt = $conn->prepare("SELECT id, email, username FROM admin_accounts WHERE
 
 // Always respond with success to avoid user enumeration
 if (!$admin || empty($admin['email'])) {
-    header('Location: forgot_admin_password.php?sent=1');
+    $redirectUrl = 'admin_verify_otp.php?email=' . urlencode($identifier) . '&otp_sent=1';
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
@@ -146,7 +148,8 @@ if ($stmt = $conn->prepare("SELECT last_sent_at FROM admin_password_resets WHERE
 }
 
 if ($tooSoon) {
-    header('Location: forgot_admin_password.php?sent=1');
+    $redirectUrl = 'admin_verify_otp.php?email=' . urlencode($adminEmail) . '&otp_sent=1';
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
@@ -186,7 +189,8 @@ if (empty($apiKey) || $apiKey === '' || $apiKey === 'your_smtp2go_api_key_here')
     error_log("DEBUG: apiKey value is: " . ($apiKey ?: 'empty string'));
     error_log("DEBUG: Check Digital Ocean App Platform -> Settings -> App-Level Environment Variables -> SMTP2GO_API_KEY");
     // Still redirect to success page for security (avoid user enumeration)
-    header('Location: forgot_admin_password.php?sent=1');
+    $redirectUrl = 'admin_verify_otp.php?email=' . urlencode($adminEmail) . '&otp_sent=1';
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
@@ -195,7 +199,8 @@ if (empty($senderEmail) || $senderEmail === '' || $senderEmail === 'your_email@e
     error_log("Current value: " . ($senderEmail ?: 'empty'));
     error_log("DEBUG: Check Digital Ocean App Platform -> Settings -> App-Level Environment Variables -> SMTP2GO_SENDER_EMAIL");
     // Still redirect to success page for security (avoid user enumeration)
-    header('Location: forgot_admin_password.php?sent=1');
+    $redirectUrl = 'admin_verify_otp.php?email=' . urlencode($adminEmail) . '&otp_sent=1';
+    header('Location: ' . $redirectUrl);
     exit();
 }
 
@@ -315,7 +320,8 @@ if ($emailSent) {
     header('Location: admin_verify_otp.php?email=' . urlencode($adminEmail) . '&otp_sent=1');
 } else {
     // Still redirect to success page for security (avoid user enumeration)
-    header('Location: forgot_admin_password.php?sent=1');
+    $redirectUrl = 'admin_verify_otp.php?email=' . urlencode($adminEmail) . '&otp_sent=1';
+    header('Location: ' . $redirectUrl);
 }
 exit();
 
