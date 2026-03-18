@@ -206,12 +206,9 @@ mysqli_close($conn);
                 <div class="filter-dropdown">
                     <select id="year-filter" onchange="filterPosts()">
                         <?php
-                        $current_year = date('Y');
-                        // Generate years from current year down to 5 years ago
-                        for ($year = $current_year; $year >= $current_year - 5; $year--) {
-                            $selected = $year_filter == $year ? 'selected' : '';
-                            echo "<option value=\"{$year}\" {$selected}>{$year}</option>";
-                        }
+                        // Only show 2026
+                        $selected_2026 = $year_filter == 2026 ? 'selected' : '';
+                        echo "<option value=\"2026\" {$selected_2026}>2026</option>";
                         ?>
                     </select>
                     <i class="fas fa-chevron-down"></i>
