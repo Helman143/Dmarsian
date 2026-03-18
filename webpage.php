@@ -323,76 +323,70 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
                 <h2 class="section-title">JOIN THE TEAM</h2>
                 <p class="register-subtitle">Begin your journey to discipline &amp; strength.</p>
                 <form class="register-form" id="registerForm" action="#" method="post" onsubmit="return false;">
-                    <div class="form-row">
-                        <div class="input-group">
-                            <input type="text" name="student_name" placeholder=" " required>
-                            <label>Student's Full Name</label>
+                    <div class="reg-grid">
+                        <!-- Left Column: Student Information -->
+                        <div class="reg-column">
+                            <div class="input-group">
+                                <input type="text" name="student_name" placeholder=" " required>
+                                <label>Student's Full Name</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="tel" name="phone" placeholder=" " required>
+                                <label>Phone Number</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="email" name="email" placeholder=" " required>
+                                <label>Email Address</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="school" placeholder=" " required>
+                                <label>School</label>
+                            </div>
+                            <div class="input-group">
+                                <select name="class" required>
+                                    <option value="" disabled selected>Select Class</option>
+                                    <option value="Poomsae">Poomsae</option>
+                                    <option value="Kyorugi">Kyorugi</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <select name="enroll_type" required>
+                                    <option value="" disabled selected>Enroll or Trial Session</option>
+                                    <option value="Enroll">Enroll</option>
+                                    <option value="Trial Session">Trial Session</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <input type="text" name="parent_name" placeholder=" " required>
-                            <label>Parent's Full Name</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <input type="text" name="address" placeholder=" " required>
-                            <label>Address</label>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" name="school" placeholder=" " required>
-                            <label>School</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <input type="tel" name="phone" placeholder=" " required>
-                            <label>Phone Number</label>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" name="email" placeholder=" " required>
-                            <label>Email Address</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <input type="text" name="parent_phone" placeholder=" " required>
-                            <label>Parent's Phone Number</label>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" name="parent_email" placeholder=" " required>
-                            <label>Parent's Email</label>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <select name="class" required>
-                                <option value="" disabled selected>Select Class</option>
-                                <option value="Poomsae">Poomsae</option>
-                                <option value="Kyorugi">Kyorugi</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <select name="belt_rank" required>
-                                <option value="" disabled selected>Select Belt Rank</option>
-                                <option value="White">White</option>
-                                <option value="Yellow">Yellow</option>
-                                <option value="Green">Green</option>
-                                <option value="Blue">Blue</option>
-                                <option value="Red">Red</option>
-                                <option value="Black">Black</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <select name="enroll_type" required>
-                                <option value="" disabled selected>Enroll or Trial Session</option>
-                                <option value="Enroll">Enroll</option>
-                                <option value="Trial Session">Trial Session</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <span></span>
+
+                        <!-- Right Column: Parent Information -->
+                        <div class="reg-column">
+                            <div class="input-group">
+                                <input type="text" name="parent_name" placeholder=" " required>
+                                <label>Parent's Full Name</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="parent_phone" placeholder=" " required>
+                                <label>Parent's Number</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="email" name="parent_email" placeholder=" " required>
+                                <label>Parent's Email</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" name="address" placeholder=" " required>
+                                <label>Address</label>
+                            </div>
+                            <div class="input-group">
+                                <select name="belt_rank" required>
+                                    <option value="" disabled selected>Select Belt Rank</option>
+                                    <option value="White">White</option>
+                                    <option value="Yellow">Yellow</option>
+                                    <option value="Green">Green</option>
+                                    <option value="Blue">Blue</option>
+                                    <option value="Red">Red</option>
+                                    <option value="Black">Black</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <button class="submit-btn" type="submit">

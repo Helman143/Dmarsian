@@ -1899,9 +1899,15 @@ section#offers {
     gap: 30px;
 }
 
-.form-row {
+.reg-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.reg-column {
+    display: flex;
+    flex-direction: column;
     gap: 30px;
 }
 
@@ -2043,7 +2049,7 @@ section#offers {
 }
 
 @media (max-width: 768px) {
-    .form-row {
+    .reg-grid {
         grid-template-columns: 1fr;
     }
 
