@@ -992,4 +992,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-}); 
+});
+
+// Session Keep-Alive: Ping the server every 5 minutes to prevent session expiration
+setInterval(function() {
+    fetch('keep_session_alive.php', {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+        }
+    }).catch(err => console.error('Keep-alive ping failed:', err));
+}, 300000);
+ 
