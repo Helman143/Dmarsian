@@ -40,26 +40,31 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
 
 // Fetch posts for display
 $conn = connectDB();
-$year_filter = isset($_GET['year']) ? (int)$_GET['year'] : null;
+
+// Fetch all distinct years that have active posts, for the dropdown
+$years_result = mysqli_query($conn, "SELECT DISTINCT YEAR(post_date) as yr FROM posts WHERE status = 'active' ORDER BY yr DESC");
+$available_years = [];
+while ($yr_row = mysqli_fetch_assoc($years_result)) {
+    $available_years[] = (int)$yr_row['yr'];
+}
+mysqli_free_result($years_result);
+
+// If no posts at all, fall back to current year in the dropdown
+if (empty($available_years)) {
+    $available_years[] = (int)date('Y');
+}
+
+// Default year: use most recent year from DB (first item, already sorted DESC)
+$most_recent_year = $available_years[0];
+
+$year_filter = isset($_GET['year']) ? (int)$_GET['year'] : $most_recent_year;
 $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
-// Base query: exclude archived posts and filter by year
-// Status is ENUM('active','archived'), so it cannot be NULL - only check for 'active'
-// If no year filter specified, show current year AND previous year (matching get_posts.php behavior)
-if ($year_filter !== null) {
-    // Specific year selected - show only that year
-    $sql = "SELECT * FROM posts WHERE status = 'active' AND YEAR(post_date) = ?";
-    $params = [$year_filter];
-    $types = "i";
-} else {
-    // No year filter - show current year and previous year (last 2 years)
-    $currentYear = date('Y');
-    $previousYear = $currentYear - 1;
-    $sql = "SELECT * FROM posts WHERE status = 'active' AND (YEAR(post_date) = ? OR YEAR(post_date) = ?)";
-    $params = [$currentYear, $previousYear];
-    $types = "ii";
-}
+// Base query: exclude archived posts and filter by the selected year
+$sql = "SELECT * FROM posts WHERE status = 'active' AND YEAR(post_date) = ?";
+$params = [$year_filter];
+$types = "i";
 
 // Add category filter if specified
 if (!empty($category_filter)) {
@@ -163,9 +168,10 @@ mysqli_close($conn);
                 <div class="filter-dropdown">
                     <select id="year-filter" onchange="filterPosts()">
                         <?php
-                        // Only show 2026
-                        $selected_2026 = ($year_filter == 2026 || $year_filter === null) ? 'selected' : '';
-                        echo "<option value=\"2026\" {$selected_2026}>2026</option>";
+                        foreach ($available_years as $yr) {
+                            $selected = ($year_filter == $yr) ? 'selected' : '';
+                            echo "<option value=\"{$yr}\" {$selected}>{$yr}</option>";
+                        }
                         ?>
                     </select>
                     <i class="fas fa-chevron-down"></i>
