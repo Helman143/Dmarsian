@@ -510,10 +510,10 @@ nav a,
 .image-preview {
     position: relative;
     width: 100%;
-    height: 200px;
+    height: 160px;
     border-radius: 10px;
     overflow: hidden;
-    margin-top: 10px;
+    margin-top: 0;
 }
 
 .image-preview img {
@@ -637,12 +637,17 @@ nav a,
 }
 
 .modal-body {
-    display: flex;
+    display: grid;
+    grid-template-columns: 220px 1fr;
     gap: 20px;
+    align-items: start;
 }
 
 .image-uploader {
-    flex-basis: 40%;
+    width: 220px;
+    height: 200px;
+    min-height: 200px;
+    max-height: 200px;
     background: #f0f0f0;
     border: 2px dashed #ccc;
     border-radius: 10px;
@@ -656,6 +661,7 @@ nav a,
     padding: 10px;
     box-sizing: border-box;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .image-uploader img {
@@ -666,26 +672,26 @@ nav a,
 }
 
 .image-uploader i {
-    font-size: 4rem;
+    font-size: 2.5rem;
     color: #888;
 }
 
 .image-uploader p {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
-    margin: 10px 0 5px 0;
+    margin: 6px 0 3px 0;
 }
 
 .image-uploader span {
-    font-size: 0.9rem;
+    font-size: 0.78rem;
     color: #666;
 }
 
 .form-fields {
-    flex-basis: 60%;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
+    min-width: 0;
 }
 
 .form-group {
