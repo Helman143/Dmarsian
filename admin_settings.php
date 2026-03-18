@@ -112,7 +112,7 @@ require_once 'db_connect.php';
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                             </div>
-                            <small class="text-muted">Min 8 chars with upper, lower, number, and special character.</small>
+                            <small class="text-warning fw-bold">Min 8 chars with upper, lower, number, and special character.</small>
                         </div>
                     </div>
                     <div class="form-actions">

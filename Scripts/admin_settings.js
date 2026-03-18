@@ -314,4 +314,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initial load of admin accounts
   refreshAdminAccountsTable();
+
+  // Real-time automatic updates for the Admin Accounts Table (Every 5 seconds)
+  setInterval(function() {
+      // Only refresh if the Admins Account tab is currently active
+      if (document.getElementById("admins-account").style.display === "block") {
+          // Pause auto-refresh if any password is currently revealed to prevent hiding it mid-view
+          const isAnyPasswordRevealed = document.querySelector(".password-masked[style*='display: none']") !== null;
+          
+          if (!isAnyPasswordRevealed) {
+              refreshAdminAccountsTable();
+          }
+      }
+  }, 5000);
 });
