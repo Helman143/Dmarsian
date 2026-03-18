@@ -15,6 +15,23 @@ ini_set('display_errors', 1);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Serif+Pro:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="Styles/typography.css">
+    <style>
+        /* Custom scrollbar for the info box */
+        .scrollable-info::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-info::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .scrollable-info::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 106, 0.3);
+            border-radius: 10px;
+        }
+        .scrollable-info::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 106, 0.5);
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -32,7 +49,7 @@ ini_set('display_errors', 1);
                         If the account exists, an OTP has been sent to its registered email address.
                     </p>
                 </div>
-                <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:12px;margin-bottom:16px">
+                <div class="scrollable-info" style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:12px;margin-bottom:16px;max-height:150px;overflow-y:auto;text-align:left">
                     <p style="font-size:12px;color:#856404;margin:0 0 6px 0">
                         <strong>📧 Didn't receive the email?</strong>
                     </p>
