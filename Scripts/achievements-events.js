@@ -118,8 +118,7 @@ function renderSlider(posts, sliderId) {
         return (
             `<article class="slide-card post-card ${sliderClass}">`
           +   `<div class="image-wrap">`
-          +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="${imageErrorHandler}(this)" loading="lazy" style="background-color: #2d2d2d;">`
-          +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
+          +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="${imageErrorHandler}" loading="lazy" style="background-color: #2d2d2d;">`
           +     `<span class="hover-overlay"></span>`
           +   `</div>`
           +   `<div class="card-body">`

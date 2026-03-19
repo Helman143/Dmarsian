@@ -638,25 +638,24 @@ if (!empty($spacesName)) {
             return null;
         }
         
-        // If it's already a full URL (Spaces/CDN) or data URI, use it directly
-        if (imagePath.match(/^(https?:\/\/|data:)/)) {
-            return imagePath;
+        let rawPath = imagePath.trim();
+        
+        // 1. If it's already a full URL (Spaces/CDN) or data URI, use it directly
+        if (rawPath.match(/^(https?:\/\/|data:)/)) {
+            return rawPath;
         }
         
-        // Local path resolution
-        let cleanPath = imagePath.replace(/^\//, '');
+        // 2. Local path resolution
+        let cleanPath = rawPath.replace(/^\//, '');
         
-        // Fallback: if it's just a filename, prepend the standard local path
-        if (!cleanPath.includes('/')) {
+        // Detect if it's missing the standard prefix
+        if (!cleanPath.startsWith('uploads/') && !cleanPath.includes('/')) {
             cleanPath = 'uploads/posts/' + cleanPath;
         }
         
-        // Prepend base path if exists
-        const protocol = window.location.protocol;
-        const host = window.location.host;
-        const fullBasePath = protocol + '//' + host + (basePath || '');
-        
-        return (basePath || '') + '/' + cleanPath;
+        // Use the global siteBasePath (detected in PHP)
+        const siteBase = (window.siteBasePath || '').replace(/\/$/, '');
+        return siteBase + '/' + cleanPath;
     }
     
     function renderSlider(posts, sliderId) {
