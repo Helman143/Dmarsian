@@ -1,6 +1,30 @@
-// Global variables
-let currentPostId = null;
-let isEditMode = false;
+// Initialize BroadcastChannel for real-time updates
+let postUpdateChannel = null;
+if (typeof BroadcastChannel !== 'undefined') {
+    postUpdateChannel = new BroadcastChannel('post-updates');
+}
+
+// Helper function to broadcast post updates
+function broadcastPostUpdate(type, category, postId = null) {
+    if (postUpdateChannel) {
+        postUpdateChannel.postMessage({
+            type: type,
+            category: category,
+            postId: postId,
+            timestamp: Date.now()
+        });
+    }
+}
+
+// Global base path for local image resolution
+const basePath = (function() {
+    const isProduction = window.location.hostname.includes('ondigitalocean.app');
+    if (isProduction) return '';
+    const path = window.location.pathname;
+    const parts = path.split('/');
+    if (parts.length > 2) return '/' + parts[1];
+    return '';
+})();
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
@@ -245,8 +269,9 @@ async function loadPostData(postId) {
                 
                 // Show preview - normalize path
                 let imgSrc = post.image_path.trim();
-                if (!imgSrc.match(/^(https?:\/\/|\/)/)) {
-                    imgSrc = '/' + imgSrc.replace(/^\//, '');
+                if (!imgSrc.match(/^(https?:\/\/|data:)/)) {
+                    // Prepend base path if it's a local path
+                    imgSrc = (basePath || '') + '/' + imgSrc.replace(/^\//, '');
                 }
                 previewImg.src = imgSrc;
                 imagePreview.style.display = 'block';
@@ -313,6 +338,12 @@ async function handleFormSubmit(e) {
             } else {
                 console.log('Post created but no image path returned');
             }
+            // Broadcast post creation to other tabs (webpage.php)
+            const category = formData.get('category');
+            if (category) {
+                broadcastPostUpdate('post-created', category);
+            }
+            
             Swal.fire({
                 title: 'Success!',
                 text: data.message,
@@ -359,6 +390,12 @@ async function updatePost() {
         const data = await response.json();
         
         if (data.success) {
+            // Broadcast post update to other tabs (webpage.php)
+            const category = formData.get('category');
+            if (category && currentPostId) {
+                broadcastPostUpdate('post-updated', category, currentPostId);
+            }
+            
             Swal.fire({
                 title: 'Updated!',
                 text: data.message,
@@ -420,6 +457,24 @@ async function archivePost(postId) {
         const data = await response.json();
         
         if (data.success) {
+            // Get category from post card before removing it
+            let category = null;
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postCard) {
+                const postTag = postCard.querySelector('.post-tag');
+                if (postTag) {
+                    const tagText = postTag.textContent.trim().toLowerCase();
+                    if (tagText === 'achievement') category = 'achievement';
+                    else if (tagText === 'event') category = 'event';
+                    else if (tagText === 'achievement/event') category = 'achievement_event';
+                }
+            }
+            
+            // Broadcast post archive to other tabs (webpage.php)
+            if (category) {
+                broadcastPostUpdate('post-archived', category, postId);
+            }
+
             Swal.fire({
                 title: 'Archived!',
                 text: data.message,
@@ -429,7 +484,6 @@ async function archivePost(postId) {
                 confirmButtonColor: '#00ff6a'
             }).then(() => {
                 // Remove the post card immediately from the DOM
-                const postCard = document.querySelector(`[data-post-id="${postId}"]`);
                 if (postCard) {
                     postCard.style.transition = 'opacity 0.3s';
                     postCard.style.opacity = '0';

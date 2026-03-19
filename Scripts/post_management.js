@@ -8,6 +8,16 @@ if (typeof BroadcastChannel !== 'undefined') {
     postUpdateChannel = new BroadcastChannel('post-updates');
 }
 
+// Global base path for local image resolution
+const basePath = (function() {
+    const isProduction = window.location.hostname.includes('ondigitalocean.app');
+    if (isProduction) return '';
+    const path = window.location.pathname;
+    const parts = path.split('/');
+    if (parts.length > 2) return '/' + parts[1];
+    return '';
+})();
+
 // Helper function to broadcast post updates
 function broadcastPostUpdate(type, category, postId = null) {
     if (postUpdateChannel) {
@@ -265,8 +275,9 @@ async function loadPostData(postId) {
                 
                 // Show preview - normalize path
                 let imgSrc = post.image_path.trim();
-                if (!imgSrc.match(/^(https?:\/\/|\/)/)) {
-                    imgSrc = '/' + imgSrc.replace(/^\//, '');
+                if (!imgSrc.match(/^(https?:\/\/|data:)/)) {
+                    // Prepend base path if it's a local path
+                    imgSrc = (basePath || '') + '/' + imgSrc.replace(/^\//, '');
                 }
                 previewImg.src = imgSrc;
                 imagePreview.style.display = 'block';

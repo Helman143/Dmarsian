@@ -594,8 +594,35 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
     // DigitalOcean Spaces base URL for images (set by PHP)
     const SPACES_BASE_URL = <?php echo $spacesBaseUrl ? json_encode($spacesBaseUrl) : 'null'; ?>;
     
+    // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
+    const basePath = (function() {
+        const isProduction = window.location.hostname.includes('ondigitalocean.app');
+        if (isProduction) return '';
+        
+        const path = window.location.pathname;
+        // If path is /Dmarsian/webpage.php, base is /Dmarsian
+        const parts = path.split('/');
+        if (parts.length > 2) {
+            return '/' + parts[1];
+        }
+        return '';
+    })();
+
+    // Initialize BroadcastChannel for real-time updates
+    if (typeof BroadcastChannel !== 'undefined') {
+        const postUpdateChannel = new BroadcastChannel('post-updates');
+        postUpdateChannel.onmessage = (event) => {
+            console.log('Post update received:', event.data);
+            // Refresh sliders or reload page
+            // For now, reload is safest to ensure all server-side logic (like year filters) is re-run
+            // Use a slight delay to ensure DB transaction is completed on server
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        };
+    }
+    
     // Base URL helper function - handles both Spaces URLs and local paths
-    // Priority: Full URL > Spaces URL > Local relative path
     function getImageUrl(imagePath) {
         if (!imagePath || imagePath.trim() === '') {
             return null;
@@ -606,53 +633,21 @@ if (!empty($spacesName) && !empty($spacesRegion)) {
             return imagePath;
         }
         
-        // Extract filename from path (handles "uploads/posts/file.jpg" or just "file.jpg")
-        const fileName = imagePath.split('/').pop();
+        // Local path resolution
+        let cleanPath = imagePath.replace(/^\//, '');
         
-        // If Spaces is configured, use Spaces URL
-        if (SPACES_BASE_URL) {
-            return SPACES_BASE_URL + fileName;
+        // Fallback: if it's just a filename, prepend the standard local path
+        if (!cleanPath.includes('/')) {
+            cleanPath = 'uploads/posts/' + cleanPath;
         }
         
-        // Fallback to local relative path (no leading slash for compatibility)
-        return `uploads/posts/${fileName}`;
+        // Prepend base path if exists
+        const protocol = window.location.protocol;
+        const host = window.location.host;
+        const fullBasePath = protocol + '//' + host + (basePath || '');
+        
+        return (basePath || '') + '/' + cleanPath;
     }
-    
-    // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
-    // On production (DigitalOcean), app is at root, so base path should be empty
-    const basePath = (function() {
-        // Check if we're on DigitalOcean App Platform (production)
-        const isProduction = window.location.hostname.includes('ondigitalocean.app');
-        
-        // On production, always use root (no base path)
-        if (isProduction) {
-            return '';
-        }
-        
-        // On localhost, detect subdirectory if present
-        // Method 1: Try to detect from current page path
-        const path = window.location.pathname;
-        const pathParts = path.split('/').filter(p => p && p !== 'index.php' && p !== 'webpage.php');
-        
-        // If we're in a subdirectory (e.g., /Dmarsian/webpage.php), extract it
-        if (pathParts.length > 0) {
-            const potentialBase = '/' + pathParts[0];
-            return potentialBase;
-        }
-        
-        // Method 2: Try to detect from script src
-        const scripts = document.getElementsByTagName('script');
-        for (let script of scripts) {
-            if (script.src && script.src.includes(window.location.hostname)) {
-                const match = script.src.match(/^(https?:\/\/[^\/]+)(\/[^\/]+)/);
-                if (match && match[2] && match[2] !== '/') {
-                    return match[2];
-                }
-            }
-        }
-        
-        return '';
-    })();
     
     function renderSlider(posts, sliderId) {
         const slider = document.getElementById(sliderId);
