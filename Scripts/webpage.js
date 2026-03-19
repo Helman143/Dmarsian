@@ -292,7 +292,13 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             if (!valid) {
                 e.preventDefault();
-                alert('Please fill in all required fields.');
+                Swal.fire({
+                    title: 'Incomplete Fields',
+                    text: 'Please fill in all required fields.',
+                    icon: 'warning',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
             }
         });
     }

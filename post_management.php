@@ -559,5 +559,6 @@ mysqli_close($conn);
         setTimeout(checkImages, 500);
     })();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
-</html> 
+</html>

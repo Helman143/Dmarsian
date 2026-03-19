@@ -274,7 +274,14 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             const result = await response.json();
             
             if (result.status === 'success') {
-                alert(result.message);
+                Swal.fire({
+                    title: 'Success!',
+                    text: result.message,
+                    icon: 'success',
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    confirmButtonColor: '#00ff6a'
+                });
                 loadStudents(); // Reload the students table
                 form.reset(); // Clear the form
                 
@@ -304,10 +311,22 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                     }));
                 }
             } else {
-                alert('Error: ' + result.message);
+                Swal.fire({
+                    title: 'Error',
+                    text: result.message,
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
             }
         } catch (error) {
-            alert('Error submitting form: ' + error.message);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error submitting form: ' + error.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
         }
         
         return false;
@@ -481,7 +500,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             
             // Show alert for critical errors
             if (error.message.includes('JSON') || error.message.includes('504')) {
-                alert('Failed to load students. The server may be experiencing issues. Please try again in a moment.');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to load students. The server may be experiencing issues. Please try again in a moment.',
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
             }
         }
     }
@@ -522,7 +547,19 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     }
 
     async function deleteStudent(jejaNo) {
-        if (confirm('Are you sure you want to delete this student?')) {
+        const result = await Swal.fire({
+            title: 'Delete Student?',
+            text: "Are you sure you want to delete this student?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#00ff6a',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete!',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
+
+        if (result.isConfirmed) {
             try {
                 const response = await fetch('delete_student.php', {
                     method: 'POST',
@@ -535,13 +572,32 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    alert(result.message);
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: result.message,
+                        icon: 'success',
+                        background: '#1a1a1a',
+                        color: '#fff',
+                        confirmButtonColor: '#00ff6a'
+                    });
                     loadStudents(); // Reload the table
                 } else {
-                    alert('Error: ' + result.message);
+                    Swal.fire({
+                        title: 'Error',
+                        text: result.message,
+                        icon: 'error',
+                        background: '#1a1a1a',
+                        color: '#fff'
+                    });
                 }
             } catch (error) {
-                alert('Error deleting student: ' + error.message);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error deleting student: ' + error.message,
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
             }
         }
     }
@@ -630,11 +686,29 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     // Export table (visible rows) to CSV, skipping the Actions column
     function exportStudentsToCSV(){
         const table = document.querySelector('.student-table');
-        if(!table) return alert('No table to export.');
+        if(!table) {
+            Swal.fire({
+                title: 'Note',
+                text: 'No table to export.',
+                icon: 'info',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+            return;
+        }
 
         const thead = table.querySelector('thead');
         const tbody = table.querySelector('tbody');
-        if(!thead || !tbody) return alert('Table is missing header or body.');
+        if(!thead || !tbody) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Table is missing header or body.',
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+            return;
+        }
 
         const headerCells = [...thead.querySelectorAll('th')];
         const actionsColIndex = headerCells.findIndex(th => (th.textContent || '').trim().toLowerCase() === 'actions');
@@ -689,5 +763,6 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         }
     });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html> 

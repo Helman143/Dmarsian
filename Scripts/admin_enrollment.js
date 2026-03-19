@@ -114,91 +114,111 @@ function searchApproved(term) {
 }
 
 // Function to approve enrollment
-function approveEnrollment(id) {
-    if (confirm('Approve this enrollment?')) {
-        fetch('approve_enrollment.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'id=' + encodeURIComponent(id)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (typeof Swal !== 'undefined') {
-                let icon = 'info';
-                let title = 'Info';
-                if (result.status === 'success') {
-                    icon = 'success';
-                    title = 'Success!';
-                } else if (result.status === 'error') {
-                    icon = 'error';
-                    title = 'Error';
-                } else if (result.status === 'info') {
-                    icon = 'info';
-                    title = 'Information';
-                }
-                
-                Swal.fire({
-                    icon: icon,
-                    title: title,
-                    text: result.message,
-                    timer: result.status === 'success' ? 2000 : 3000,
-                    showConfirmButton: result.status === 'error' || result.status === 'info'
-                });
-            } else {
-                alert(result.message);
-            }
-            
-            // If student data is returned, add it immediately to the table
-            if (result.status === 'success' && result.student) {
-                // Add the new student to the approved enrollments table immediately
-                const student = result.student;
-                const tbody = document.getElementById('approvedTableBody');
-                if (tbody) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${student.id || ''}</td>
-                        <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
-                        <td>${student.date_enrolled || ''}</td>
-                        <td>${student.full_name || ''}</td>
-                        <td>${student.phone || ''}</td>
-                    `;
-                    // Insert at the top of the table
-                    tbody.insertBefore(row, tbody.firstChild);
-                    // Also add to the approvedEnrollments array
-                    approvedEnrollments.unshift({
-                        id: student.id,
-                        jeja_no: student.jeja_no,
-                        date_enrolled: student.date_enrolled,
-                        full_name: student.full_name,
-                        phone: student.phone
-                    });
-                }
-                
-                // Remove the approved enrollment from pending table immediately
-                pendingEnrollments = pendingEnrollments.filter(req => req.id !== id);
-                renderPendingTable(pendingEnrollments);
-                
-                // Broadcast approval event to other tabs/pages
-                if (enrollmentChannel) {
-                    enrollmentChannel.postMessage({
-                        type: 'enrollment_approved',
-                        student: student,
-                        enrollmentId: id
-                    });
-                }
-            }
-            
-            // Refresh pending enrollments to remove the approved one
-            loadPendingEnrollments();
-            // Refresh approved enrollments immediately (no delay needed with transaction)
-            loadApprovedEnrollments();
-            
-            // Also update discount tables in payment.php if present
-            if (typeof fetchStudentsForDiscountTables === 'function') {
-                fetchStudentsForDiscountTables();
-            }
-        });
+async function approveEnrollment(id) {
+    const result = await Swal.fire({
+        title: 'Approve Enrollment?',
+        text: 'Are you sure you want to approve this enrollment?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, approve it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) {
+        return;
     }
+
+    fetch('approve_enrollment.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + encodeURIComponent(id)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (typeof Swal !== 'undefined') {
+            let icon = 'info';
+            let title = 'Info';
+            if (result.status === 'success') {
+                icon = 'success';
+                title = 'Success!';
+            } else if (result.status === 'error') {
+                icon = 'error';
+                title = 'Error';
+            } else if (result.status === 'info') {
+                icon = 'info';
+                title = 'Information';
+            }
+            
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: result.message,
+                timer: result.status === 'success' ? 2000 : 3000,
+                showConfirmButton: result.status === 'error' || result.status === 'info'
+            });
+        } else {
+            Swal.fire({
+                title: 'Info',
+                text: result.message,
+                icon: 'info',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+        }
+        
+        // If student data is returned, add it immediately to the table
+        if (result.status === 'success' && result.student) {
+            // Add the new student to the approved enrollments table immediately
+            const student = result.student;
+            const tbody = document.getElementById('approvedTableBody');
+            if (tbody) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.id || ''}</td>
+                    <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
+                    <td>${student.date_enrolled || ''}</td>
+                    <td>${student.full_name || ''}</td>
+                    <td>${student.phone || ''}</td>
+                `;
+                // Insert at the top of the table
+                tbody.insertBefore(row, tbody.firstChild);
+                // Also add to the approvedEnrollments array
+                approvedEnrollments.unshift({
+                    id: student.id,
+                    jeja_no: student.jeja_no,
+                    date_enrolled: student.date_enrolled,
+                    full_name: student.full_name,
+                    phone: student.phone
+                });
+            }
+            
+            // Remove the approved enrollment from pending table immediately
+            pendingEnrollments = pendingEnrollments.filter(req => req.id !== id);
+            renderPendingTable(pendingEnrollments);
+            
+            // Broadcast approval event to other tabs/pages
+            if (enrollmentChannel) {
+                enrollmentChannel.postMessage({
+                    type: 'enrollment_approved',
+                    student: student,
+                    enrollmentId: id
+                });
+            }
+        }
+        
+        // Refresh pending enrollments to remove the approved one
+        loadPendingEnrollments();
+        // Refresh approved enrollments immediately (no delay needed with transaction)
+        loadApprovedEnrollments();
+        
+        // Also update discount tables in payment.php if present
+        if (typeof fetchStudentsForDiscountTables === 'function') {
+            fetchStudentsForDiscountTables();
+        }
+    });
 }
 
 // Listen for enrollment updates from other tabs/pages

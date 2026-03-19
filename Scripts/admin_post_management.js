@@ -274,7 +274,13 @@ async function loadPostData(postId) {
         }
     } catch (error) {
         console.error('Error loading post data:', error);
-        alert('Error loading post data');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error loading post data',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
@@ -307,16 +313,35 @@ async function handleFormSubmit(e) {
             } else {
                 console.log('Post created but no image path returned');
             }
-            alert(data.message);
-            closeModal();
-            // Use cache-busting reload to ensure fresh data
-            location.reload(true);
+            Swal.fire({
+                title: 'Success!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            }).then(() => {
+                closeModal();
+                location.reload(true);
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
         }
     } catch (error) {
         console.error('Error creating post:', error);
-        alert('Error creating post: ' + error.message);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error creating post: ' + error.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
@@ -334,20 +359,52 @@ async function updatePost() {
         const data = await response.json();
         
         if (data.success) {
-            alert(data.message);
-            closeModal();
-            location.reload(); // Refresh to show updated post
+            Swal.fire({
+                title: 'Updated!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            }).then(() => {
+                closeModal();
+                location.reload(); 
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
         }
     } catch (error) {
         console.error('Error updating post:', error);
-        alert('Error updating post');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error updating post',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
 async function archivePost(postId) {
-    if (!confirm('Are you sure you want to archive this post?')) {
+    const result = await Swal.fire({
+        title: 'Archive Post?',
+        text: "Are you sure you want to archive this post?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, archive it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
     
@@ -363,37 +420,63 @@ async function archivePost(postId) {
         const data = await response.json();
         
         if (data.success) {
-            alert(data.message);
-            // Remove the post card immediately from the DOM
-            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
-            if (postCard) {
-                postCard.style.transition = 'opacity 0.3s';
-                postCard.style.opacity = '0';
-                setTimeout(() => {
-                    postCard.remove();
-                    // Check if grid is empty and show message
-                    const postGrid = document.getElementById('post-grid');
-                    if (postGrid && postGrid.querySelectorAll('.post-card').length === 0) {
-                        location.reload(true); // Force reload with cache bypass
-                    }
-                }, 300);
-            } else {
-                // Force reload with cache bypass to ensure fresh data
-                location.reload(true);
-            }
+            Swal.fire({
+                title: 'Archived!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            }).then(() => {
+                // Remove the post card immediately from the DOM
+                const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+                if (postCard) {
+                    postCard.style.transition = 'opacity 0.3s';
+                    postCard.style.opacity = '0';
+                    setTimeout(() => {
+                        postCard.remove();
+                        // Check if grid is empty and show message
+                        const postGrid = document.getElementById('post-grid');
+                        if (postGrid && postGrid.querySelectorAll('.post-card').length === 0) {
+                            location.reload(true); // Force reload with cache bypass
+                        }
+                    }, 300);
+                } else {
+                    // Force reload with cache bypass to ensure fresh data
+                    location.reload(true);
+                }
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
         }
     } catch (error) {
         console.error('Error archiving post:', error);
-        alert('Error archiving post');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error archiving post',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
 async function toggleSliderVisibility(postId, currentShowInSlider) {
     // Check if feature is available (set by PHP in admin_post_management.php)
     if (typeof SHOW_IN_SLIDER_AVAILABLE !== 'undefined' && !SHOW_IN_SLIDER_AVAILABLE) {
-        alert('This feature requires a database migration.\n\nPlease visit run_migration.php to enable the "Remove from Slider" feature.');
+        Swal.fire({
+            title: 'Migration Required',
+            text: 'This feature requires a database migration. Please visit run_migration.php to enable it.',
+            icon: 'info',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         return;
     }
     
@@ -402,7 +485,13 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
     currentShowInSlider = parseInt(currentShowInSlider);
     
     if (!postId || isNaN(postId) || postId <= 0) {
-        alert('Error: Invalid post ID');
+        Swal.fire({
+            title: 'Error',
+            text: 'Invalid post ID',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         console.error('Invalid postId:', postId);
         return;
     }
@@ -410,16 +499,27 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
     // Find the specific post card - ensure we're targeting only this post
     const postCard = document.querySelector(`[data-post-id="${postId}"]`);
     if (!postCard) {
-        alert('Error: Post not found in DOM');
+        Swal.fire({
+            title: 'Error',
+            text: 'Post not found in DOM',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         console.error('Post card not found for ID:', postId);
         return;
     }
     
     // Get the button for this specific post only
-    const button = postCard.querySelector('.remove-slider-btn');
     if (!button) {
         // Button doesn't exist - migration probably not run yet
-        alert('This feature requires a database migration. Please visit run_migration.php to enable it.');
+        Swal.fire({
+            title: 'Migration Required',
+            text: 'This feature requires a database migration. Please visit run_migration.php to enable it.',
+            icon: 'info',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         console.warn('Remove slider button not found - migration may not be run yet');
         return;
     }
@@ -431,8 +531,21 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
     }
     
     const actionText = currentShowInSlider === 0 ? 'show in slider' : 'remove from slider';
-    const confirmMessage = `Are you sure you want to ${actionText} this post?\n\nThis will ${currentShowInSlider === 0 ? 'restore' : 'hide'} the post from Achievement and Event sliders on the homepage.\n\nThe post will remain visible in the archive and admin panel.`;
-    if (!confirm(confirmMessage)) {
+    const confirmMessage = `Are you sure you want to ${actionText} this post? This will ${currentShowInSlider === 0 ? 'restore' : 'hide'} the post from Achievement and Event sliders.`;
+    
+    const sliderResult = await Swal.fire({
+        title: 'Update Slider visibility?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, update it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!sliderResult.isConfirmed) {
         return;
     }
     
@@ -486,7 +599,14 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
             const statusMessage = newValue === 0 
                 ? 'Post removed from Achievement and Event sliders. It will remain visible in the archive and admin panel.'
                 : 'Post added to Achievement and Event sliders.';
-            alert(statusMessage);
+            Swal.fire({
+                title: 'Success!',
+                text: statusMessage,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            });
             
             // Broadcast update for real-time slider refresh on webpage.php
             // This only affects sliders, not archive or admin panel
@@ -505,13 +625,29 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
             
             // If migration is required, show helpful message with link
             if (data.migration_required) {
-                const migrationMsg = errorMsg + '\n\nWould you like to run the migration now?';
-                if (confirm(migrationMsg)) {
-                    window.location.href = 'run_migration.php';
-                    return;
-                }
+                Swal.fire({
+                    title: 'Migration Required',
+                    text: errorMsg + ' Would you like to run the migration now?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00ff6a',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Run Migration',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                }).then((r) => {
+                    if (r.isConfirmed) {
+                        window.location.href = 'run_migration.php';
+                    }
+                });
             } else {
-                alert('Error: ' + errorMsg);
+                Swal.fire({
+                    title: 'Error',
+                    text: errorMsg,
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
             }
             
             console.error('Toggle failed:', data);
@@ -522,7 +658,13 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
         }
     } catch (error) {
         console.error('Error toggling slider visibility for post', postId, ':', error);
-        alert('Error toggling slider visibility: ' + error.message);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error toggling slider visibility: ' + error.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         // Re-enable button on error
         button.disabled = false;
         button.style.opacity = '1';
@@ -532,7 +674,13 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
 
 async function archiveCurrentPost() {
     if (!currentPostId) {
-        alert('No post selected to archive');
+        Swal.fire({
+            title: 'Note',
+            text: 'No post selected to archive',
+            icon: 'info',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         return;
     }
     
@@ -548,7 +696,13 @@ async function archiveCurrentPost() {
             await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error) {
             console.error('Error saving changes before archiving:', error);
-            alert('Error saving changes. Please save manually before archiving.');
+            Swal.fire({
+                title: 'Error',
+                text: 'Error saving changes. Please save manually before archiving.',
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
             return;
         }
     }

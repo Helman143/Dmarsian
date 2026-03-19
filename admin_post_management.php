@@ -661,5 +661,6 @@ mysqli_close($conn);
     })();
     </script>
     <script src="Scripts/sidebar.js?v=2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html> 

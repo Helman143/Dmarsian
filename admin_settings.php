@@ -193,5 +193,6 @@ require_once 'db_connect.php';
     });
 })();
 </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html> 

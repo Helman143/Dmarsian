@@ -76,10 +76,24 @@ function populateApprovedTable(data = approvedEnrollments) {
     });
 }
 
-// Function to approve enrollment
-function approveEnrollment(id) {
-    if (confirm('Approve this enrollment?')) {
-        fetch('approve_enrollment.php', {
+async function approveEnrollment(id) {
+    const result = await Swal.fire({
+        title: 'Approve Enrollment?',
+        text: 'Are you sure you want to approve this enrollment?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, approve it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    fetch('approve_enrollment.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'id=' + encodeURIComponent(id)
@@ -157,7 +171,6 @@ function approveEnrollment(id) {
                 fetchStudentsForDiscountTables();
             }
         });
-    }
 }
 
 // Search functionality for pending enrollments

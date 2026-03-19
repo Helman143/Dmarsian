@@ -294,7 +294,13 @@ async function loadPostData(postId) {
         }
     } catch (error) {
         console.error('Error loading post data:', error);
-        alert('Error loading post data');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error loading post data',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
@@ -340,16 +346,35 @@ async function handleFormSubmit(e) {
                 broadcastPostUpdate('post-created', category);
             }
             
-            alert(data.message);
-            closeModal();
-            // Use cache-busting reload to ensure fresh data
-            location.reload();
+            Swal.fire({
+                title: 'Success!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            }).then(() => {
+                closeModal();
+                location.reload();
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
         }
     } catch (error) {
         console.error('Error creating post:', error);
-        alert('Error creating post: ' + error.message);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error creating post: ' + error.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
@@ -375,20 +400,52 @@ async function updatePost() {
                 broadcastPostUpdate('post-updated', category, currentPostId);
             }
             
-            alert(data.message);
-            closeModal();
-            location.reload(); // Refresh to show updated post
+            Swal.fire({
+                title: 'Updated!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            }).then(() => {
+                closeModal();
+                location.reload(); 
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
         }
     } catch (error) {
         console.error('Error updating post:', error);
-        alert('Error updating post');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error updating post',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
 async function archivePost(postId) {
-    if (!confirm('Are you sure you want to archive this post?')) {
+    const result = await Swal.fire({
+        title: 'Archive Post?',
+        text: "Are you sure you want to archive this post?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, archive it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
     
@@ -471,21 +528,46 @@ async function archivePost(postId) {
                 location.reload();
             }
             
-            alert(data.message);
+            Swal.fire({
+                title: 'Archived!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
             // Reload even on error to ensure UI matches database state
             location.reload();
         }
     } catch (error) {
         console.error('Error archiving post:', error);
-        alert('Error archiving post: ' + error.message);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error archiving post: ' + error.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 
 async function archiveCurrentPost() {
     if (!currentPostId) {
-        alert('No post selected to archive');
+        Swal.fire({
+            title: 'Note',
+            text: 'No post selected to archive',
+            icon: 'info',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
         return;
     }
     
@@ -501,7 +583,13 @@ async function archiveCurrentPost() {
             await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error) {
             console.error('Error saving changes before archiving:', error);
-            alert('Error saving changes. Please save manually before archiving.');
+            Swal.fire({
+                title: 'Error',
+                text: 'Error saving changes. Please save manually before archiving.',
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
             return;
         }
     }
@@ -512,7 +600,19 @@ async function archiveCurrentPost() {
 
 // Delete post permanently (DELETE FROM database)
 async function deletePost(postId) {
-    if (!confirm('Are you sure you want to PERMANENTLY DELETE this post? This action cannot be undone!')) {
+    const result = await Swal.fire({
+        title: 'Delete Permanently?',
+        text: "Are you sure you want to PERMANENTLY DELETE this post? This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) {
         return;
     }
     
@@ -574,15 +674,34 @@ async function deletePost(postId) {
                 location.reload();
             }
             
-            alert(data.message);
+            Swal.fire({
+                title: 'Deleted!',
+                text: data.message,
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            });
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+                title: 'Error',
+                text: data.message,
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
             // Reload even on error to ensure UI matches database state
             location.reload();
         }
     } catch (error) {
         console.error('Error deleting post:', error);
-        alert('Error deleting post: ' + error.message);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error deleting post: ' + error.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
     }
 }
 

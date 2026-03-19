@@ -260,5 +260,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         })();
     });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
-</html> 
+</html>

@@ -49,35 +49,60 @@ function attachTogglePasswordListeners() {
 
 // Function to reset password for an admin account
 function resetPassword(userId) {
-  if (
-    confirm(
-      "Are you sure you want to reset the password for this admin account? This will set a default password."
-    )
-  ) {
-    const formData = new FormData();
-    formData.append("action", "reset_admin_password");
-    formData.append("id", userId);
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "This will set a default password for this admin account.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#00ff6a',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, reset it!',
+    background: '#1a1a1a',
+    color: '#fff'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append("action", "reset_admin_password");
+      formData.append("id", userId);
 
-    fetch("admin_actions.php", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === "success") {
-          alert(
-            "Password reset successfully! New password: " + data.new_password
-          );
-          refreshAdminAccountsTable();
-        } else {
-          alert("Error: " + data.message);
-        }
+      fetch("admin_actions.php", {
+        method: "POST",
+        body: formData,
       })
-      .catch((error) => {
-        console.error("Error resetting password:", error);
-        alert("An error occurred while resetting the password.");
-      });
-  }
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            Swal.fire({
+              title: 'Reset Successful!',
+              text: "New password: " + data.new_password,
+              icon: 'success',
+              background: '#1a1a1a',
+              color: '#fff',
+              confirmButtonColor: '#00ff6a'
+            });
+            refreshAdminAccountsTable();
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: data.message,
+              icon: 'error',
+              background: '#1a1a1a',
+              color: '#fff'
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error resetting password:", error);
+          Swal.fire({
+            title: 'Error',
+            text: "An error occurred while resetting the password.",
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+          });
+        });
+    }
+  });
 }
 
 // Function to attach event listeners to reset password buttons
@@ -149,29 +174,60 @@ function attachDeleteButtonListeners() {
   deleteBtns.forEach((button) => {
     button.addEventListener("click", function () {
       const userId = this.getAttribute("data-id");
-      if (confirm("Are you sure you want to delete this admin account?")) {
-        const formData = new FormData();
-        formData.append("action", "delete_admin");
-        formData.append("id", userId);
+      Swal.fire({
+        title: 'Delete Admin Account?',
+        text: "Are you sure you want to delete this admin account? This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        background: '#1a1a1a',
+        color: '#fff'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const formData = new FormData();
+          formData.append("action", "delete_admin");
+          formData.append("id", userId);
 
-        fetch("admin_actions.php", {
-          method: "POST",
-          body: formData,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.status === "success") {
-              alert(data.message);
-              refreshAdminAccountsTable();
-            } else {
-              alert("Error: " + data.message);
-            }
+          fetch("admin_actions.php", {
+            method: "POST",
+            body: formData,
           })
-          .catch((error) => {
-            console.error("Error deleting admin account:", error);
-            alert("An error occurred while deleting the account.");
-          });
-      }
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                Swal.fire({
+                  title: 'Deleted!',
+                  text: data.message,
+                  icon: 'success',
+                  background: '#1a1a1a',
+                  color: '#fff',
+                  confirmButtonColor: '#00ff6a'
+                });
+                refreshAdminAccountsTable();
+              } else {
+                Swal.fire({
+                  title: 'Error',
+                  text: data.message,
+                  icon: 'error',
+                  background: '#1a1a1a',
+                  color: '#fff'
+                });
+              }
+            })
+            .catch((error) => {
+              console.error("Error deleting admin account:", error);
+              Swal.fire({
+                title: 'Error',
+                text: "An error occurred while deleting the account.",
+                icon: 'error',
+                background: '#1a1a1a',
+                color: '#fff'
+              });
+            });
+        }
+      });
     });
   });
 }
@@ -202,11 +258,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const pw = document.getElementById("admin-password").value;
     const cpw = document.getElementById("admin-confirm-password").value;
     if (!isStrongPassword(pw)) {
-      alert("Password must be 8+ chars with upper, lower, number, special.");
+      Swal.fire({
+        title: 'Weak Password',
+        text: "Password must be 8+ chars with upper, lower, number, and special character.",
+        icon: 'warning',
+        background: '#1a1a1a',
+        color: '#fff'
+      });
       return;
     }
     if (pw !== cpw) {
-      alert("Passwords do not match.");
+      Swal.fire({
+        title: 'Mismatch',
+        text: "Passwords do not match.",
+        icon: 'error',
+        background: '#1a1a1a',
+        color: '#fff'
+      });
       return;
     }
     const formData = new FormData();
@@ -232,16 +300,35 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {
-          alert(data.message);
+          Swal.fire({
+            title: 'Saved!',
+            text: data.message,
+            icon: 'success',
+            background: '#1a1a1a',
+            color: '#fff',
+            confirmButtonColor: '#00ff6a'
+          });
           clearAdminForm();
           refreshAdminAccountsTable();
         } else {
-          alert("Error: " + data.message);
+          Swal.fire({
+            title: 'Error',
+            text: data.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+          });
         }
       })
       .catch((error) => {
         console.error("Error saving admin account:", error);
-        alert("An error occurred while saving the account.");
+        Swal.fire({
+          title: 'Error',
+          text: "An error occurred while saving the account.",
+          icon: 'error',
+          background: '#1a1a1a',
+          color: '#fff'
+        });
       });
   });
 
@@ -249,18 +336,36 @@ document.addEventListener("DOMContentLoaded", function () {
   updateBtn.addEventListener("click", function () {
     const userId = document.getElementById("admin-user-id").value;
     if (!userId) {
-      alert("Please select an admin account to update first.");
+      Swal.fire({
+        title: 'Note',
+        text: "Please select an admin account to update first.",
+        icon: 'info',
+        background: '#1a1a1a',
+        color: '#fff'
+      });
       return;
     }
     const upw = document.getElementById("admin-password").value;
     const ucpw = document.getElementById("admin-confirm-password").value;
     if (upw) {
       if (!isStrongPassword(upw)) {
-        alert("Password must be 8+ chars with upper, lower, number, special.");
+        Swal.fire({
+          title: 'Weak Password',
+          text: "Password must be 8+ chars with upper, lower, number, and special character.",
+          icon: 'warning',
+          background: '#1a1a1a',
+          color: '#fff'
+        });
         return;
       }
       if (upw !== ucpw) {
-        alert("Passwords do not match.");
+        Swal.fire({
+          title: 'Mismatch',
+          text: "Passwords do not match.",
+          icon: 'error',
+          background: '#1a1a1a',
+          color: '#fff'
+        });
         return;
       }
     }
@@ -289,16 +394,35 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {
-          alert(data.message);
+          Swal.fire({
+            title: 'Updated!',
+            text: data.message,
+            icon: 'success',
+            background: '#1a1a1a',
+            color: '#fff',
+            confirmButtonColor: '#00ff6a'
+          });
           clearAdminForm();
           refreshAdminAccountsTable();
         } else {
-          alert("Error: " + data.message);
+          Swal.fire({
+            title: 'Error',
+            text: data.message,
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+          });
         }
       })
       .catch((error) => {
         console.error("Error updating admin account:", error);
-        alert("An error occurred while updating the account.");
+        Swal.fire({
+          title: 'Error',
+          text: "An error occurred while updating the account.",
+          icon: 'error',
+          background: '#1a1a1a',
+          color: '#fff'
+        });
       });
   });
 

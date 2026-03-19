@@ -71,7 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.btn-update').addEventListener('click', function() {
         const selectedRow = tableBody.querySelector('tr.selected');
         if (!selectedRow) {
-            alert('Please select a student to update');
+            Swal.fire({
+                title: 'Note',
+                text: 'Please select a student to update',
+                icon: 'info',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
             return;
         }
         

@@ -873,8 +873,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!btn) return;
             const jeja = btn.getAttribute('data-jeja');
             if (!jeja) return;
-            const ok = confirm('Send reminder email to student and parent for ' + jeja + '?');
-            if (!ok) return;
+            const result = await Swal.fire({
+                title: 'Send Reminder?',
+                text: 'Send reminder email to student and parent for ' + jeja + '?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00ff6a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, send it!',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+            if (!result.isConfirmed) return;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
@@ -885,7 +895,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 const result = await resp.json();
                 if (result.status === 'success') {
-                    alert('Reminder sent successfully!\n\nIf you don\'t receive the email, please check:\n1. Spam/Junk folder\n2. Email configuration (SMTP2GO settings)\n3. Server error logs');
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Reminder sent successfully!',
+                        icon: 'success',
+                        background: '#1a1a1a',
+                        color: '#fff'
+                    });
                     // Refresh dues only on success
                     fetchAndPopulateDues();
                 } else {
@@ -924,11 +940,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         errorMsg += '3. Check SMTP2GO dashboard for sender verification';
                     }
                     
-                    alert(errorMsg);
+                    Swal.fire({
+                        title: 'Send Failed',
+                        text: errorMsg,
+                        icon: 'error',
+                        background: '#1a1a1a',
+                        color: '#fff'
+                    });
                     console.error('Email send error:', result);
                 }
             } catch (err) {
-                alert('Error sending reminder: ' + err.message + '\n\nPlease check:\n1. Server connection\n2. Email configuration\n3. Browser console for details');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error sending reminder: ' + err.message,
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
                 console.error('Reminder send error:', err);
             } finally {
                 btn.disabled = false;
@@ -941,8 +969,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const bulkBtn = document.getElementById('sendAllRemindersBtn');
     if (bulkBtn) {
         bulkBtn.addEventListener('click', async function() {
-            const ok = confirm('Send reminders to ALL due students listed?');
-            if (!ok) return;
+            const result = await Swal.fire({
+                title: 'Send All Reminders?',
+                text: 'Send reminders to ALL due students listed?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#00ff6a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, send all!',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+            if (!result.isConfirmed) return;
             bulkBtn.disabled = true;
             bulkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             try {
@@ -964,7 +1002,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (result.success_count > 0) {
                         msg += '\n\nIf emails are not received, check:\n1. Spam/Junk folder\n2. Email configuration\n3. SMTP2GO account status';
                     }
-                    alert(msg);
+                    Swal.fire({
+                        title: 'Bulk Processed',
+                        text: msg,
+                        icon: 'info',
+                        background: '#1a1a1a',
+                        color: '#fff'
+                    });
                     // Refresh only when successful
                     fetchAndPopulateDues();
                 } else {
@@ -980,11 +1024,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         errorMsg += '5. Click Save and redeploy if needed';
                     }
                     
-                    alert(errorMsg);
+                    Swal.fire({
+                        title: 'Bulk Send Failed',
+                        text: errorMsg,
+                        icon: 'error',
+                        background: '#1a1a1a',
+                        color: '#fff'
+                    });
                     console.error('Bulk email send error:', result);
                 }
             } catch (err) {
-                alert('Error sending bulk reminders: ' + err.message + '\n\nPlease check:\n1. Server connection\n2. Email configuration\n3. Browser console for details');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error sending bulk reminders: ' + err.message,
+                    icon: 'error',
+                    background: '#1a1a1a',
+                    color: '#fff'
+                });
                 console.error('Bulk reminder send error:', err);
             } finally {
                 bulkBtn.disabled = false;

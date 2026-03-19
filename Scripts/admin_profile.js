@@ -89,6 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // editBtn.style.display = 'inline-block';
         // saveBtn.style.display = 'none';
         // cancelBtn.style.display = 'none';
-        // alert('Profile updated! (Demo only, not saved to server)');
+        // Swal.fire({
+        //     title: 'Success!',
+        //     text: 'Profile updated! (Demo only, not saved to server)',
+        //     icon: 'success',
+        //     background: '#1a1a1a',
+        //     color: '#fff'
+        // });
     });
 }); 
