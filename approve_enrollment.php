@@ -119,9 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $conn->begin_transaction();
     try {
         // Insert into students table with all required fields
-        $stmt = $conn->prepare("INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
-            'ssssssssssdsss',
+            'ssssssssssdssss',
             $temp_jeja_no,
             $enrollment['full_name'],
             $enrollment['address'],
@@ -135,7 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             $discount,
             $schedule,
             $date_enrolled,
-            $status
+            $status,
+            $enrollment['gender']
         );
         
         if (!$stmt->execute()) {

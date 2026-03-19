@@ -24,6 +24,7 @@ while ($row = $result->fetch_assoc()) {
         'belt_rank' => $row['belt_rank'],
         'class' => $row['class'],
         'schedule' => '', // No schedule in table, leave blank or generate if needed
+        'gender' => $row['gender'] ?? '',
     ];
 }
 echo json_encode(['status' => 'success', 'data' => $pending]);

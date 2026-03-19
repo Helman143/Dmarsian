@@ -59,13 +59,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $class = $_POST['class'] ?? '';
     $parent_email = $_POST['parent_email'] ?? '';
     $belt_rank = $_POST['belt_rank'] ?? '';
+    $gender = $_POST['gender'] ?? '';
     $enroll_type = $_POST['enroll_type'] ?? '';
     if ($enroll_type !== 'Enroll') {
         echo json_encode(['status' => 'error', 'message' => 'Invalid enrollment type.']);
         exit();
     }
-    $stmt = $conn->prepare("INSERT INTO enrollment_requests (full_name, phone, school, belt_rank, address, email, class, parent_name, parent_phone, parent_email, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-    $stmt->bind_param("ssssssssss", $full_name, $phone, $school, $belt_rank, $address, $email, $class, $parent_name, $parent_phone, $parent_email);
+    $stmt = $conn->prepare("INSERT INTO enrollment_requests (full_name, phone, school, belt_rank, address, email, class, parent_name, parent_phone, parent_email, gender, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+    $stmt->bind_param("sssssssssss", $full_name, $phone, $school, $belt_rank, $address, $email, $class, $parent_name, $parent_phone, $parent_email, $gender);
     if ($stmt->execute()) {
         // Notify Super Admin via SMTP2Go (non-blocking: ignore response)
         $adminTo = (defined('ADMIN_BCC_EMAIL') && ADMIN_BCC_EMAIL) ? ADMIN_BCC_EMAIL : SMTP2GO_SENDER_EMAIL;
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $textBody =
             "A new enrollment request has been submitted.\n\n" .
             "Student: $full_name\n" .
+            "Gender: $gender\n" .
             "Parent: $parent_name\n" .
             "Class: $class | Belt: $belt_rank\n" .
             "Student Email: $email | Parent Email: $parent_email\n" .
@@ -84,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             '<div style="font-family:Arial,Helvetica,sans-serif;line-height:1.5;color:#222">' .
                 '<h3 style="margin:0 0 10px">New Enrollment Request</h3>' .
                 '<p><strong>Student:</strong> ' . htmlspecialchars($full_name) . '</p>' .
+                '<p><strong>Gender:</strong> ' . htmlspecialchars($gender) . '</p>' .
                 '<p><strong>Parent:</strong> ' . htmlspecialchars($parent_name) . '</p>' .
                 '<p><strong>Class/Belt:</strong> ' . htmlspecialchars($class) . ' | ' . htmlspecialchars($belt_rank) . '</p>' .
                 '<p><strong>Student Email:</strong> ' . htmlspecialchars($email) . '<br>' .
