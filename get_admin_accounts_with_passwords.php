@@ -16,12 +16,12 @@ if ($result->num_rows > 0) {
         echo "<td class='password-cell'>";
         echo "<span class='password-masked'>[Click to Show Password]</span>";
         echo "<span class='password-actual' style='display:none;'>" . htmlspecialchars($row['password']) . "</span>";
-        echo "<button type='button' class='toggle-password-btn' title='Show/Hide Password'><i class='fas fa-eye'></i></button>";
-        echo "<button type='button' class='reset-password-btn' data-user-id='" . $row['id'] . "' title='Reset Password'><i class='fas fa-key'></i></button>";
+        echo "<button type='button' class='toggle-password-btn' title='Show/Hide Password' data-tooltip='Show/Hide Password'><i class='fas fa-eye'></i></button>";
+        echo "<button type='button' class='reset-password-btn' data-user-id='" . $row['id'] . "' title='Reset Password' data-tooltip='Reset Password'><i class='fas fa-key'></i></button>";
         echo "</td>";
         echo '<td>';
-        echo '<button type="button" class="action-btn edit-admin" data-id="' . $row['id'] . '" data-email="' . htmlspecialchars($row['email']) . '" data-username="' . htmlspecialchars($row['username']) . '" data-password="' . htmlspecialchars($row['password']) . '"><i class="fas fa-edit"></i></button>';
-        echo '<button type="button" class="action-btn delete-admin" data-id="' . $row['id'] . '"><i class="fas fa-trash-alt"></i></button>';
+        echo '<button type="button" class="action-btn edit-admin" data-id="' . $row['id'] . '" data-email="' . htmlspecialchars($row['email']) . '" data-username="' . htmlspecialchars($row['username']) . '" data-password="' . htmlspecialchars($row['password']) . '" title="EDIT" data-tooltip="EDIT"><i class="fas fa-edit"></i></button>';
+        echo '<button type="button" class="action-btn delete-admin" data-id="' . $row['id'] . '" title="DELETE" data-tooltip="DELETE"><i class="fas fa-trash-alt"></i></button>';
         echo '</td>';
         echo "</tr>";
     }
