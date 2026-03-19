@@ -341,8 +341,11 @@ if (!empty($spacesName)) {
                                 <label>Student's Full Name</label>
                             </div>
                             <div class="input-group">
-                                <input type="tel" name="phone" placeholder=" " required>
-                                <label>Phone Number</label>
+                                <select name="gender" required>
+                                    <option value="" disabled selected>Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
                             </div>
                             <div class="input-group">
                                 <input type="email" name="email" placeholder=" " required>
@@ -353,18 +356,8 @@ if (!empty($spacesName)) {
                                 <label>School</label>
                             </div>
                             <div class="input-group">
-                                <select name="gender" required>
-                                    <option value="" disabled selected>Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <select name="class" required>
-                                    <option value="" disabled selected>Select Class</option>
-                                    <option value="Poomsae">Poomsae</option>
-                                    <option value="Kyorugi">Kyorugi</option>
-                                </select>
+                                <input type="tel" name="phone" placeholder=" " required>
+                                <label>Phone Number</label>
                             </div>
                             <div class="input-group">
                                 <select name="enroll_type" required>
@@ -402,6 +395,13 @@ if (!empty($spacesName)) {
                                     <option value="Blue">Blue</option>
                                     <option value="Red">Red</option>
                                     <option value="Black">Black</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <select name="class" required>
+                                    <option value="" disabled selected>Select Class</option>
+                                    <option value="Poomsae">Poomsae</option>
+                                    <option value="Kyorugi">Kyorugi</option>
                                 </select>
                             </div>
                         </div>
