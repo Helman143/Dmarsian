@@ -78,67 +78,42 @@ function renderSlider(posts, sliderId) {
         
         // Check if we have a valid image path
         if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
-            // Handle full URLs (Spaces/CDN)
-            if (post.image_path.match(/^(https?:\/\/|data:)/)) {
-                imageSrc = post.image_path;
+            const rawPath = post.image_path.trim();
+            
+            // 1. Handle full URLs (Spaces/CDN/Data)
+            if (rawPath.match(/^(https?:\/\/|data:)/)) {
+                imageSrc = rawPath;
                 hasImage = true;
             } else {
-                // Handle local paths (uploads/posts/filename.png)
-                // Paths from database might be:
-                // - "uploads/posts/filename.png" (root level)
-                // - "admin/uploads/posts/filename.png" (admin folder)
-                // - "/uploads/posts/filename.png" (with leading slash)
-                let cleanPath = post.image_path.trim();
+                // 2. Handle local paths (relative to site root/basePath)
+                let cleanPath = rawPath.replace(/^\//, '');
                 
-                // Remove leading slash if present (normalize)
-                if (cleanPath.startsWith('/')) {
-                    cleanPath = cleanPath.substring(1);
-                }
-                
-                // Check if path already includes 'admin/' prefix
-                const hasAdminPrefix = cleanPath.startsWith('admin/');
-                
-                // If path starts with 'uploads/', transform to 'admin/uploads/'
-                if (cleanPath.startsWith('uploads/')) {
-                    cleanPath = 'admin/' + cleanPath;
-                } else if (!cleanPath.startsWith('admin/')) {
-                    // If it's just a filename, prepend admin/uploads/posts/
-                    cleanPath = 'admin/uploads/posts/' + cleanPath;
-                }
-                
-                // Build the full path with basePath if needed
-                if (basePath && basePath !== '') {
-                    // Remove trailing slash from basePath if present
-                    const base = basePath.replace(/\/$/, '');
-                    imageSrc = base + '/' + cleanPath;
-                } else {
-                    // Root-relative path (starts with /)
-                    imageSrc = '/' + cleanPath;
-                }
+                // If the path doesn't have a known prefix, it might need one (legacy support)
+                // But generally we assume the DB path is relative to root or admin/
+                const base = (window.siteBasePath || '').replace(/\/$/, '');
+                imageSrc = base + '/' + cleanPath;
                 hasImage = true;
             }
         }
         
         // Determine initial slider class based on index (for 3D Coverflow effect)
-        // First card: active, Second card: next, Others: hidden
-        let sliderClass = '';
-        if (index === 0) {
-            sliderClass = 'active';
-        } else if (index === 1) {
-            sliderClass = 'next';
-        } else {
-            sliderClass = 'hidden';
-        }
+        let sliderClass = index === 0 ? 'active' : (index === 1 ? 'next' : 'hidden');
         
-        // Image error handler: try admin path, then placeholder.png, then Logo2.png, then SVG
-        // Build admin path if original is root/uploads/
-        let adminPath = '';
-        if (hasImage && imageSrc.includes('/uploads/') && !imageSrc.includes('/admin/')) {
-            adminPath = imageSrc.replace('/uploads/', '/admin/uploads/');
-        }
-        
-        // Create error handler with proper escaping
-        const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0&&'${adminPath}'){img.src='${adminPath}';img.dataset.tries='1';}else if(tries<=1){img.src='${placeholderImagePath}';img.dataset.tries='2';}else if(tries==2){img.src='${fallbackPlaceholderPath}';img.dataset.tries='3';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
+        // Image error handler: try Spaces fallback, then placeholder SVG
+        const imageErrorHandler = `(function(img){
+            img.onerror = null;
+            var tries = parseInt(img.dataset.tries || '0');
+            var rawPath = '${(post.image_path || '').replace(/'/g, "\\'")}';
+            
+            if (tries == 0 && window.spacesBaseUrl && rawPath && !rawPath.match(/^(https?:\\/\\/|data:)/)) {
+                var fileName = rawPath.split('/').pop();
+                img.src = window.spacesBaseUrl.replace(/\\/$/, '') + '/' + fileName;
+                img.dataset.tries = '1';
+            } else {
+                img.src = '${placeholderSvg}';
+                img.style.backgroundColor = '#2d2d2d';
+            }
+        })(this)`;
         
         return (
             `<article class="slide-card post-card ${sliderClass}">`

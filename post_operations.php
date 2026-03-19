@@ -696,4 +696,74 @@ function deletePost() {
         echo json_encode(['success' => false, 'message' => 'Error deleting post: ' . $error]);
     }
 }
+/**
+ * Get the full URL for a post image, handling local files and cloud fallbacks.
+ * 
+ * @param string $image_path The path or URL stored in the database
+ * @param string $basePath Optional base path for local URLs (e.g., /Dmarsian)
+ * @param string|null $spacesBaseUrl Optional DigitalOcean Spaces base URL
+ * @return string The final URL to display
+ */
+function getPostImageUrl($image_path, $basePath = '', $spacesBaseUrl = null) {
+    $placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E";
+    
+    if (empty($image_path) || trim($image_path) === '') {
+        return $placeholder;
+    }
+
+    $img_path = trim($image_path);
+
+    // 1. If already a full URL (Spaces/CDN/Data), use it directly
+    if (preg_match('/^(https?:\/\/|data:)/', $img_path)) {
+        return $img_path;
+    }
+
+    // 2. Check if it's a valid local file
+    $file_path = $img_path;
+    if (strpos($file_path, '/') === 0) {
+        $file_path = substr($file_path, 1);
+    }
+    
+    // Check relative to current directory and root
+    // Since this file might be included from various locations, we check a few possibilities
+    $possible_paths = [
+        __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path),
+        $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $file_path)
+    ];
+    
+    // Also check if the path is already absolute or relative to CWD
+    if (file_exists($file_path)) {
+        $clean_path = ltrim($img_path, '/');
+        return ($basePath === '') ? '/' . $clean_path : $basePath . '/' . $clean_path;
+    }
+
+    foreach ($possible_paths as $path) {
+        if (file_exists($path)) {
+            $clean_path = ltrim($img_path, '/');
+            return ($basePath === '') ? '/' . $clean_path : $basePath . '/' . $clean_path;
+        }
+    }
+
+    // 3. Fallback to Spaces only if local check fails AND spaces is configured
+    if ($spacesBaseUrl) {
+        $fileName = basename($img_path);
+        return rtrim($spacesBaseUrl, '/') . '/' . $fileName;
+    }
+
+    return $placeholder;
+}
+
+/**
+ * Get the DigitalOcean Spaces base URL from environment variables.
+ * 
+ * @return string|null The base URL or null if not configured
+ */
+function getSpacesBaseUrlFromEnv() {
+    $spacesName = getenv('SPACES_NAME');
+    $spacesRegion = getenv('SPACES_REGION') ?: 'nyc3';
+    if (!empty($spacesName)) {
+        return "https://{$spacesName}.{$spacesRegion}.digitaloceanspaces.com/posts/";
+    }
+    return null;
+}
 ?> 

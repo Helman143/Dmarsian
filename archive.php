@@ -2,6 +2,17 @@
 require_once 'post_operations.php';
 
 $conn = connectDB();
+
+// Detect base path for local URLs
+$basePath = '';
+$scriptName = $_SERVER['SCRIPT_NAME'];
+if (strpos($scriptName, '/Dmarsian/') !== false) {
+    $basePath = '/Dmarsian';
+}
+
+// Get Spaces base URL for fallback
+$spacesBaseUrl = getSpacesBaseUrlFromEnv();
+
 $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : date('Y');
 $category_filter = isset($_GET['category']) ? mysqli_real_escape_string($conn, $_GET['category']) : '';
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
@@ -102,16 +113,20 @@ mysqli_close($conn);
                         <div class="text-center w-100" style="color:#111;">No posts found.</div>
                     <?php else: ?>
                         <?php foreach ($posts as $i => $post): ?>
+                            <?php 
+                            $final_img_path = getPostImageUrl($post['image_path'] ?? null, $basePath, $spacesBaseUrl);
+                            ?>
                             <div class="col-12 col-sm-6 col-lg-4 d-flex">
                                 <article class="archive-card w-100" style="--i: <?= (int)$i ?>;"
                                          data-title="<?= htmlspecialchars($post['title']) ?>"
                                          data-desc="<?= htmlspecialchars($post['description']) ?>"
                                          data-date="<?= date('F j, Y g:i A', strtotime($post['post_date'])) ?>"
-                                         data-image="<?= !empty($post['image_path']) ? htmlspecialchars($post['image_path']) : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image' ?>">
+                                         data-image="<?= htmlspecialchars($final_img_path) ?>">
                                     <div class="archive-media">
                                         <img class="img-fluid w-100"
-                                             src="<?= !empty($post['image_path']) ? htmlspecialchars($post['image_path']) : 'https://via.placeholder.com/400x300.png/2d2d2d/ffffff?text=No+Image' ?>"
-                                             alt="<?= htmlspecialchars($post['title']) ?>">
+                                             src="<?= htmlspecialchars($final_img_path) ?>"
+                                             alt="<?= htmlspecialchars($post['title']) ?>"
+                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%232d2d2d\' width=\'400\' height=\'300\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23ffffff\' font-family=\'Arial\' font-size=\'18\'%3ENo Image%3C/text%3E%3C/svg%3E';">
                                         <div class="archive-date-tag"><?= date('M j, Y', strtotime($post['post_date'])) ?></div>
                                     </div>
                                     <div class="archive-body">

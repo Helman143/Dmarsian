@@ -14,15 +14,25 @@ if (empty($heroVideoUrl)) {
     $heroVideoUrl = 'Video/quality_restoration_20251105174029661.mp4';
 }
 
+// Detect base path for local URLs
+$basePath = '';
+$scriptName = $_SERVER['SCRIPT_NAME'];
+if (strpos($scriptName, '/Dmarsian/') !== false) {
+    $basePath = '/Dmarsian';
+}
+
 // Get DigitalOcean Spaces base URL for images
-// Format: https://[SPACES_NAME].[SPACES_REGION].digitaloceanspaces.com/posts/
 $spacesBaseUrl = null;
 $spacesName = getenv('SPACES_NAME');
 $spacesRegion = getenv('SPACES_REGION') ?: 'nyc3';
-if (!empty($spacesName) && !empty($spacesRegion)) {
+if (!empty($spacesName)) {
     $spacesBaseUrl = "https://{$spacesName}.{$spacesRegion}.digitaloceanspaces.com/posts/";
 }
 ?>
+<script>
+    window.spacesBaseUrl = <?php echo json_encode($spacesBaseUrl); ?>;
+    window.siteBasePath = <?php echo json_encode($basePath); ?>;
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -275,12 +275,33 @@ async function loadPostData(postId) {
                 
                 // Show preview - normalize path
                 let imgSrc = post.image_path.trim();
-                if (!imgSrc.match(/^(https?:\/\/|data:)/)) {
+                const isFullUrl = imgSrc.match(/^(https?:\/\/|data:)/);
+                
+                if (!isFullUrl) {
                     // Prepend base path if it's a local path
-                    imgSrc = (basePath || '') + '/' + imgSrc.replace(/^\//, '');
+                    imgSrc = (window.siteBasePath || basePath || '') + '/' + imgSrc.replace(/^\//, '');
                 }
+                
+                // Add error handler for cloud fallback
+                previewImg.dataset.tries = '0';
+                previewImg.onerror = function() {
+                    const tries = parseInt(this.dataset.tries || '0');
+                    if (tries === 0 && window.spacesBaseUrl && !isFullUrl) {
+                        const fileName = post.image_path.trim().split('/').pop();
+                        this.src = window.spacesBaseUrl.replace(/\/$/, '') + '/' + fileName;
+                        this.dataset.tries = '1';
+                    } else {
+                        this.style.display = 'none';
+                        // Show placeholder in background
+                        imagePreview.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%232d2d2d' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-size='18'%3ENo Image%3C/text%3E%3C/svg%3E\")";
+                        imagePreview.style.backgroundSize = 'cover';
+                    }
+                };
+                
                 previewImg.src = imgSrc;
+                previewImg.style.display = 'block';
                 imagePreview.style.display = 'block';
+                imagePreview.style.backgroundImage = 'none';
                 
                 // Reset remove image flag since image exists
                 const removeImageFlag = document.getElementById('remove-image-flag');
