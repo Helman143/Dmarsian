@@ -757,4 +757,137 @@ async function filterPosts() {
 
 function editPost(postId) {
     openModal(postId);
-} 
+}
+
+async function toggleSliderVisibility(postId, currentShowInSlider) {
+    if (typeof SHOW_IN_SLIDER_AVAILABLE !== 'undefined' && !SHOW_IN_SLIDER_AVAILABLE) {
+        Swal.fire({
+            title: 'Migration Required',
+            text: 'This feature requires a database migration. Please visit run_migration.php to enable it.',
+            icon: 'info',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
+        return;
+    }
+    
+    // Validate postId
+    postId = parseInt(postId);
+    if (!postId || isNaN(postId) || postId <= 0) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Invalid post ID',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
+        return;
+    }
+    
+    // Find the specific post card
+    const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+    if (!postCard) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Post not found',
+            icon: 'error',
+            background: '#1a1a1a',
+            color: '#fff'
+        });
+        return;
+    }
+    
+    const button = postCard.querySelector('.remove-slider-btn');
+    if (!button) {
+        console.warn('Slider toggle button not found for post:', postId);
+        return;
+    }
+    
+    const actionText = currentShowInSlider === 0 ? 'show in slider' : 'remove from slider';
+    const confirmMessage = `Are you sure you want to ${actionText} this post? This will ${currentShowInSlider === 0 ? 'restore' : 'hide'} the post from Achievement and Event sliders.`;
+    
+    const result = await Swal.fire({
+        title: 'Update Slider visibility?',
+        text: confirmMessage,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#00ff6a',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, update it!',
+        background: '#1a1a1a',
+        color: '#fff'
+    });
+
+    if (!result.isConfirmed) return;
+    
+    try {
+        button.disabled = true;
+        button.style.opacity = '0.6';
+        
+        const response = await fetch('post_operations.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=toggle_slider_visibility&id=${postId}`
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const newValue = parseInt(data.show_in_slider);
+            const icon = button.querySelector('i');
+            
+            if (icon) {
+                if (newValue === 0) {
+                    button.classList.add('active');
+                    button.title = 'Show in Slider';
+                    button.setAttribute('onclick', `toggleSliderVisibility(${postId}, 0)`);
+                    icon.className = 'fas fa-eye';
+                } else {
+                    button.classList.remove('active');
+                    button.title = 'Remove from Slider';
+                    button.setAttribute('onclick', `toggleSliderVisibility(${postId}, 1)`);
+                    icon.className = 'fas fa-eye-slash';
+                }
+            }
+            
+            // Broadcast update
+            if (typeof BroadcastChannel !== 'undefined') {
+                const bc = new BroadcastChannel('post-updates');
+                bc.postMessage({
+                    type: 'post-slider-toggled',
+                    category: data.category,
+                    postId: postId,
+                    showInSlider: newValue
+                });
+                bc.close();
+            }
+            
+            Swal.fire({
+                title: 'Success!',
+                text: newValue === 0 ? 'Post removed from sliders.' : 'Post added to sliders.',
+                icon: 'success',
+                background: '#1a1a1a',
+                color: '#fff',
+                confirmButtonColor: '#00ff6a'
+            });
+        } else if (data.migration_required) {
+            Swal.fire({
+                title: 'Migration Required',
+                text: data.message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Run Migration',
+                background: '#1a1a1a',
+                color: '#fff'
+            }).then((r) => { if (r.isConfirmed) window.location.href = 'run_migration.php'; });
+        } else {
+            throw new Error(data.message || 'Action failed');
+        }
+    } catch (err) {
+        console.error('Slider toggle error:', err);
+        Swal.fire({ title: 'Error', text: 'Error toggling slider visibility', icon: 'error', background: '#1a1a1a', color: '#fff' });
+    } finally {
+        button.disabled = false;
+        button.style.opacity = '1';
+    }
+}

@@ -61,7 +61,10 @@ $year_filter = isset($_GET['year']) ? (int)$_GET['year'] : $most_recent_year;
 $category_filter_raw = isset($_GET['category']) ? trim($_GET['category']) : '';
 $category_filter = !empty($category_filter_raw) ? strtolower(mysqli_real_escape_string($conn, $category_filter_raw)) : '';
 
-// Base query: exclude archived posts and filter by the selected year
+// Check if show_in_slider column exists (for conditional button display)
+$showInSliderColumnExists = checkColumnExists('posts', 'show_in_slider');
+
+// Build query based on status and year
 $sql = "SELECT * FROM posts WHERE status = 'active' AND YEAR(post_date) = ?";
 $params = [$year_filter];
 $types = "i";
@@ -210,6 +213,14 @@ mysqli_close($conn);
                                     <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <?php if ($showInSliderColumnExists): ?>
+                                    <button class="remove-slider-btn <?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'active' : ''; ?>" 
+                                            onclick="toggleSliderVisibility(<?php echo $post['id']; ?>, <?php echo isset($post['show_in_slider']) ? (int)$post['show_in_slider'] : 1; ?>)"
+                                            title="<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'Show in Slider' : 'Remove from Slider'; ?>"
+                                            data-post-id="<?php echo $post['id']; ?>">
+                                        <i class="fas fa-<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'eye' : 'eye-slash'; ?>"></i>
+                                    </button>
+                                    <?php endif; ?>
                                     <button class="archive-post-btn" onclick="archivePost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-archive"></i>
                                     </button>
@@ -287,6 +298,17 @@ mysqli_close($conn);
         </div>
     </div>
     <script src="Scripts/post_management.js"></script>
+    <script>
+    // Global flag for slider visibility feature
+    const SHOW_IN_SLIDER_AVAILABLE = <?php echo $showInSliderColumnExists ? 'true' : 'false'; ?>;
+    
+    // Hide buttons if feature not available
+    if (!SHOW_IN_SLIDER_AVAILABLE) {
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.remove-slider-btn').forEach(btn => btn.style.display = 'none');
+        });
+    }
+    </script>
     <!-- Bootstrap 5 JS bundle (Popper included) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>

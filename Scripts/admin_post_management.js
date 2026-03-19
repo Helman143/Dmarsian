@@ -586,6 +586,8 @@ async function toggleSliderVisibility(postId, currentShowInSlider) {
     }
     
     // Get the button for this specific post only
+    const button = postCard.querySelector('.remove-slider-btn');
+    
     if (!button) {
         // Button doesn't exist - migration probably not run yet
         Swal.fire({
