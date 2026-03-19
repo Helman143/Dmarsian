@@ -85,6 +85,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         </tbody>
                     </table>
                 </div>
+                <div id="collectionPagination" class="pagination-container mt-3">
+                    <!-- Pagination controls will be loaded here -->
+                </div>
             </div>
 
             <!-- Collection Trend Chart -->

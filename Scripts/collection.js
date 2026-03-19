@@ -1,5 +1,7 @@
 // Store payments data globally to avoid re-fetching on period change
 let paymentsData = [];
+let currentCollectionPage = 1;
+const collectionItemsPerPage = 15;
 
 // Fetch payment records and update table, stats, and chart
 async function fetchAndDisplayPayments() {
@@ -31,33 +33,11 @@ async function fetchAndDisplayPayments() {
             payments = [];
         }
 
+        // Store payments data for period change updates
+        paymentsData = payments;
+
         // 1. Populate Transaction Table
-        const tbody = document.getElementById('transactionTableBody');
-        if (tbody) {
-            tbody.innerHTML = '';
-            if (payments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No payment transactions found.</td></tr>';
-            } else {
-                payments.forEach(payment => {
-                    const row = document.createElement('tr');
-                    const amountPaid = parseFloat(payment.amount_paid || 0);
-                    const discount = parseFloat(payment.discount || 0);
-                    const totalAmount = amountPaid - discount;
-                    row.innerHTML = `
-                        <td>${payment.id || ''}</td>
-                        <td>${payment.date_paid || ''}</td>
-                        <td>${payment.jeja_no || ''}</td>
-                        <td>₱${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td>₱${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td>${payment.payment_type || ''}</td>
-                        <td>₱${discount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td>₱${totalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td>${payment.status || ''}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
-        }
+        renderTransactionTable(payments);
 
         // 2. Update Monthly and Yearly Stats
         const now = new Date();
@@ -78,8 +58,6 @@ async function fetchAndDisplayPayments() {
         if (monthlyAmount) monthlyAmount.textContent = `₱${monthlyTotal.toLocaleString()}`;
         if (yearlyAmount) yearlyAmount.textContent = `₱${yearlyTotal.toLocaleString()}`;
 
-        // Store payments data for period change updates
-        paymentsData = payments;
 
         // 3. Update Chart
         updateCollectionChart(payments);
@@ -270,4 +248,101 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-}); 
+});
+
+// Global variables for pagination
+// (already declared at the top of the file)
+
+function renderTransactionTable(payments) {
+    const tbody = document.getElementById('transactionTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    
+    // Calculate slice for pagination
+    const totalPages = Math.ceil(payments.length / collectionItemsPerPage);
+    if (currentCollectionPage > totalPages) currentCollectionPage = totalPages || 1;
+    
+    const startIdx = (currentCollectionPage - 1) * collectionItemsPerPage;
+    const endIdx = startIdx + collectionItemsPerPage;
+    const paginatedPayments = payments.slice(startIdx, endIdx);
+
+    if (paginatedPayments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">No payment transactions found.</td></tr>';
+    } else {
+        paginatedPayments.forEach(payment => {
+            const row = document.createElement('tr');
+            const amountPaid = parseFloat(payment.amount_paid || 0);
+            const discount = parseFloat(payment.discount || 0);
+            const totalAmount = amountPaid - discount;
+            row.innerHTML = `
+                <td>${payment.id || ''}</td>
+                <td>${payment.date_paid || ''}</td>
+                <td>${payment.jeja_no || ''}</td>
+                <td>₱${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>₱${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>${payment.payment_type || ''}</td>
+                <td>₱${discount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>₱${totalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>${payment.status || ''}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    renderCollectionPagination(totalPages, currentCollectionPage);
+}
+
+function renderCollectionPagination(totalPages, currentPage) {
+    const container = document.getElementById('collectionPagination');
+    if (!container) return;
+
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '<div class="pagination">';
+
+    // Previous Button
+    html += `<button class="page-btn prev" ${currentPage === 1 ? 'disabled' : ''} onclick="changeCollectionPage(${currentPage - 1})">
+        <i class="fas fa-chevron-left"></i> Previous
+    </button>`;
+
+    // Page Numbers
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    if (startPage > 1) {
+        html += `<button class="page-link" onclick="changeCollectionPage(1)">1</button>`;
+        if (startPage > 2) html += '<span class="pager-dots">...</span>';
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-link ${i === currentPage ? 'active' : ''}" onclick="changeCollectionPage(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += '<span class="pager-dots">...</span>';
+        html += `<button class="page-link" onclick="changeCollectionPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    // Next Button
+    html += `<button class="page-btn next" ${currentPage === totalPages ? 'disabled' : ''} onclick="changeCollectionPage(${currentPage + 1})">
+        Next <i class="fas fa-chevron-right"></i>
+    </button>`;
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function changeCollectionPage(page) {
+    currentCollectionPage = page;
+    if (paymentsData) {
+        renderTransactionTable(paymentsData);
+    }
+}
