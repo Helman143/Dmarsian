@@ -167,87 +167,9 @@ $result_complete = $conn->query($sql_complete);
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="Scripts/trial_session.js"></script>
 <!-- Bootstrap 5 JS bundle (Popper included) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script>
-// Mobile-safe dropdown: avoid touch+click double-trigger (match payment.php behavior)
-(function(){
-    const dropdown = document.querySelector('.sidebar .dropdown');
-    const toggle = dropdown ? dropdown.querySelector('.dropdown-toggle') : null;
-    if(!dropdown || !toggle) return;
-
-    function open(){ dropdown.classList.add('open'); }
-    function close(){ dropdown.classList.remove('open'); }
-
-    let touched = false;
-    toggle.addEventListener('click', function(e){
-        if (touched) { e.preventDefault(); touched = false; return; }
-        e.preventDefault();
-        dropdown.classList.toggle('open');
-    });
-    toggle.addEventListener('touchstart', function(e){
-        e.preventDefault();
-        touched = true;
-        open();
-        setTimeout(function(){ touched = false; }, 300);
-    }, {passive:false});
-
-    dropdown.addEventListener('mouseenter', open);
-    dropdown.addEventListener('mouseleave', close);
-    document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) close(); });
-})();
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.btn-complete').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var idx = this.getAttribute('data-index');
-            if (confirm('Mark this trial session as complete?')) {
-                fetch('complete_trial_session.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'index=' + encodeURIComponent(idx)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(err => alert('Request failed: ' + err));
-            }
-        });
-    });
-    // Convert to Enrollment handler for Complete table
-    document.querySelectorAll('#completeTableBody .btn-approve').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var row = this.closest('tr');
-            var regId = row.querySelector('td').textContent.trim(); // Transaction ID is first column
-            if (confirm('Convert this trial session to full enrollment?')) {
-                fetch('convert_trial_to_student.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'registration_id=' + encodeURIComponent(regId)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Converted to student successfully!');
-                        location.reload();
-                    } else {
-                        let errorMsg = data.message || 'Unknown error occurred';
-                        if (data.mysql_error) {
-                            errorMsg += '\n\nDatabase Error: ' + data.mysql_error;
-                        }
-                        alert('Error: ' + errorMsg);
-                    }
-                })
-                .catch(err => alert('Request failed: ' + err));
-            }
-        });
-    });
-});
-</script>
 </body>
 </html> 
