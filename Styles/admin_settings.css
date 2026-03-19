@@ -696,3 +696,96 @@ html, body {
     }
 }
 
+/* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(16px, 2.4vw, 24px);
+    padding-bottom: clamp(10px, 1.6vw, 14px);
+}
+
+.pagination {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(0, 255, 106, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.page-btn, .page-link {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-main);
+    padding: 6px 12px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.page-btn i {
+    font-size: 0.8rem;
+}
+
+.page-link {
+    min-width: 36px;
+    justify-content: center;
+}
+
+.page-link:hover, .page-btn:hover:not(:disabled) {
+    background: rgba(0, 255, 106, 0.1);
+    border-color: rgba(0, 255, 106, 0.4);
+    color: var(--emerald-1);
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(0, 255, 106, 0.3);
+}
+
+.page-link.active {
+    background: var(--emerald-1);
+    color: #000;
+    border-color: var(--emerald-1);
+    box-shadow: 0 0 15px rgba(0, 255, 106, 0.5);
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    color: #555;
+    border-color: transparent;
+}
+
+.pager-dots {
+    color: var(--text-sub);
+    padding: 0 4px;
+    font-weight: bold;
+}
+
+@media (max-width: 767.98px) {
+    .pagination {
+        padding: 6px 10px;
+        gap: 4px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .page-btn span {
+        display: none; /* Hide text on mobile button to save space */
+    }
+    
+    .page-btn {
+        padding: 6px 10px;
+    }
+    
+    .page-link {
+        min-width: 32px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+}

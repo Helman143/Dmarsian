@@ -59,26 +59,13 @@ require_once 'db_connect.php';
                                 <th>Details</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $sql = "SELECT * FROM activity_log ORDER BY datetime DESC";
-                            $result = $conn->query($sql);
-                            if ($result && $result->num_rows > 0) {
-                                while($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>" . htmlspecialchars($row['action_type']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['datetime']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['admin_account']) . "</td>";
-                                    echo "<td>" . htmlspecialchars(str_replace('STD-', '', $row['student_id'])) . "</td>";
-                                    echo "<td>" . nl2br(htmlspecialchars($row['details'])) . "</td>";
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='5'>No activity found.</td></tr>";
-                            }
-                            ?>
+                        <tbody id="activity-log-body">
+                            <!-- Activity log will be loaded dynamically via JavaScript -->
                         </tbody>
                     </table>
+                </div>
+                <div id="activity-pagination" class="pagination-container mt-3">
+                    <!-- Pagination controls will be loaded here -->
                 </div>
             </div>
             <div id="admins-account" class="tab-content" style="display:none;">

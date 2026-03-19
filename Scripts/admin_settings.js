@@ -436,19 +436,97 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Initial load of admin accounts
+  // Initial load of admin accounts and activity logs
   refreshAdminAccountsTable();
+  fetchActivityLogs(1);
 
   // Real-time automatic updates for the Admin Accounts Table (Every 5 seconds)
-  setInterval(function() {
-      // Only refresh if the Admins Account tab is currently active
-      if (document.getElementById("admins-account").style.display === "block") {
-          // Pause auto-refresh if any password is currently revealed to prevent hiding it mid-view
-          const isAnyPasswordRevealed = document.querySelector(".password-masked[style*='display: none']") !== null;
-          
-          if (!isAnyPasswordRevealed) {
-              refreshAdminAccountsTable();
-          }
+  setInterval(function () {
+    // Only refresh if the Admins Account tab is currently active
+    if (document.getElementById("admins-account").style.display === "block") {
+      // Pause auto-refresh if any password is currently revealed to prevent hiding it mid-view
+      const isAnyPasswordRevealed =
+        document.querySelector(".password-masked[style*='display: none']") !==
+        null;
+
+      if (!isAnyPasswordRevealed) {
+        refreshAdminAccountsTable();
       }
+    }
   }, 5000);
 });
+
+// Activity Log Pagination Logic
+let currentActivityPage = 1;
+
+function fetchActivityLogs(page) {
+  currentActivityPage = page;
+  fetch(`get_activity_logs.php?page=${page}&limit=15`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        const tbody = document.getElementById("activity-log-body");
+        if (tbody) {
+          tbody.innerHTML = data.html;
+          renderActivityPagination(data.total_pages, data.current_page);
+        }
+      } else {
+        console.error("Error fetching activity logs:", data.message);
+      }
+    })
+    .catch((error) => console.error("Error fetching activity logs:", error));
+}
+
+function renderActivityPagination(totalPages, currentPage) {
+  const container = document.getElementById("activity-pagination");
+  if (!container) return;
+
+  if (totalPages <= 1) {
+    container.innerHTML = "";
+    return;
+  }
+
+  let html = '<div class="pagination">';
+
+  // Previous Button
+  html += `<button class="page-btn prev" ${
+    currentPage === 1 ? "disabled" : ""
+  } onclick="fetchActivityLogs(${currentPage - 1})">
+        <i class="fas fa-chevron-left"></i> Previous
+    </button>`;
+
+  // Page Numbers
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + 4);
+
+  if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
+  }
+
+  if (startPage > 1) {
+    html += `<button class="page-link" onclick="fetchActivityLogs(1)">1</button>`;
+    if (startPage > 2) html += '<span class="pager-dots">...</span>';
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    html += `<button class="page-link ${
+      i === currentPage ? "active" : ""
+    }" onclick="fetchActivityLogs(${i})">${i}</button>`;
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1)
+      html += '<span class="pager-dots">...</span>';
+    html += `<button class="page-link" onclick="fetchActivityLogs(${totalPages})">${totalPages}</button>`;
+  }
+
+  // Next Button
+  html += `<button class="page-btn next" ${
+    currentPage === totalPages ? "disabled" : ""
+  } onclick="fetchActivityLogs(${currentPage + 1})">
+        Next <i class="fas fa-chevron-right"></i>
+    </button>`;
+
+  html += "</div>";
+  container.innerHTML = html;
+}
