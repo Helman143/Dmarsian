@@ -1,5 +1,18 @@
+// Pagination global variables
+let currentPaymentPage = 1;
+let currentNonDiscountPage = 1;
+let currentDiscountPage = 1;
+const paymentItemsPerPage = 10;
+
+let globalPaymentRecords = [];
+let globalBalancesMap = {};
+let globalStatusesMap = {};
+let globalNonDiscountStudents = [];
+let globalDiscountStudents = [];
+
 // Fetch and populate payment records from the server
 function fetchPayments(searchTerm = '') {
+
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -72,7 +85,10 @@ function fetchPayments(searchTerm = '') {
             });
         }
 
-        populatePaymentTable(payments, balancesMap, statusesMap);
+        globalPaymentRecords = payments;
+        globalBalancesMap = balancesMap;
+        globalStatusesMap = statusesMap;
+        populatePaymentTable();
     })
     .catch(err => {
         console.error('Error in fetchPayments:', err);
@@ -84,20 +100,29 @@ function fetchPayments(searchTerm = '') {
 }
 
 // Populate payment records table
-function populatePaymentTable(records, balancesMap = {}, statusesMap = {}) {
+function populatePaymentTable() {
     const tableBody = document.getElementById('paymentTableBody');
     tableBody.innerHTML = '';
-    if (!records.length) {
+    
+    if (!globalPaymentRecords || !globalPaymentRecords.length) {
         tableBody.innerHTML = '<tr><td colspan="9">No payment records found.</td></tr>';
+        renderPaginationControls('paymentPagination', 0, 1, 'changePaymentPage');
         return;
     }
+
+    const totalPages = Math.ceil(globalPaymentRecords.length / paymentItemsPerPage);
+    if (currentPaymentPage > totalPages) currentPaymentPage = totalPages || 1;
+
+    const startIdx = (currentPaymentPage - 1) * paymentItemsPerPage;
+    const paginatedRecords = globalPaymentRecords.slice(startIdx, startIdx + paymentItemsPerPage);
+
     // Pre-compute per-student stats for fallback balance (current month totals, prior payments, discount)
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const monthStr = `${yyyy}-${mm}`;
     const statsMap = new Map(); // key -> { sumThisMonth, hasPrev, discount }
-    records.forEach(r => {
+    globalPaymentRecords.forEach(r => {
         const raw = r.jeja_no || '';
         const num = String(raw).replace(/\D/g, '');
         const key = num ? ('STD-' + num.padStart(5, '0')) : raw;
@@ -116,43 +141,52 @@ function populatePaymentTable(records, balancesMap = {}, statusesMap = {}) {
         }
         statsMap.set(key, stat);
     });
-    records.forEach(record => {
-        const row = document.createElement('tr');
-        const raw = record.jeja_no || '';
-        const num = String(raw).replace(/\D/g, '');
-        const canon = num ? ('STD-' + num.padStart(5, '0')) : raw;
-        let bal = balancesMap[canon] != null ? Number(balancesMap[canon]) : null;
-        if (bal == null || isNaN(bal)) {
-            const s = statsMap.get(canon) || { sumThisMonth: 0, hasPrev: false, discount: 0 };
-            const dueBase = s.hasPrev ? 1500 : 1800;
-            const estimated = Math.max(0, (dueBase - (parseFloat(s.discount) || 0)) - (parseFloat(s.sumThisMonth) || 0));
-            bal = estimated;
-        }
-        // Prefer the student's current status; fallback to record.status
-        let statusText = statusesMap[canon] || (record.status ? String(record.status).trim() : '');
-        const statusLower = statusText.toLowerCase();
-        if (!(statusLower === 'active' || statusLower === 'inactive' || statusLower === 'freeze')) {
-            // If value is not one of the three expected, clear it to avoid confusion
-            statusText = '';
-        } else {
-            // Normalize capitalization
-            statusText = statusText.charAt(0).toUpperCase() + statusText.slice(1).toLowerCase();
-        }
-        row.innerHTML = `
-            <td>${record.jeja_no ? record.jeja_no.replace(/^STD-/, '') : ''}</td>
-            <td>${record.fullname}</td>
-            <td>${record.date_paid}</td>
-            <td>₱${parseFloat(record.amount_paid).toFixed(2)}</td>
-            <td>${record.payment_type}</td>
-            <td>₱${(parseFloat(record.discount) || 0).toFixed(2)}</td>
-            <td>${record.date_enrolled}</td>
-            <td>₱${Number(bal).toLocaleString(undefined, {minimumFractionDigits:2})}</td>
-            <td class="status-${statusText ? statusText.toLowerCase() : ''}">${statusText}</td>
-        `;
-        tableBody.appendChild(row);
-    });
+
+    if (paginatedRecords.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="9">No payment records found on this page.</td></tr>';
+    } else {
+        paginatedRecords.forEach(record => {
+            const row = document.createElement('tr');
+            const raw = record.jeja_no || '';
+            const num = String(raw).replace(/\D/g, '');
+            const canon = num ? ('STD-' + num.padStart(5, '0')) : raw;
+            let bal = globalBalancesMap[canon] != null ? Number(globalBalancesMap[canon]) : null;
+            if (bal == null || isNaN(bal)) {
+                const s = statsMap.get(canon) || { sumThisMonth: 0, hasPrev: false, discount: 0 };
+                const dueBase = s.hasPrev ? 1500 : 1800;
+                const estimated = Math.max(0, (dueBase - (parseFloat(s.discount) || 0)) - (parseFloat(s.sumThisMonth) || 0));
+                bal = estimated;
+            }
+            // Prefer the student's current status; fallback to record.status
+            let statusText = globalStatusesMap[canon] || (record.status ? String(record.status).trim() : '');
+            const statusLower = statusText.toLowerCase();
+            if (!(statusLower === 'active' || statusLower === 'inactive' || statusLower === 'freeze')) {
+                statusText = '';
+            } else {
+                statusText = statusText.charAt(0).toUpperCase() + statusText.slice(1).toLowerCase();
+            }
+            row.innerHTML = `
+                <td>${record.jeja_no ? record.jeja_no.replace(/^STD-/, '') : ''}</td>
+                <td>${record.fullname}</td>
+                <td>${record.date_paid}</td>
+                <td>₱${parseFloat(record.amount_paid).toFixed(2)}</td>
+                <td>${record.payment_type}</td>
+                <td>₱${(parseFloat(record.discount) || 0).toFixed(2)}</td>
+                <td>${record.date_enrolled}</td>
+                <td>₱${Number(bal).toLocaleString(undefined, {minimumFractionDigits:2})}</td>
+                <td class="status-${statusText ? statusText.toLowerCase() : ''}">${statusText}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    renderPaginationControls('paymentPagination', totalPages, currentPaymentPage, 'changePaymentPage');
 }
 
+function changePaymentPage(page) {
+    currentPaymentPage = page;
+    populatePaymentTable();
+}
 // Handle form submission via AJAX
 function handlePaymentSubmit(event) {
     event.preventDefault();
@@ -283,49 +317,139 @@ function fetchStudentsForDiscountTables(searchNonDiscount = '', searchDiscount =
 }
 
 function populateDiscountTables(students, searchNonDiscount, searchDiscount) {
-    const nonDiscountTbody = document.getElementById('nonDiscountTableBody');
-    const discountTbody = document.getElementById('discountTableBody');
-    nonDiscountTbody.innerHTML = '';
-    discountTbody.innerHTML = '';
-
     // Filter and populate Non Discount Students
-    students.filter(student => parseFloat(student.discount) === 0 &&
+    globalNonDiscountStudents = students.filter(student => parseFloat(student.discount) === 0 &&
         (!searchNonDiscount || student.full_name.toLowerCase().includes(searchNonDiscount.toLowerCase()) || student.jeja_no.toLowerCase().includes(searchNonDiscount.toLowerCase()))
-    ).forEach(student => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
-            <td>${student.full_name}</td>
-            <td>₱${parseFloat(student.discount).toFixed(2)}</td>
-            <td>${student.date_enrolled || ''}</td>
-            <td class="status-${student.status ? student.status.toLowerCase() : ''}">${student.status || ''}</td>
-        `;
-        nonDiscountTbody.appendChild(row);
-    });
+    );
 
     // Filter and populate Discount Students
-    students.filter(student => parseFloat(student.discount) > 0 &&
+    globalDiscountStudents = students.filter(student => parseFloat(student.discount) > 0 &&
         (!searchDiscount || student.full_name.toLowerCase().includes(searchDiscount.toLowerCase()) || student.jeja_no.toLowerCase().includes(searchDiscount.toLowerCase()))
-    ).forEach(student => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
-            <td>${student.full_name}</td>
-            <td>₱${parseFloat(student.discount).toFixed(2)}</td>
-            <td>${student.date_enrolled || ''}</td>
-            <td class="status-${student.status ? student.status.toLowerCase() : ''}">${student.status || ''}</td>
-        `;
-        discountTbody.appendChild(row);
-    });
+    );
 
-    // If no records
-    if (nonDiscountTbody.children.length === 0) {
-        nonDiscountTbody.innerHTML = '<tr><td colspan="9">No non-discount students found.</td></tr>';
-    }
-    if (discountTbody.children.length === 0) {
-        discountTbody.innerHTML = '<tr><td colspan="9">No discount students found.</td></tr>';
-    }
+    // Reset pages to 1 on new data/search
+    currentNonDiscountPage = 1;
+    currentDiscountPage = 1;
+
+    renderNonDiscountTable();
+    renderDiscountTable();
 }
+
+function renderNonDiscountTable() {
+    const tbody = document.getElementById('nonDiscountTableBody');
+    tbody.innerHTML = '';
+
+    const totalPages = Math.ceil(globalNonDiscountStudents.length / paymentItemsPerPage);
+    if (currentNonDiscountPage > totalPages) currentNonDiscountPage = totalPages || 1;
+
+    const startIdx = (currentNonDiscountPage - 1) * paymentItemsPerPage;
+    const paginatedRecords = globalNonDiscountStudents.slice(startIdx, startIdx + paymentItemsPerPage);
+
+    if (paginatedRecords.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No non-discount students found.</td></tr>';
+    } else {
+        paginatedRecords.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
+                <td>${student.full_name}</td>
+                <td>₱${parseFloat(student.discount).toFixed(2)}</td>
+                <td>${student.date_enrolled || ''}</td>
+                <td class="status-${student.status ? student.status.toLowerCase() : ''}">${student.status || ''}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    renderPaginationControls('nonDiscountPagination', totalPages, currentNonDiscountPage, 'changeNonDiscountPage');
+}
+
+function changeNonDiscountPage(page) {
+    currentNonDiscountPage = page;
+    renderNonDiscountTable();
+}
+
+function renderDiscountTable() {
+    const tbody = document.getElementById('discountTableBody');
+    tbody.innerHTML = '';
+
+    const totalPages = Math.ceil(globalDiscountStudents.length / paymentItemsPerPage);
+    if (currentDiscountPage > totalPages) currentDiscountPage = totalPages || 1;
+
+    const startIdx = (currentDiscountPage - 1) * paymentItemsPerPage;
+    const paginatedRecords = globalDiscountStudents.slice(startIdx, startIdx + paymentItemsPerPage);
+
+    if (paginatedRecords.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No discount students found.</td></tr>';
+    } else {
+        paginatedRecords.forEach(student => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${student.jeja_no ? student.jeja_no.replace(/^STD-/, '') : ''}</td>
+                <td>${student.full_name}</td>
+                <td>₱${parseFloat(student.discount).toFixed(2)}</td>
+                <td>${student.date_enrolled || ''}</td>
+                <td class="status-${student.status ? student.status.toLowerCase() : ''}">${student.status || ''}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    renderPaginationControls('discountPagination', totalPages, currentDiscountPage, 'changeDiscountPage');
+}
+
+function changeDiscountPage(page) {
+    currentDiscountPage = page;
+    renderDiscountTable();
+}
+
+function renderPaginationControls(containerId, totalPages, currentPage, changeFunc) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '<div class="pagination">';
+
+    // Previous Button
+    html += `<button class="page-btn prev" ${currentPage === 1 ? 'disabled' : ''} onclick="${changeFunc}(${currentPage - 1})">
+        <i class="fas fa-chevron-left"></i> Previous
+    </button>`;
+
+    // Page Numbers
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    if (startPage > 1) {
+        html += `<button class="page-link" onclick="${changeFunc}(1)">1</button>`;
+        if (startPage > 2) html += '<span class="pager-dots">...</span>';
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-link ${i === currentPage ? 'active' : ''}" onclick="${changeFunc}(${i})">${i}</button>`;
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += '<span class="pager-dots">...</span>';
+        html += `<button class="page-link" onclick="${changeFunc}(${totalPages})">${totalPages}</button>`;
+    }
+
+    // Next Button
+    html += `<button class="page-btn next" ${currentPage === totalPages ? 'disabled' : ''} onclick="${changeFunc}(${currentPage + 1})">
+        Next <i class="fas fa-chevron-right"></i>
+    </button>`;
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
 
 // Auto-fill discount and status when STD No. or Full Name is entered
 function fetchStudentDiscount() {

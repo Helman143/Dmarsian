@@ -122,6 +122,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         <tbody id="paymentTableBody"></tbody>
                     </table>
                 </div>
+                <div id="paymentPagination" class="pagination-container mt-3"></div>
             </div>
 
             <!-- Non Discount Students Table -->
@@ -147,6 +148,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         <tbody id="nonDiscountTableBody"></tbody>
                     </table>
                 </div>
+                <div id="nonDiscountPagination" class="pagination-container mt-3"></div>
             </div>
 
             <!-- Discount Students Table -->
@@ -172,6 +174,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
                         <tbody id="discountTableBody"></tbody>
                     </table>
                 </div>
+                <div id="discountPagination" class="pagination-container mt-3"></div>
             </div>
 
             
