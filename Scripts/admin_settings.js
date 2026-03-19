@@ -461,20 +461,37 @@ let currentActivityPage = 1;
 
 function fetchActivityLogs(page) {
   currentActivityPage = page;
+  const tbody = document.getElementById("activity-log-body");
+  if (tbody) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+  }
+
   fetch(`get_activity_logs.php?page=${page}&limit=15`)
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
       if (data.status === "success") {
-        const tbody = document.getElementById("activity-log-body");
         if (tbody) {
           tbody.innerHTML = data.html;
           renderActivityPagination(data.total_pages, data.current_page);
         }
       } else {
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ff4444;">Error: ${data.message}</td></tr>`;
+        }
         console.error("Error fetching activity logs:", data.message);
       }
     })
-    .catch((error) => console.error("Error fetching activity logs:", error));
+    .catch((error) => {
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ff4444;">Failed to load logs. Please check your connection.</td></tr>`;
+      }
+      console.error("Error fetching activity logs:", error);
+    });
 }
 
 function renderActivityPagination(totalPages, currentPage) {
