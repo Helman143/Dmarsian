@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $parent_phone = $reg['parent_phone'] ?? null;
     $parent_email = $reg['parent_email'] ?? null;
     $belt_rank = $reg['belt_rank'] ?? '';
+    $gender = $reg['gender'] ?? '';
     $schedule = 'MWF-PM'; // Default schedule for trial conversions
     
     // Validate required fields
@@ -48,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Use temporary jeja_no since it's NOT NULL, then update with actual value
     $temp_jeja_no = 'TEMP-' . time() . '-' . rand(1000, 9999);
     $date_enrolled = date('Y-m-d');
-    $sql = "INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, ?, ?, 'Active')";
+    $sql = "INSERT INTO students (jeja_no, full_name, address, phone, email, school, parent_name, parent_phone, parent_email, belt_rank, gender, discount, schedule, date_enrolled, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, ?, ?, 'Active')";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssssssssssss',
+    $stmt->bind_param('sssssssssssss',
         $temp_jeja_no,
         $student_name,
         $address,
@@ -61,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $parent_phone,
         $parent_email,
         $belt_rank,
+        $gender,
         $schedule,
         $date_enrolled
     );

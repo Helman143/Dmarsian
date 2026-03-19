@@ -85,6 +85,7 @@ $result_complete = $conn->query($sql_complete);
                             <th>Phone No.</th>
                             <th>Email</th>
                             <th>School</th>
+                            <th>Gender</th>
                             <th>Parent's Name</th>
                             <th>Parent's Phone</th>
                             <th>Parent's Email</th>
@@ -105,6 +106,7 @@ $result_complete = $conn->query($sql_complete);
                                     <td><?= htmlspecialchars($row['phone']) ?></td>
                                     <td><?= htmlspecialchars($row['email']) ?></td>
                                     <td><?= htmlspecialchars($row['school']) ?></td>
+                                    <td><?= htmlspecialchars($row['gender'] ?? '') ?></td>
                                     <td><?= htmlspecialchars($row['parents_name']) ?></td>
                                     <td><?= htmlspecialchars($row['parent_phone']) ?></td>
                                     <td><?= htmlspecialchars($row['parent_email']) ?></td>
@@ -115,7 +117,7 @@ $result_complete = $conn->query($sql_complete);
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="14">No trial session registrations found.</td></tr>
+                            <tr><td colspan="15">No trial session registrations found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

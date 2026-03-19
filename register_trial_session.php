@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'class' => $_POST['class'] ?? '',
         'parent_email' => $_POST['parent_email'] ?? '',
         'belt_rank' => $_POST['belt_rank'] ?? '',
+        'gender' => $_POST['gender'] ?? '',
         'enroll_type' => $_POST['enroll_type'] ?? '',
         'date_requested' => date('Y-m-d H:i:s')
     ];
@@ -90,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $textBody =
             "A new trial session request has been submitted.\n\n" .
             "Student: {$request['student_name']}\n" .
+            "Gender: {$request['gender']}\n" .
             "Parent: {$request['parents_name']}\n" .
             "Class: {$request['class']} | Belt: {$request['belt_rank']}\n" .
             "Student Email: {$request['email']} | Parent Email: {$request['parent_email']}\n" .

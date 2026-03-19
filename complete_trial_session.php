@@ -21,9 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     $req = $requests[$index];
+    $gender = $req['gender'] ?? '';
     $conn = connectDB();
-    $stmt = $conn->prepare("INSERT INTO registrations (student_name, address, parents_name, phone, email, parent_phone, school, class, parent_email, belt_rank, enroll_type, date_registered, status, trial_payment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'complete', 200.00)");
-    $stmt->bind_param('ssssssssssss',
+    $stmt = $conn->prepare("INSERT INTO registrations (student_name, address, parents_name, phone, email, parent_phone, school, class, parent_email, belt_rank, gender, enroll_type, date_registered, status, trial_payment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'complete', 200.00)");
+    $stmt->bind_param('sssssssssssss',
         $req['student_name'],
         $req['address'],
         $req['parents_name'],
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $req['class'],
         $req['parent_email'],
         $req['belt_rank'],
+        $gender,
         $req['enroll_type'],
         $req['date_requested']
     );
