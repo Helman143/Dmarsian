@@ -210,7 +210,7 @@ mysqli_close($conn);
                                 <?php endif; ?>
                                 <span class="post-tag <?php echo $post['category']; ?>"><?php echo $post['category'] === 'achievement_event' ? 'Achievement/Event' : ucfirst($post['category']); ?></span>
                                 <div class="post-actions">
-                                    <button class="edit-post-btn" onclick="editPost(<?php echo $post['id']; ?>)">
+                                    <button class="edit-post-btn" title="Edit" onclick="editPost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <?php if ($showInSliderColumnExists): ?>
@@ -221,7 +221,7 @@ mysqli_close($conn);
                                         <i class="fas fa-<?php echo (isset($post['show_in_slider']) && $post['show_in_slider'] == 0) ? 'eye' : 'eye-slash'; ?>"></i>
                                     </button>
                                     <?php endif; ?>
-                                    <button class="archive-post-btn" onclick="archivePost(<?php echo $post['id']; ?>)">
+                                    <button class="archive-post-btn" title="Delete" onclick="archivePost(<?php echo $post['id']; ?>)">
                                         <i class="fas fa-archive"></i>
                                     </button>
                                 </div>
