@@ -331,7 +331,7 @@ nav a,
 
 .post-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
 }
 
@@ -352,7 +352,7 @@ nav a,
 }
 
 .post-image {
-    height: 280px;
+    height: 180px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -410,27 +410,27 @@ nav a,
 }
 
 .post-content {
-    padding: 18px;
+    padding: 12px;
     max-width: 800px;
 }
 
 .post-title {
     color: #fff;
-    font-size: 1.35rem;
-    margin: 0 0 8px 0;
+    font-size: 1.15rem;
+    margin: 0 0 6px 0;
     font-weight: 700;
 }
 
 .post-date {
     color: var(--text-muted);
-    font-size: 0.85rem;
-    margin-bottom: 12px;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
 }
 
 .post-description {
     color: #e8f6ed;
-    font-size: 0.98rem;
-    line-height: 1.6;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .post-actions {
