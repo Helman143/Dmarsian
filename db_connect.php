@@ -41,4 +41,21 @@ function connectDB() {
 if (!isset($conn) || (isset($conn) && isset($conn->connect_error) && $conn->connect_error)) {
     $conn = connectDB();
 }
+
+/**
+ * Check if a specific column exists in a table
+ */
+function checkColumnExists($table, $column) {
+    global $conn;
+    if (!$conn) $conn = connectDB();
+    if (!$conn) return false;
+    
+    try {
+        $sql = "SHOW COLUMNS FROM " . mysqli_real_escape_string($conn, $table) . " LIKE '" . mysqli_real_escape_string($conn, $column) . "'";
+        $result = mysqli_query($conn, $sql);
+        return $result && mysqli_num_rows($result) > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}
 ?>

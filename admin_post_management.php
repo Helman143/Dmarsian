@@ -68,37 +68,7 @@ $params = [$year_filter];
 $types = "i";
 
 // Check if show_in_slider column exists (for conditional button display)
-$showInSliderColumnExists = false;
-try {
-    // Use a more reliable check - query the information_schema
-    $checkSql = "SELECT COUNT(*) as col_count FROM information_schema.COLUMNS 
-                 WHERE TABLE_SCHEMA = DATABASE() 
-                 AND TABLE_NAME = 'posts' 
-                 AND COLUMN_NAME = 'show_in_slider'";
-    $checkResult = mysqli_query($conn, $checkSql);
-    if ($checkResult !== false) {
-        $checkRow = mysqli_fetch_assoc($checkResult);
-        if ($checkRow && isset($checkRow['col_count']) && (int)$checkRow['col_count'] > 0) {
-            $showInSliderColumnExists = true;
-        }
-        mysqli_free_result($checkResult);
-    }
-    
-    // Fallback to SHOW COLUMNS if information_schema doesn't work
-    if (!$showInSliderColumnExists) {
-        $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-        if ($checkColumn !== false && mysqli_num_rows($checkColumn) > 0) {
-            $showInSliderColumnExists = true;
-        }
-        if ($checkColumn) {
-            mysqli_free_result($checkColumn);
-        }
-    }
-} catch (Exception $e) {
-    // If check fails, assume column doesn't exist (safer default)
-    $showInSliderColumnExists = false;
-    error_log("Error checking show_in_slider column: " . $e->getMessage());
-}
+$showInSliderColumnExists = checkColumnExists('posts', 'show_in_slider');
 
 
 // Add category filter if specified

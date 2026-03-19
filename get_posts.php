@@ -35,11 +35,7 @@ try {
     $previousYear = $currentYear - 1;
     
     // Check if show_in_slider column exists
-    $columnExists = false;
-    $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-    if ($checkColumn && mysqli_num_rows($checkColumn) > 0) {
-        $columnExists = true;
-    }
+    $columnExists = checkColumnExists('posts', 'show_in_slider');
     
     // Build base query - only filter by show_in_slider if column exists
     if ($columnExists) {

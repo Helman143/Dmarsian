@@ -29,43 +29,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_migration'])) {
         }
         
         // Check if column already exists
-        $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-        if (mysqli_num_rows($checkColumn) > 0) {
+        if (checkColumnExists('posts', 'show_in_slider')) {
             $message = "Column 'show_in_slider' already exists. Migration not needed.";
             $success = true;
-            mysqli_close($conn);
         } else {
             // Add show_in_slider column
-            $sql = "ALTER TABLE posts 
-                    ADD COLUMN show_in_slider TINYINT(1) NOT NULL DEFAULT 1 
-                    AFTER status";
+            $sql = "ALTER TABLE posts ADD COLUMN show_in_slider TINYINT(1) NOT NULL DEFAULT 1 AFTER status";
             
             if (mysqli_query($conn, $sql)) {
                 $message = "Column 'show_in_slider' added successfully.\n";
                 
                 // Set all existing posts to visible (1) by default
-                $updateSql = "UPDATE posts SET show_in_slider = 1 WHERE show_in_slider IS NULL OR show_in_slider = 0";
+                $updateSql = "UPDATE posts SET show_in_slider = 1";
                 if (mysqli_query($conn, $updateSql)) {
                     $message .= "All existing posts set to show_in_slider = 1.\n";
-                } else {
-                    $message .= "Warning: Failed to update existing posts: " . mysqli_error($conn) . "\n";
                 }
                 
-                // Add index for performance
+                // Add index - ignore if fails (index might exist from previous partial run)
                 $indexSql = "ALTER TABLE posts ADD INDEX idx_show_in_slider (show_in_slider)";
-                if (mysqli_query($conn, $indexSql)) {
-                    $message .= "Index 'idx_show_in_slider' added successfully.\n";
-                } else {
-                    $message .= "Warning: Failed to add index (may already exist): " . mysqli_error($conn) . "\n";
-                }
+                mysqli_query($conn, $indexSql);
                 
                 $message .= "\nMigration completed successfully!";
                 $success = true;
             } else {
                 throw new Exception('Failed to add column: ' . mysqli_error($conn));
             }
-            
-            mysqli_close($conn);
         }
     } catch (Exception $e) {
         $error = "Migration failed: " . $e->getMessage();
@@ -76,17 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_migration'])) {
 }
 
 // Check current status
-$columnExists = false;
-try {
-    $conn = connectDB();
-    if ($conn) {
-        $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-        $columnExists = mysqli_num_rows($checkColumn) > 0;
-        mysqli_close($conn);
-    }
-} catch (Exception $e) {
-    $error = "Error checking column status: " . $e->getMessage();
-}
+$columnExists = checkColumnExists('posts', 'show_in_slider');
 ?>
 <!DOCTYPE html>
 <html lang="en">

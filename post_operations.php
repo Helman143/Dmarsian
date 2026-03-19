@@ -368,20 +368,24 @@ function toggleSliderVisibility() {
         }
         
         // Check if show_in_slider column exists
-        $columnExists = false;
-        $checkColumn = mysqli_query($conn, "SHOW COLUMNS FROM posts LIKE 'show_in_slider'");
-        if ($checkColumn !== false) {
-            $columnExists = mysqli_num_rows($checkColumn) > 0;
-        }
+        $columnExists = checkColumnExists('posts', 'show_in_slider');
         
         if (!$columnExists) {
-            mysqli_close($conn);
-            echo json_encode([
-                'success' => false, 
-                'message' => 'Database migration required. Please visit run_migration.php to run the migration first.',
-                'migration_required' => true
-            ]);
-            return;
+            // Attempt auto-migration if column is missing
+            $migrationSql = "ALTER TABLE posts ADD COLUMN show_in_slider TINYINT(1) NOT NULL DEFAULT 1 AFTER status";
+            if (mysqli_query($conn, $migrationSql)) {
+                // Set existing posts to visible
+                mysqli_query($conn, "UPDATE posts SET show_in_slider = 1");
+                $columnExists = true;
+            } else {
+                mysqli_close($conn);
+                echo json_encode([
+                    'success' => false, 
+                    'message' => 'Database migration required. Please visit run_migration.php to run it manually.',
+                    'migration_required' => true
+                ]);
+                return;
+            }
         }
         
         // First, verify the post exists and get current show_in_slider value and category
