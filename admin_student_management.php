@@ -30,15 +30,15 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
         <!-- Main Content -->
+        <!-- Mobile fixed topbar -->
+        <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between p-2 mb-3">
+            <button id="mobileSidebarToggle" class="neon-menu-btn btn btn-outline-primary d-md-none mb-3" type="button" aria-label="Toggle sidebar">
+                <span class="neon-hamburger"></span>
+            </button>
+            <h1 class="page-title m-0 fs-4">STUDENT MANAGEMENT</h1>
+        </div>
+
         <div class="main-content">
-            <!-- Mobile menu button (visible on small screens only) -->
-            <div class="mobile-topbar d-flex d-md-none align-items-center justify-content-between p-2 mb-3">
-                <button id="mobileSidebarToggle" class="btn btn-sm btn-outline-success" type="button" aria-label="Toggle sidebar">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="page-title m-0 fs-4">STUDENT MANAGEMENT</h1>
-            </div>
-            
             <h1 class="page-title d-none d-md-block">STUDENT MANAGEMENT</h1>
             
             <div class="student-form-container">

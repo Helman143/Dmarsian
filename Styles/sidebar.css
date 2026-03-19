@@ -219,6 +219,7 @@
 		position: fixed;
 		top: 14px;
 		left: 14px;
+		right: 14px; /* Added right to allow justify-content: between to work across the width */
 		width: auto;
 		background: transparent !important;
 		padding: 0 !important;
@@ -227,7 +228,7 @@
 		/* Below backdrop when active, but accessible */
 	}
 
-	.mobile-topbar span {
+	.mobile-topbar span:not(.neon-hamburger) {
 		display: none !important;
 	}
 
@@ -247,13 +248,16 @@
 		transform: scale(0.95);
 	}
 
-	.mobile-topbar .btn i {
-		color: var(--primary-color) !important;
-		font-size: 1.2rem;
+	.mobile-topbar .page-title {
+		margin-left: auto;
+		margin-right: auto;
+		flex: 1;
+		text-align: center;
+		padding-right: 44px; /* Offset the width of the menu button to truly center the text */
 	}
 
 	/* Provide room so the floating button doesn't overlap the page title */
-	.mobile-topbar+.main-content {
+	.mobile-topbar~.main-content {
 		padding-top: 80px !important;
 	}
 
