@@ -237,7 +237,7 @@ if (!empty($spacesName)) {
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/11.jfif" alt="Offer 3" class="img-fluid">
+                        <img src="Picture/11.jpg" alt="Offer 3" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Belt Promotion & Certification</h3>
                             <div class="offer-desc">Official belt testing and certification to recognize your progress and achievements.</div>
