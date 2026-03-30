@@ -35,12 +35,15 @@ if (!empty($spacesName)) {
 </script>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D'Marsians Taekwondo Gym</title>
-    <meta name="description" content="D'Marsians Taekwondo Gym in Pagadian City — offering beginner to advanced Taekwondo training, belt promotions, sparring, and self-defense classes for all ages.">
-    <meta name="keywords" content="D'Marsians Taekwondo Gym, Taekwondo Pagadian City, Taekwondo classes, martial arts gym, belt promotion, self defense">
+    <meta name="description"
+        content="D'Marsians Taekwondo Gym in Pagadian City — offering beginner to advanced Taekwondo training, belt promotions, sparring, and self-defense classes for all ages.">
+    <meta name="keywords"
+        content="D'Marsians Taekwondo Gym, Taekwondo Pagadian City, Taekwondo classes, martial arts gym, belt promotion, self defense">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/png" href="Picture/Logo2.png">
     <link rel="apple-touch-icon" href="Picture/Logo2.png">
@@ -50,19 +53,46 @@ if (!empty($spacesName)) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Updated typography: Orbitron/Teko for headings, Montserrat for body -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Teko:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Teko:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
-    /* Slider card description clamp with See more toggle */
-    .slide-card .card-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
-    .slide-card .see-more { display: none; margin-top: 6px; background: none; border: 0; color: #198754; font-weight: 600; cursor: pointer; padding: 0; }
-    .slide-card.has-more .see-more { display: inline; }
-    .slide-card.expanded .card-text { -webkit-line-clamp: unset; display: block; }
-    
-    /* Larger fonts for Achievements and Events headings */
-    .achievements-section h2,
-    .events-section h2 { font-size: clamp(2rem, 3.2vw, 3rem); }
+        /* Slider card description clamp with See more toggle */
+        .slide-card .card-text {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+        }
+
+        .slide-card .see-more {
+            display: none;
+            margin-top: 6px;
+            background: none;
+            border: 0;
+            color: #198754;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .slide-card.has-more .see-more {
+            display: inline;
+        }
+
+        .slide-card.expanded .card-text {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+
+        /* Larger fonts for Achievements and Events headings */
+        .achievements-section h2,
+        .events-section h2 {
+            font-size: clamp(2rem, 3.2vw, 3rem);
+        }
     </style>
 </head>
+
 <body>
     <!-- MOBILE COMMAND STRIP (Offcanvas Shutter) -->
     <nav class="navbar mobile-command fixed-top d-xl-none" aria-label="Mobile navigation">
@@ -72,9 +102,8 @@ if (!empty($spacesName)) {
                 D'MARSIANS TAEKWONDO GYM
             </a>
 
-            <button id="mobileMenuToggle" class="neon-burger" type="button"
-                    data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas"
-                    aria-controls="mobileOffcanvas" aria-label="Open menu">
+            <button id="mobileMenuToggle" class="neon-burger" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#mobileOffcanvas" aria-controls="mobileOffcanvas" aria-label="Open menu">
                 <span class="burger-line"></span>
                 <span class="burger-line"></span>
                 <span class="burger-line"></span>
@@ -82,7 +111,8 @@ if (!empty($spacesName)) {
         </div>
     </nav>
 
-    <div class="offcanvas offcanvas-end offcanvas-holo d-xl-none" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
+    <div class="offcanvas offcanvas-end offcanvas-holo d-xl-none" tabindex="-1" id="mobileOffcanvas"
+        aria-labelledby="mobileOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="mobileOffcanvasLabel">MENU</h5>
             <button type="button" class="btn-close holo-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -122,7 +152,7 @@ if (!empty($spacesName)) {
         <div class="ambient-light-orb"></div>
         <!-- Grid pattern overlay -->
         <div class="grid-pattern-overlay"></div>
-        
+
         <!-- Holographic Monitor Frame -->
         <div class="video-frame-container">
             <div class="video-frame">
@@ -133,12 +163,13 @@ if (!empty($spacesName)) {
             <!-- Floating Logo -->
             <img src="Picture/Logo2.png" alt="D'Marsians Logo" class="floating-logo">
         </div>
-        
+
         <!-- Hero Content Below Video -->
         <div class="hero-content">
             <h3 class="sub-glitch">EMPOWERING STUDENTS THROUGH</h3>
             <h2 class="main-glitch" data-text="DISCIPLINE & STRENGTH">DISCIPLINE & STRENGTH</h2>
-            <p class="hero-desc">Train with the best. Build confidence, respect, and physical power in a state-of-the-art environment.</p>
+            <p class="hero-desc">Train with the best. Build confidence, respect, and physical power in a
+                state-of-the-art environment.</p>
             <div class="cta-wrapper">
                 <a href="#register" class="btn-reactor hero-btn">REGISTER NOW</a>
             </div>
@@ -179,7 +210,8 @@ if (!empty($spacesName)) {
                         <!-- Left: Image (col-lg-5) -->
                         <div class="col-12 col-lg-5 d-flex justify-content-center justify-content-lg-start">
                             <div class="instructor-img-wrapper instructor-photo-frame">
-                                <img src="Picture/sir-mars.png" alt="Head Coach Mars" class="instructor-photo img-fluid">
+                                <img src="Picture/sir-mars.png" alt="Head Coach Mars"
+                                    class="instructor-photo img-fluid">
                             </div>
                         </div>
 
@@ -200,7 +232,8 @@ if (!empty($spacesName)) {
                                 </div>
 
                                 <p class="instructor-bio">
-                                    Certified Taekwondo 3rd Dan Black Belt with 23 years of experience — building discipline, confidence, and champions on and off the mat.
+                                    Certified Taekwondo 3rd Dan Black Belt with 23 years of experience — building
+                                    discipline, confidence, and champions on and off the mat.
                                 </p>
 
 
@@ -222,7 +255,8 @@ if (!empty($spacesName)) {
                         <img src="Picture/9.jfif" alt="Offer 1" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Beginner to Advanced Taekwondo Training</h3>
-                            <div class="offer-desc">Comprehensive classes for all skill levels, from new students to advanced practitioners.</div>
+                            <div class="offer-desc">Comprehensive classes for all skill levels, from new students to
+                                advanced practitioners.</div>
                         </div>
                     </div>
                 </div>
@@ -231,7 +265,8 @@ if (!empty($spacesName)) {
                         <img src="Picture/10.jfif" alt="Offer 2" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Self-Defense Techniques</h3>
-                            <div class="offer-desc">Practical self-defense skills for real-life situations, taught by experienced instructors.</div>
+                            <div class="offer-desc">Practical self-defense skills for real-life situations, taught by
+                                experienced instructors.</div>
                         </div>
                     </div>
                 </div>
@@ -240,7 +275,8 @@ if (!empty($spacesName)) {
                         <img src="Picture/11.jpg" alt="Offer 3" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Belt Promotion & Certification</h3>
-                            <div class="offer-desc">Official belt testing and certification to recognize your progress and achievements.</div>
+                            <div class="offer-desc">Official belt testing and certification to recognize your progress
+                                and achievements.</div>
                         </div>
                     </div>
                 </div>
@@ -249,7 +285,8 @@ if (!empty($spacesName)) {
                         <img src="Picture/6.jfif" alt="Offer 4" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Physical Fitness & Conditioning</h3>
-                            <div class="offer-desc">Improve strength, flexibility, and endurance through dynamic martial arts workouts.</div>
+                            <div class="offer-desc">Improve strength, flexibility, and endurance through dynamic martial
+                                arts workouts.</div>
                         </div>
                     </div>
                 </div>
@@ -258,7 +295,8 @@ if (!empty($spacesName)) {
                         <img src="Picture/7.jfif" alt="Offer 5" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Sparring (Kyorugi)</h3>
-                            <div class="offer-desc">Competitive and non-contact Taekwondo sparring to develop agility and strategy.</div>
+                            <div class="offer-desc">Competitive and non-contact Taekwondo sparring to develop agility
+                                and strategy.</div>
                         </div>
                     </div>
                 </div>
@@ -267,7 +305,8 @@ if (!empty($spacesName)) {
                         <img src="Picture/8.jfif" alt="Offer 6" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Patterns (Poomsae)</h3>
-                            <div class="offer-desc">A series of choreographed movements to develop focus, discipline, and technique.</div>
+                            <div class="offer-desc">A series of choreographed movements to develop focus, discipline,
+                                and technique.</div>
                         </div>
                     </div>
                 </div>
@@ -285,10 +324,16 @@ if (!empty($spacesName)) {
                     </div>
                     <div class="col-12 col-md-8">
                         <div class="about-text text-center text-md-start">
-                        <h2 class="section-title">ABOUT US</h2>
-                        <p>
-                        At D’Marsians Taekwondo, we don’t just teach kicks and forms — we build <span class="highlight-green">discipline</span>, <span class="highlight-green">respect</span>, and <span class="highlight-green">confidence</span> in every student. Our program focuses on guiding students toward excellence both on and off the mat. We provide a safe, supportive environment where every child can grow stronger, sharper, and more self-assured.
-                        </p>
+                            <h2 class="section-title">ABOUT US</h2>
+                            <p>
+                                At D’Marsians Taekwondo, we don’t just teach kicks and forms — we build <span
+                                    class="highlight-green">discipline</span>, <span
+                                    class="highlight-green">respect</span>, and <span
+                                    class="highlight-green">confidence</span> in every student. Our program focuses on
+                                guiding students toward excellence both on and off the mat. We provide a safe,
+                                supportive environment where every child can grow stronger, sharper, and more
+                                self-assured.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -298,8 +343,10 @@ if (!empty($spacesName)) {
                     <div class="stat-card h-100" id="schedule" data-icon="🗓">
                         <h3><span class="icon" style="color:#00D01D;">&#128197;</span> Rank's Schedule</h3>
                         <ul>
-                            <li><span class="stat-label">Beginner:</span> Tuesday, Thursday, &amp; Friday<br>5:00 PM - 6:00 PM</li>
-                            <li><span class="stat-label">Intermediate:</span> Monday, Wednesday, &amp; Friday<br>5:00 PM - 6:00 PM</li>
+                            <li><span class="stat-label">Beginner:</span> Tuesday, Thursday, &amp; Friday<br>5:00 PM -
+                                6:00 PM</li>
+                            <li><span class="stat-label">Intermediate:</span> Monday, Wednesday, &amp; Friday<br>5:00 PM
+                                - 6:00 PM</li>
                         </ul>
                     </div>
                 </div>
@@ -317,7 +364,7 @@ if (!empty($spacesName)) {
                     <div class="stat-card h-100" data-icon="⏰">
                         <h3><span class="icon">&#128337;</span> Opening Hours</h3>
                         <ul>
-                            <li><span class="stat-label">Monday - Friday:</span> 6:30 AM - 9:00 AM</li>
+                            <li><span class="stat-label">Monday - Friday:</span> 9:00 AM - 7:00 PM</li>
                             <li><span class="stat-label">Saturday:</span> 5:30 PM - 9:00 PM</li>
                         </ul>
                     </div>
@@ -411,13 +458,15 @@ if (!empty($spacesName)) {
                         <span class="btn-shine"></span>
                     </button>
                 </form>
-                <p class="register-disclaimer">*Notice: After submitting the form, please wait for a confirmation email from D'Marsians Taekwondo Gym to verify your successful registration.</p>
+                <p class="register-disclaimer">*Notice: After submitting the form, please wait for a confirmation email
+                    from D'Marsians Taekwondo Gym to verify your successful registration.</p>
             </div>
         </div>
     </section>
 
     <!-- CONTACTS, MAP, FOOTER -->
-    <section id="contacts" class="footer-section container-fluid" style="background-color: #FFFFFF !important; background-image: none !important;">
+    <section id="contacts" class="footer-section container-fluid"
+        style="background-color: #FFFFFF !important; background-image: none !important;">
         <!-- <div class="footer-map-bg">
             <img class="footer-map-img" src="Picture/3.png" alt="Map showing D'Marsians Taekwondo location">
         </div> -->
@@ -426,7 +475,8 @@ if (!empty($spacesName)) {
                 <div class="row gy-5">
                     <!-- Column 1: Brand Identity -->
                     <div class="col-12 col-md-4 text-center text-md-start">
-                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 mb-3">
+                        <div
+                            class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 mb-3">
                             <img src="Picture/Logo2.png" alt="D'Marsians logo" class="footer-console-logo img-fluid">
                             <div>
                                 <div class="footer-console-title">D'Marsians</div>
@@ -468,14 +518,17 @@ if (!empty($spacesName)) {
                             <a class="social-btn" href="mailto:dmarsians.taekwondo@gmail.com" aria-label="Email us">
                                 <i class="fa-solid fa-envelope"></i>
                             </a>
-                            <a class="social-btn" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <a class="social-btn" href="https://www.facebook.com/" target="_blank"
+                                rel="noopener noreferrer" aria-label="Facebook">
                                 <i class="fa-brands fa-facebook-f"></i>
                             </a>
                         </div>
 
                         <div class="footer-badges justify-content-center justify-content-md-end gap-3">
                             <img src="Picture/SCC_NEW_LOGO 1.png" alt="SCC logo" class="footer-badge img-fluid">
-                            <img src="Picture/Diskartech.png" alt="Diskartech logo" class="footer-badge img-fluid clickable-logo" id="diskartech-logo" role="button" tabindex="0">
+                            <img src="Picture/Diskartech.png" alt="Diskartech logo"
+                                class="footer-badge img-fluid clickable-logo" id="diskartech-logo" role="button"
+                                tabindex="0">
                             <img src="Picture/ccs.png" alt="CCS logo" class="footer-badge img-fluid">
                         </div>
                     </div>
@@ -505,18 +558,23 @@ if (!empty($spacesName)) {
     <div class="popup-overlay" id="otpModal" style="display: none;">
         <div class="popup-modal">
             <h3>Verify Your Email</h3>
-            <p>We've sent a 6-digit OTP code to your email address. Please enter it below to verify your email and complete your registration.</p>
+            <p>We've sent a 6-digit OTP code to your email address. Please enter it below to verify your email and
+                complete your registration.</p>
             <div class="input-group" style="margin: 20px 0;">
-                <input type="text" id="otpInput" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" placeholder=" " required style="width: 100%; padding: 12px; font-size: 18px; text-align: center; letter-spacing: 8px; border: 1px solid #ccc; border-radius: 4px; color: #1A1A1A;">
+                <input type="text" id="otpInput" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" placeholder=" "
+                    required
+                    style="width: 100%; padding: 12px; font-size: 18px; text-align: center; letter-spacing: 8px; border: 1px solid #ccc; border-radius: 4px; color: #1A1A1A;">
                 <label style="color: #666;">Enter 6-digit OTP</label>
             </div>
             <div id="otpError" style="color: #ff4444; margin: 10px 0; display: none;"></div>
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button class="popup-close-btn" onclick="verifyOTP()" id="verifyOtpBtn">VERIFY</button>
-                <button class="popup-close-btn" onclick="closeOTPModal()" style="background: #e0e0e0; color: #333;">CANCEL</button>
+                <button class="popup-close-btn" onclick="closeOTPModal()"
+                    style="background: #e0e0e0; color: #333;">CANCEL</button>
             </div>
             <p style="margin-top: 15px; font-size: 12px; color: #888;">
-                Didn't receive the code? <a href="#" onclick="resendOTP(); return false;" style="color: #337418; font-weight: bold;">Resend OTP</a>
+                Didn't receive the code? <a href="#" onclick="resendOTP(); return false;"
+                    style="color: #337418; font-weight: bold;">Resend OTP</a>
             </p>
         </div>
     </div>
@@ -608,939 +666,940 @@ if (!empty($spacesName)) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="Scripts/webpage.js"></script>
     <script>
-    // DigitalOcean Spaces base URL for images (set by PHP)
-    const SPACES_BASE_URL = <?php echo $spacesBaseUrl ? json_encode($spacesBaseUrl) : 'null'; ?>;
-    
-    // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
-    const basePath = (function() {
-        const isProduction = window.location.hostname.includes('ondigitalocean.app');
-        if (isProduction) return '';
-        
-        const path = window.location.pathname;
-        // If path is /Dmarsian/webpage.php, base is /Dmarsian
-        const parts = path.split('/');
-        if (parts.length > 2) {
-            return '/' + parts[1];
-        }
-        return '';
-    })();
+        // DigitalOcean Spaces base URL for images (set by PHP)
+        const SPACES_BASE_URL = <?php echo $spacesBaseUrl ? json_encode($spacesBaseUrl) : 'null'; ?>;
 
-    // Initialize BroadcastChannel for real-time updates
-    if (typeof BroadcastChannel !== 'undefined') {
-        const postUpdateChannel = new BroadcastChannel('post-updates');
-        postUpdateChannel.onmessage = (event) => {
-            console.log('Post update received:', event.data);
-            // Refresh sliders or reload page
-            // For now, reload is safest to ensure all server-side logic (like year filters) is re-run
-            // Use a slight delay to ensure DB transaction is completed on server
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
-        };
-    }
-    
-    // Base URL helper function - handles both Spaces URLs and local paths
-    function getImageUrl(imagePath) {
-        if (!imagePath || imagePath.trim() === '') {
-            return null;
-        }
-        
-        let rawPath = imagePath.trim();
-        
-        // 1. If it's already a full URL (Spaces/CDN) or data URI, use it directly
-        if (rawPath.match(/^(https?:\/\/|data:)/)) {
-            return rawPath;
-        }
-        
-        // 2. Local path resolution
-        let cleanPath = rawPath.replace(/^\//, '');
-        
-        // Detect if it's missing the standard prefix
-        if (!cleanPath.startsWith('uploads/') && !cleanPath.includes('/')) {
-            cleanPath = 'uploads/posts/' + cleanPath;
-        }
-        
-        // Use the global siteBasePath (detected in PHP)
-        const siteBase = (window.siteBasePath || '').replace(/\/$/, '');
-        return siteBase + '/' + cleanPath;
-    }
-    
-    function renderSlider(posts, sliderId) {
-        const slider = document.getElementById(sliderId);
-        if (!slider) return;
-        const track = slider.querySelector('[data-slider-track]');
-        if (!track) return;
+        // Detect base path for image URLs (handles subdirectory installations like /Dmarsian/)
+        const basePath = (function () {
+            const isProduction = window.location.hostname.includes('ondigitalocean.app');
+            if (isProduction) return '';
 
-        // Get button references once (used throughout function)
-        const prevBtn = slider.querySelector('.arrow-btn.prev');
-        const nextBtn = slider.querySelector('.arrow-btn.next');
+            const path = window.location.pathname;
+            // If path is /Dmarsian/webpage.php, base is /Dmarsian
+            const parts = path.split('/');
+            if (parts.length > 2) {
+                return '/' + parts[1];
+            }
+            return '';
+        })();
 
-        // Handle empty state - show message if no posts
-        if (!posts || posts.length === 0) {
-            const categoryName = sliderId === 'achievements-slider' ? 'achievements' : 'events';
-            track.innerHTML = `<div class="slider-empty-state" style="text-align: center; padding: 40px 20px; color: #888; font-size: 1.1rem;">
+        // Initialize BroadcastChannel for real-time updates
+        if (typeof BroadcastChannel !== 'undefined') {
+            const postUpdateChannel = new BroadcastChannel('post-updates');
+            postUpdateChannel.onmessage = (event) => {
+                console.log('Post update received:', event.data);
+                // Refresh sliders or reload page
+                // For now, reload is safest to ensure all server-side logic (like year filters) is re-run
+                // Use a slight delay to ensure DB transaction is completed on server
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            };
+        }
+
+        // Base URL helper function - handles both Spaces URLs and local paths
+        function getImageUrl(imagePath) {
+            if (!imagePath || imagePath.trim() === '') {
+                return null;
+            }
+
+            let rawPath = imagePath.trim();
+
+            // 1. If it's already a full URL (Spaces/CDN) or data URI, use it directly
+            if (rawPath.match(/^(https?:\/\/|data:)/)) {
+                return rawPath;
+            }
+
+            // 2. Local path resolution
+            let cleanPath = rawPath.replace(/^\//, '');
+
+            // Detect if it's missing the standard prefix
+            if (!cleanPath.startsWith('uploads/') && !cleanPath.includes('/')) {
+                cleanPath = 'uploads/posts/' + cleanPath;
+            }
+
+            // Use the global siteBasePath (detected in PHP)
+            const siteBase = (window.siteBasePath || '').replace(/\/$/, '');
+            return siteBase + '/' + cleanPath;
+        }
+
+        function renderSlider(posts, sliderId) {
+            const slider = document.getElementById(sliderId);
+            if (!slider) return;
+            const track = slider.querySelector('[data-slider-track]');
+            if (!track) return;
+
+            // Get button references once (used throughout function)
+            const prevBtn = slider.querySelector('.arrow-btn.prev');
+            const nextBtn = slider.querySelector('.arrow-btn.next');
+
+            // Handle empty state - show message if no posts
+            if (!posts || posts.length === 0) {
+                const categoryName = sliderId === 'achievements-slider' ? 'achievements' : 'events';
+                track.innerHTML = `<div class="slider-empty-state" style="text-align: center; padding: 40px 20px; color: #888; font-size: 1.1rem;">
                 <p style="margin: 0;">No ${categoryName} available at this time.</p>
             </div>`;
-            // Hide navigation arrows for empty state
-            if (prevBtn) prevBtn.style.display = 'none';
-            if (nextBtn) nextBtn.style.display = 'none';
-            return;
-        }
-
-        // Show navigation arrows if they were hidden
-        if (prevBtn) prevBtn.style.display = '';
-        if (nextBtn) nextBtn.style.display = '';
-
-        const cardsHtml = posts.map((post, index) => {
-            // Create SVG data URI placeholder that always works
-            const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
-            // Fallback placeholder image paths - use relative paths
-            const placeholderImagePath = 'Picture/placeholder.png';
-            const fallbackPlaceholderPath = 'Picture/Logo2.png';
-            
-            let imageSrc = placeholderSvg;
-            let hasImage = false;
-            
-            // Check if we have a valid image path
-            if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
-                // Use the helper function to get the correct image URL
-                const resolvedUrl = getImageUrl(post.image_path);
-                if (resolvedUrl) {
-                    imageSrc = resolvedUrl;
-                    hasImage = true;
-                    // Debug logging
-                    console.log(`Image path construction: original="${post.image_path}", resolved="${resolvedUrl}"`);
-                }
+                // Hide navigation arrows for empty state
+                if (prevBtn) prevBtn.style.display = 'none';
+                if (nextBtn) nextBtn.style.display = 'none';
+                return;
             }
-            
-            // Determine initial slider class based on index (for 3D Coverflow effect)
-            // First card: active, Second card: next, Others: hidden
-            let sliderClass = '';
-            if (index === 0) {
-                sliderClass = 'active';
-            } else if (index === 1) {
-                sliderClass = 'next';
-            } else {
-                sliderClass = 'hidden';
-            }
-            
-            // Image error handler: try placeholder.png, then Logo2.png, then SVG
-            // Multi-tier fallback: try placeholder images, then SVG
-            const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0){img.src='${placeholderImagePath}';img.dataset.tries='1';}else if(tries==1){img.src='${fallbackPlaceholderPath}';img.dataset.tries='2';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
-            
-            // Debug: log image URL construction
-            console.log("Image URL resolved:", imageSrc);
-            
-            return (
-                `<article class="slide-card post-card ${sliderClass}">`
-              +   `<div class="image-wrap">`
-              +     `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="${imageErrorHandler}(this)" loading="lazy" style="background-color: #2d2d2d;">`
-              +     `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
-              +     `<span class="hover-overlay"></span>`
-              +   `</div>`
-              +   `<div class="card-body">`
-              +     `<h5 class="card-title">${post.title || 'Untitled'}</h5>`
-              +     `<p class="card-text small mb-0">${post.description || ''}</p>`
-              +     `<button type="button" class="see-more">See more</button>`
-              +   `</div>`
-              + `</article>`
-            );
-        }).join('');
-        track.innerHTML = cardsHtml;
 
-        // Set initial z-index values for 3D Coverflow effect (for achievements and events sliders)
-        // Wait for DOM to update before querying
-        if (sliderId === 'achievements-slider' || sliderId === 'events-slider') {
-            requestAnimationFrame(() => {
-                const cards = Array.from(track.querySelectorAll('.slide-card'));
-                cards.forEach((card, index) => {
-                    if (card.classList.contains('active')) {
-                        card.style.zIndex = '10';
-                    } else if (card.classList.contains('next')) {
-                        card.style.zIndex = '5';
-                    } else {
-                        card.style.zIndex = '0';
+            // Show navigation arrows if they were hidden
+            if (prevBtn) prevBtn.style.display = '';
+            if (nextBtn) nextBtn.style.display = '';
+
+            const cardsHtml = posts.map((post, index) => {
+                // Create SVG data URI placeholder that always works
+                const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+                // Fallback placeholder image paths - use relative paths
+                const placeholderImagePath = 'Picture/placeholder.png';
+                const fallbackPlaceholderPath = 'Picture/Logo2.png';
+
+                let imageSrc = placeholderSvg;
+                let hasImage = false;
+
+                // Check if we have a valid image path
+                if (post.image_path && post.image_path !== null && post.image_path.trim() !== '') {
+                    // Use the helper function to get the correct image URL
+                    const resolvedUrl = getImageUrl(post.image_path);
+                    if (resolvedUrl) {
+                        imageSrc = resolvedUrl;
+                        hasImage = true;
+                        // Debug logging
+                        console.log(`Image path construction: original="${post.image_path}", resolved="${resolvedUrl}"`);
                     }
-                });
-            });
-        }
-
-        // open modal when any part of a card is clicked (event delegation)
-        if (!track._postClickBound) {
-            track.addEventListener('click', (e) => {
-                const card = e.target && e.target.closest ? e.target.closest('.slide-card') : null;
-                if (!card || !track.contains(card)) return;
-                const cards = Array.from(track.querySelectorAll('.slide-card'));
-                const idx = cards.indexOf(card);
-                if (idx >= 0 && posts[idx]) {
-                    openPostModal(posts[idx]);
                 }
-            });
-            track._postClickBound = true;
-        }
 
-        // Add see-more toggles only when text is overflowing
-        Array.from(track.querySelectorAll('.slide-card')).forEach((card) => {
-            const textEl = card.querySelector('.card-text');
-            const btn = card.querySelector('.see-more');
-            if (!textEl || !btn) return;
-            // defer measurement until after layout
-            requestAnimationFrame(() => {
-                if (textEl.scrollHeight > textEl.clientHeight + 1) {
-                    card.classList.add('has-more');
-                    btn.addEventListener('click', (ev) => {
-                        ev.stopPropagation();
-                        card.classList.toggle('expanded');
-                        btn.textContent = card.classList.contains('expanded') ? 'See less' : 'See more';
+                // Determine initial slider class based on index (for 3D Coverflow effect)
+                // First card: active, Second card: next, Others: hidden
+                let sliderClass = '';
+                if (index === 0) {
+                    sliderClass = 'active';
+                } else if (index === 1) {
+                    sliderClass = 'next';
+                } else {
+                    sliderClass = 'hidden';
+                }
+
+                // Image error handler: try placeholder.png, then Logo2.png, then SVG
+                // Multi-tier fallback: try placeholder images, then SVG
+                const imageErrorHandler = `(function(img){img.onerror=null;var tries=parseInt(img.dataset.tries||'0');if(tries==0){img.src='${placeholderImagePath}';img.dataset.tries='1';}else if(tries==1){img.src='${fallbackPlaceholderPath}';img.dataset.tries='2';}else{img.src='${placeholderSvg}';img.style.backgroundColor='#2d2d2d';img.onerror=null;}})`;
+
+                // Debug: log image URL construction
+                console.log("Image URL resolved:", imageSrc);
+
+                return (
+                    `<article class="slide-card post-card ${sliderClass}">`
+                    + `<div class="image-wrap">`
+                    + `<img src="${imageSrc}" alt="${post.title || 'Post image'}" onerror="${imageErrorHandler}(this)" loading="lazy" style="background-color: #2d2d2d;">`
+                    + `${!hasImage ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; font-size: 18px; font-weight: bold; pointer-events: none; z-index: 1;">No Image</div>' : ''}`
+                    + `<span class="hover-overlay"></span>`
+                    + `</div>`
+                    + `<div class="card-body">`
+                    + `<h5 class="card-title">${post.title || 'Untitled'}</h5>`
+                    + `<p class="card-text small mb-0">${post.description || ''}</p>`
+                    + `<button type="button" class="see-more">See more</button>`
+                    + `</div>`
+                    + `</article>`
+                );
+            }).join('');
+            track.innerHTML = cardsHtml;
+
+            // Set initial z-index values for 3D Coverflow effect (for achievements and events sliders)
+            // Wait for DOM to update before querying
+            if (sliderId === 'achievements-slider' || sliderId === 'events-slider') {
+                requestAnimationFrame(() => {
+                    const cards = Array.from(track.querySelectorAll('.slide-card'));
+                    cards.forEach((card, index) => {
+                        if (card.classList.contains('active')) {
+                            card.style.zIndex = '10';
+                        } else if (card.classList.contains('next')) {
+                            card.style.zIndex = '5';
+                        } else {
+                            card.style.zIndex = '0';
+                        }
                     });
-                }
-            });
-        });
-
-        function getStep() {
-            const firstCard = track.querySelector('.slide-card');
-            if (!firstCard) return 0;
-            const styles = getComputedStyle(track);
-            const gap = parseFloat(styles.columnGap || styles.gap || '0');
-            const width = firstCard.getBoundingClientRect().width;
-            return width + gap;
-        }
-
-        function updateButtons() {
-            const maxScrollLeft = track.scrollWidth - track.clientWidth - 1; // tolerance
-            prevBtn.disabled = track.scrollLeft <= 0;
-            nextBtn.disabled = track.scrollLeft >= maxScrollLeft;
-        }
-
-        function scrollByStep(direction) {
-            const step = getStep();
-            if (!step) return;
-            track.scrollBy({ left: direction * step, behavior: 'smooth' });
-        }
-
-        // Don't use scroll-based navigation for achievements or events (both use infinite carousel)
-        if (sliderId !== 'achievements-slider' && sliderId !== 'events-slider') {
-            // Function to update active card based on scroll position (for events only)
-            function updateActiveCard() {
-                const cards = Array.from(track.querySelectorAll('.slide-card'));
-                if (cards.length === 0) return;
-                
-                const trackRect = track.getBoundingClientRect();
-                const trackCenter = trackRect.left + trackRect.width / 2;
-                
-                let activeCard = null;
-                let minDistance = Infinity;
-                
-                cards.forEach(card => {
-                    const cardRect = card.getBoundingClientRect();
-                    const cardCenter = cardRect.left + cardRect.width / 2;
-                    const distance = Math.abs(cardCenter - trackCenter);
-                    
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        activeCard = card;
-                    }
                 });
-                
-                // Remove active class from all cards
-                cards.forEach(card => card.classList.remove('active'));
-                
-                // Add active class to the center card
-                if (activeCard) {
-                    activeCard.classList.add('active');
-                }
             }
 
-            prevBtn.addEventListener('click', () => scrollByStep(-1));
-            nextBtn.addEventListener('click', () => scrollByStep(1));
-            track.addEventListener('scroll', () => {
-                updateButtons();
-                updateActiveCard();
-            }, { passive: true });
+            // open modal when any part of a card is clicked (event delegation)
+            if (!track._postClickBound) {
+                track.addEventListener('click', (e) => {
+                    const card = e.target && e.target.closest ? e.target.closest('.slide-card') : null;
+                    if (!card || !track.contains(card)) return;
+                    const cards = Array.from(track.querySelectorAll('.slide-card'));
+                    const idx = cards.indexOf(card);
+                    if (idx >= 0 && posts[idx]) {
+                        openPostModal(posts[idx]);
+                    }
+                });
+                track._postClickBound = true;
+            }
 
-            // Initialize state after layout
-            requestAnimationFrame(() => {
-                updateButtons();
-                updateActiveCard();
+            // Add see-more toggles only when text is overflowing
+            Array.from(track.querySelectorAll('.slide-card')).forEach((card) => {
+                const textEl = card.querySelector('.card-text');
+                const btn = card.querySelector('.see-more');
+                if (!textEl || !btn) return;
+                // defer measurement until after layout
+                requestAnimationFrame(() => {
+                    if (textEl.scrollHeight > textEl.clientHeight + 1) {
+                        card.classList.add('has-more');
+                        btn.addEventListener('click', (ev) => {
+                            ev.stopPropagation();
+                            card.classList.toggle('expanded');
+                            btn.textContent = card.classList.contains('expanded') ? 'See less' : 'See more';
+                        });
+                    }
+                });
             });
-            window.addEventListener('resize', () => {
+
+            function getStep() {
+                const firstCard = track.querySelector('.slide-card');
+                if (!firstCard) return 0;
+                const styles = getComputedStyle(track);
+                const gap = parseFloat(styles.columnGap || styles.gap || '0');
+                const width = firstCard.getBoundingClientRect().width;
+                return width + gap;
+            }
+
+            function updateButtons() {
+                const maxScrollLeft = track.scrollWidth - track.clientWidth - 1; // tolerance
+                prevBtn.disabled = track.scrollLeft <= 0;
+                nextBtn.disabled = track.scrollLeft >= maxScrollLeft;
+            }
+
+            function scrollByStep(direction) {
+                const step = getStep();
+                if (!step) return;
+                track.scrollBy({ left: direction * step, behavior: 'smooth' });
+            }
+
+            // Don't use scroll-based navigation for achievements or events (both use infinite carousel)
+            if (sliderId !== 'achievements-slider' && sliderId !== 'events-slider') {
+                // Function to update active card based on scroll position (for events only)
+                function updateActiveCard() {
+                    const cards = Array.from(track.querySelectorAll('.slide-card'));
+                    if (cards.length === 0) return;
+
+                    const trackRect = track.getBoundingClientRect();
+                    const trackCenter = trackRect.left + trackRect.width / 2;
+
+                    let activeCard = null;
+                    let minDistance = Infinity;
+
+                    cards.forEach(card => {
+                        const cardRect = card.getBoundingClientRect();
+                        const cardCenter = cardRect.left + cardRect.width / 2;
+                        const distance = Math.abs(cardCenter - trackCenter);
+
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            activeCard = card;
+                        }
+                    });
+
+                    // Remove active class from all cards
+                    cards.forEach(card => card.classList.remove('active'));
+
+                    // Add active class to the center card
+                    if (activeCard) {
+                        activeCard.classList.add('active');
+                    }
+                }
+
+                prevBtn.addEventListener('click', () => scrollByStep(-1));
+                nextBtn.addEventListener('click', () => scrollByStep(1));
+                track.addEventListener('scroll', () => {
+                    updateButtons();
+                    updateActiveCard();
+                }, { passive: true });
+
+                // Initialize state after layout
                 requestAnimationFrame(() => {
                     updateButtons();
                     updateActiveCard();
                 });
-            });
-        } else {
-            // For achievements and events, don't attach scroll listeners - infinite carousel will handle it
-            // Just ensure buttons are enabled
-            prevBtn.disabled = false;
+                window.addEventListener('resize', () => {
+                    requestAnimationFrame(() => {
+                        updateButtons();
+                        updateActiveCard();
+                    });
+                });
+            } else {
+                // For achievements and events, don't attach scroll listeners - infinite carousel will handle it
+                // Just ensure buttons are enabled
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+            }
+        }
+
+        // Fetch and render sliders
+        // Global error handler for images (fallback for any images that fail to load)
+        window.addEventListener('error', function (e) {
+            if (e.target && e.target.tagName === 'IMG') {
+                const img = e.target;
+                // Only handle if it's not already a placeholder (SVG or local placeholder)
+                if (!img.src.includes('data:image/svg') && !img.src.includes('Logo2.png')) {
+                    // Use local placeholder instead of external service
+                    const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+                    img.src = placeholderSvg;
+                    img.onerror = null; // Prevent infinite loop
+                }
+            }
+        }, true); // Use capture phase
+
+        // Infinite Loop Coverflow Carousel for Achievements and Events
+        function setupCoverflowCarousel(slider, track, cards) {
+            const nextBtn = slider.querySelector('.arrow-btn.next');
+            const prevBtn = slider.querySelector('.arrow-btn.prev');
+
+            if (!nextBtn || !prevBtn || cards.length === 0) {
+                console.error('Coverflow carousel setup failed: buttons or cards not found');
+                return;
+            }
+
+            // Check if already initialized - prevent duplicate initialization
+            if (slider.dataset.coverflowInitialized === 'true') {
+                console.warn('Coverflow carousel already initialized for', sliderId);
+                return;
+            }
+
+            // Mark as initialized immediately to prevent race conditions
+            slider.dataset.coverflowInitialized = 'true';
+
+            // Handle Single Post Scenario
+            if (cards.length === 1) {
+                cards[0].classList.add('active');
+                cards[0].style.zIndex = '10';
+                nextBtn.style.display = 'none';
+                prevBtn.style.display = 'none';
+                return;
+            }
+
+            // Ensure buttons are enabled
             nextBtn.disabled = false;
-        }
-    }
+            prevBtn.disabled = false;
+            nextBtn.style.pointerEvents = 'auto';
+            prevBtn.style.pointerEvents = 'auto';
 
-    // Fetch and render sliders
-    // Global error handler for images (fallback for any images that fail to load)
-    window.addEventListener('error', function(e) {
-        if (e.target && e.target.tagName === 'IMG') {
-            const img = e.target;
-            // Only handle if it's not already a placeholder (SVG or local placeholder)
-            if (!img.src.includes('data:image/svg') && !img.src.includes('Logo2.png')) {
-                // Use local placeholder instead of external service
-                const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500'%3E%3Crect fill='%232d2d2d' width='400' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='20' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
-                img.src = placeholderSvg;
-                img.onerror = null; // Prevent infinite loop
+            let currentIndex = 0;
+
+            // Function to update the carousel based on current index
+            function updateCarousel() {
+                const total = cards.length;
+                if (total === 0) return;
+
+                // Remove all state classes first
+                cards.forEach(card => {
+                    card.classList.remove('active', 'prev', 'next', 'hidden');
+                    card.style.zIndex = '0';
+                });
+
+                // Calculate indexes for infinite loop
+                const prevIndex = (currentIndex - 1 + total) % total;
+                const nextIndex = (currentIndex + 1) % total;
+
+                // Assign the center item (active)
+                cards[currentIndex].classList.add('active');
+                cards[currentIndex].style.zIndex = '10';
+
+                // Assign the left item (previous)
+                cards[prevIndex].classList.add('prev');
+                cards[prevIndex].style.zIndex = '5';
+
+                // Assign the right item (next)
+                cards[nextIndex].classList.add('next');
+                cards[nextIndex].style.zIndex = '5';
+
+                // Hide all others
+                cards.forEach((card, index) => {
+                    if (index !== currentIndex && index !== prevIndex && index !== nextIndex) {
+                        card.classList.add('hidden');
+                    }
+                });
             }
-        }
-    }, true); // Use capture phase
 
-    // Infinite Loop Coverflow Carousel for Achievements and Events
-    function setupCoverflowCarousel(slider, track, cards) {
-        const nextBtn = slider.querySelector('.arrow-btn.next');
-        const prevBtn = slider.querySelector('.arrow-btn.prev');
-        
-        if (!nextBtn || !prevBtn || cards.length === 0) {
-            console.error('Coverflow carousel setup failed: buttons or cards not found');
-            return;
-        }
-        
-        // Check if already initialized - prevent duplicate initialization
-        if (slider.dataset.coverflowInitialized === 'true') {
-            console.warn('Coverflow carousel already initialized for', sliderId);
-            return;
-        }
-        
-        // Mark as initialized immediately to prevent race conditions
-        slider.dataset.coverflowInitialized = 'true';
-        
-        // Handle Single Post Scenario
-        if (cards.length === 1) {
-            cards[0].classList.add('active');
-            cards[0].style.zIndex = '10';
-            nextBtn.style.display = 'none';
-            prevBtn.style.display = 'none';
-            return;
+            // Remove any existing listeners by cloning buttons (preserves all classes and attributes)
+            const nextBtnClone = nextBtn.cloneNode(true);
+            const prevBtnClone = prevBtn.cloneNode(true);
+            // Replace buttons to remove old event listeners
+            nextBtn.parentNode.replaceChild(nextBtnClone, nextBtn);
+            prevBtn.parentNode.replaceChild(prevBtnClone, prevBtn);
+
+            // Get fresh references to the cloned buttons
+            const finalNextBtn = slider.querySelector('.arrow-btn.next');
+            const finalPrevBtn = slider.querySelector('.arrow-btn.prev');
+
+            // Ensure they're enabled and visible
+            if (finalNextBtn) {
+                finalNextBtn.disabled = false;
+                finalNextBtn.style.pointerEvents = 'auto';
+                finalNextBtn.style.opacity = '1';
+            }
+            if (finalPrevBtn) {
+                finalPrevBtn.disabled = false;
+                finalPrevBtn.style.pointerEvents = 'auto';
+                finalPrevBtn.style.opacity = '1';
+            }
+
+            // Event listener for next button
+            if (finalNextBtn) {
+                finalNextBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (cards.length > 0) {
+                        currentIndex = (currentIndex + 1) % cards.length;
+                        updateCarousel();
+                    }
+                }, { once: false });
+            }
+
+            // Event listener for previous button
+            if (finalPrevBtn) {
+                finalPrevBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (cards.length > 0) {
+                        currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+                        updateCarousel();
+                    }
+                }, { once: false });
+            }
+
+            // Initialize the carousel on load - ensure classes are applied
+            updateCarousel();
+
+            console.log('Coverflow carousel initialized with', cards.length, 'cards');
         }
 
-        // Ensure buttons are enabled
-        nextBtn.disabled = false;
-        prevBtn.disabled = false;
-        nextBtn.style.pointerEvents = 'auto';
-        prevBtn.style.pointerEvents = 'auto';
-        
-        let currentIndex = 0;
-        
-        // Function to update the carousel based on current index
-        function updateCarousel() {
-            const total = cards.length;
-            if (total === 0) return;
-            
-            // Remove all state classes first
-            cards.forEach(card => {
-                card.classList.remove('active', 'prev', 'next', 'hidden');
-                card.style.zIndex = '0';
-            });
-            
-            // Calculate indexes for infinite loop
-            const prevIndex = (currentIndex - 1 + total) % total;
-            const nextIndex = (currentIndex + 1) % total;
-            
-            // Assign the center item (active)
-            cards[currentIndex].classList.add('active');
-            cards[currentIndex].style.zIndex = '10';
-            
-            // Assign the left item (previous)
-            cards[prevIndex].classList.add('prev');
-            cards[prevIndex].style.zIndex = '5';
-            
-            // Assign the right item (next)
-            cards[nextIndex].classList.add('next');
-            cards[nextIndex].style.zIndex = '5';
-            
-            // Hide all others
-            cards.forEach((card, index) => {
-                if (index !== currentIndex && index !== prevIndex && index !== nextIndex) {
-                    card.classList.add('hidden');
+        fetch(`get_posts.php?category=achievement&t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        })
+            .then(res => res.json())
+            .then(posts => {
+                if (!posts || posts.length === 0) {
+                    renderSlider([], 'achievements-slider');
+                    return;
                 }
-            });
-        }
-        
-        // Remove any existing listeners by cloning buttons (preserves all classes and attributes)
-        const nextBtnClone = nextBtn.cloneNode(true);
-        const prevBtnClone = prevBtn.cloneNode(true);
-        // Replace buttons to remove old event listeners
-        nextBtn.parentNode.replaceChild(nextBtnClone, nextBtn);
-        prevBtn.parentNode.replaceChild(prevBtnClone, prevBtn);
-        
-        // Get fresh references to the cloned buttons
-        const finalNextBtn = slider.querySelector('.arrow-btn.next');
-        const finalPrevBtn = slider.querySelector('.arrow-btn.prev');
-        
-        // Ensure they're enabled and visible
-        if (finalNextBtn) {
-            finalNextBtn.disabled = false;
-            finalNextBtn.style.pointerEvents = 'auto';
-            finalNextBtn.style.opacity = '1';
-        }
-        if (finalPrevBtn) {
-            finalPrevBtn.disabled = false;
-            finalPrevBtn.style.pointerEvents = 'auto';
-            finalPrevBtn.style.opacity = '1';
-        }
-        
-        // Event listener for next button
-        if (finalNextBtn) {
-            finalNextBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (cards.length > 0) {
-                    currentIndex = (currentIndex + 1) % cards.length;
-                    updateCarousel();
-                }
-            }, { once: false });
-        }
-        
-        // Event listener for previous button
-        if (finalPrevBtn) {
-            finalPrevBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (cards.length > 0) {
-                    currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-                    updateCarousel();
-                }
-            }, { once: false });
-        }
-        
-        // Initialize the carousel on load - ensure classes are applied
-        updateCarousel();
-        
-        console.log('Coverflow carousel initialized with', cards.length, 'cards');
-    }
-
-    fetch(`get_posts.php?category=achievement&t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-            'Cache-Control': 'no-cache'
-        }
-    })
-        .then(res => res.json())
-        .then(posts => { 
-            if (!posts || posts.length === 0) {
+                renderSlider(posts, 'achievements-slider');
+                // Initialize coverflow carousel AFTER renderSlider has finished DOM injection
+                // Use setTimeout to ensure renderSlider's innerHTML and all DOM updates are complete
+                setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const slider = document.getElementById('achievements-slider');
+                            const track = slider ? slider.querySelector('.slider-track') : null;
+                            if (track) {
+                                const cards = Array.from(track.querySelectorAll('.slide-card'));
+                                if (cards.length > 0) {
+                                    // Double-check slider hasn't been initialized by another call
+                                    if (slider.dataset.coverflowInitialized !== 'true') {
+                                        setupCoverflowCarousel(slider, track, cards);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }, 100); // Small delay to ensure DOM is fully updated
+            })
+            .catch(err => {
+                console.error('Error loading achievements:', err);
                 renderSlider([], 'achievements-slider');
-                return;
-            }
-            renderSlider(posts, 'achievements-slider');
-            // Initialize coverflow carousel AFTER renderSlider has finished DOM injection
-            // Use setTimeout to ensure renderSlider's innerHTML and all DOM updates are complete
-            setTimeout(() => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        const slider = document.getElementById('achievements-slider');
-                        const track = slider ? slider.querySelector('.slider-track') : null;
-                        if (track) {
-                        const cards = Array.from(track.querySelectorAll('.slide-card'));
-                        if (cards.length > 0) {
-                            // Double-check slider hasn't been initialized by another call
-                            if (slider.dataset.coverflowInitialized !== 'true') {
-                                setupCoverflowCarousel(slider, track, cards);
-                            }
-                        }
-                        }
-                    });
-                });
-            }, 100); // Small delay to ensure DOM is fully updated
-        })
-        .catch(err => {
-            console.error('Error loading achievements:', err);
-            renderSlider([], 'achievements-slider');
-        });
+            });
 
-    fetch(`get_posts.php?category=event&t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-        }
-    })
-        .then(res => res.json())
-        .then(posts => { 
-            if (!posts || posts.length === 0) {
-                renderSlider([], 'events-slider');
-                return;
-            }
-            renderSlider(posts, 'events-slider');
-            // Initialize coverflow carousel AFTER renderSlider has finished DOM injection
-            // Use setTimeout to ensure renderSlider's innerHTML and all DOM updates are complete
-            setTimeout(() => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        const slider = document.getElementById('events-slider');
-                        const track = slider ? slider.querySelector('.slider-track') : null;
-                        if (track) {
-                        const cards = Array.from(track.querySelectorAll('.slide-card'));
-                        if (cards.length > 0) {
-                            // Double-check slider hasn't been initialized by another call
-                            if (slider.dataset.coverflowInitialized !== 'true') {
-                                setupCoverflowCarousel(slider, track, cards);
-                            }
-                        }
-                        }
-                    });
-                });
-            }, 100); // Small delay to ensure DOM is fully updated
-        })
-        .catch(err => {
-            console.error('Error loading events:', err);
-            renderSlider([], 'events-slider');
-        });
-
-    // Real-time post updates via BroadcastChannel
-    // Function to refresh a specific slider by fetching fresh data
-    function refreshSlider(sliderId, category) {
-        // Determine the API category parameter based on slider
-        let categoryParam;
-        if (sliderId === 'achievements-slider') {
-            categoryParam = 'achievement'; // get_posts.php will return both 'achievement' and 'achievement_event'
-        } else if (sliderId === 'events-slider') {
-            categoryParam = 'event'; // get_posts.php will return both 'event' and 'achievement_event'
-        } else {
-            console.error('Unknown slider ID:', sliderId);
-            return;
-        }
-        
-        // Use cache-busting timestamp and prevent caching
-        const timestamp = Date.now();
-        fetch(`get_posts.php?category=${categoryParam}&t=${timestamp}`, {
+        fetch(`get_posts.php?category=event&t=${Date.now()}`, {
             cache: 'no-store',
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
             }
         })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
+            .then(res => res.json())
             .then(posts => {
-                // Handle both array and object responses
-                const postArray = Array.isArray(posts) ? posts : (posts.posts || []);
-                
-                if (!postArray || postArray.length === 0) {
-                    // Render empty state
-                    renderSlider([], sliderId);
+                if (!posts || posts.length === 0) {
+                    renderSlider([], 'events-slider');
                     return;
                 }
-                
-                // get_posts.php already filters correctly, so we can use posts directly
-                renderSlider(postArray, sliderId);
-                
-                // Re-initialize coverflow carousel after rendering
+                renderSlider(posts, 'events-slider');
+                // Initialize coverflow carousel AFTER renderSlider has finished DOM injection
+                // Use setTimeout to ensure renderSlider's innerHTML and all DOM updates are complete
                 setTimeout(() => {
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
-                            const slider = document.getElementById(sliderId);
+                            const slider = document.getElementById('events-slider');
                             const track = slider ? slider.querySelector('.slider-track') : null;
                             if (track) {
                                 const cards = Array.from(track.querySelectorAll('.slide-card'));
                                 if (cards.length > 0) {
-                                    // Reset initialization flag to allow re-initialization
-                                    slider.dataset.coverflowInitialized = 'false';
-                                    setupCoverflowCarousel(slider, track, cards);
-                                } else {
-                                    // No cards, ensure empty state is shown
-                                    renderSlider([], sliderId);
+                                    // Double-check slider hasn't been initialized by another call
+                                    if (slider.dataset.coverflowInitialized !== 'true') {
+                                        setupCoverflowCarousel(slider, track, cards);
+                                    }
                                 }
                             }
                         });
                     });
-                }, 100);
+                }, 100); // Small delay to ensure DOM is fully updated
             })
             .catch(err => {
-                console.error(`Error refreshing ${sliderId}:`, err);
-                // On error, render empty state to prevent stale data
-                renderSlider([], sliderId);
+                console.error('Error loading events:', err);
+                renderSlider([], 'events-slider');
             });
-    }
 
-    // Initialize BroadcastChannel listener for real-time updates
-    if (typeof BroadcastChannel !== 'undefined') {
-        const postUpdateChannel = new BroadcastChannel('post-updates');
-        
-        postUpdateChannel.addEventListener('message', (event) => {
-            const { type, category, postId } = event.data;
-            
-            if (!category) {
-                console.warn('Received post update without category:', event.data);
+        // Real-time post updates via BroadcastChannel
+        // Function to refresh a specific slider by fetching fresh data
+        function refreshSlider(sliderId, category) {
+            // Determine the API category parameter based on slider
+            let categoryParam;
+            if (sliderId === 'achievements-slider') {
+                categoryParam = 'achievement'; // get_posts.php will return both 'achievement' and 'achievement_event'
+            } else if (sliderId === 'events-slider') {
+                categoryParam = 'event'; // get_posts.php will return both 'event' and 'achievement_event'
+            } else {
+                console.error('Unknown slider ID:', sliderId);
                 return;
             }
-            
-            console.log('Received post update:', type, category, postId);
-            
-            // Determine which slider(s) to refresh based on category
-            // For delete/archive operations, always refresh to ensure deleted posts are removed
-            if (type === 'post-archived' || type === 'post-deleted') {
-                // Force refresh both sliders to ensure deleted posts are removed
-                if (category === 'achievement' || category === 'achievement_event') {
-                    refreshSlider('achievements-slider', category);
+
+            // Use cache-busting timestamp and prevent caching
+            const timestamp = Date.now();
+            fetch(`get_posts.php?category=${categoryParam}&t=${timestamp}`, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 }
-                if (category === 'event' || category === 'achievement_event') {
-                    refreshSlider('events-slider', category);
-                }
-                // If achievement_event, refresh both
-                if (category === 'achievement_event') {
-                    refreshSlider('achievements-slider', category);
-                    refreshSlider('events-slider', category);
-                }
-            } else if (type === 'post-slider-toggled') {
-                // Refresh sliders when post visibility is toggled
-                // If post was hidden (showInSlider = 0), it should be removed from sliders
-                // If post was shown (showInSlider = 1), it should be added to sliders
-                if (category === 'achievement' || category === 'achievement_event') {
-                    refreshSlider('achievements-slider', category);
-                }
-                if (category === 'event' || category === 'achievement_event') {
-                    refreshSlider('events-slider', category);
-                }
-                // If achievement_event, refresh both
-                if (category === 'achievement_event') {
-                    refreshSlider('achievements-slider', category);
-                    refreshSlider('events-slider', category);
-                }
-            } else if (category === 'achievement') {
-                // Refresh achievements slider only
-                refreshSlider('achievements-slider', category);
-            } else if (category === 'event') {
-                // Refresh events slider only
-                refreshSlider('events-slider', category);
-            } else if (category === 'achievement_event') {
-                // Refresh both sliders
-                refreshSlider('achievements-slider', category);
-                refreshSlider('events-slider', category);
-            } else {
-                // Unknown category, refresh both to be safe
-                console.warn('Unknown category, refreshing both sliders:', category);
-                refreshSlider('achievements-slider', 'achievement');
-                refreshSlider('events-slider', 'event');
-            }
-        });
-    } else {
-        console.warn('BroadcastChannel not supported. Real-time updates disabled.');
-    }
-
-    // Post modal helpers
-    function normalizePostDate(post) {
-        return post.posted_at || post.date || post.created_at || '';
-    }
-    function formatPostDate(dateString) {
-        if (!dateString) return '';
-        // Normalize common "YYYY-MM-DD HH:MM:SS" into ISO-like "YYYY-MM-DDTHH:MM:SS"
-        const normalized = dateString.replace(' ', 'T');
-        const date = new Date(normalized);
-        if (isNaN(date)) return dateString; // Fallback if parsing fails
-        return date.toLocaleString('en-PH', {
-            month: 'long',
-            day: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-    }
-    function getPostDescription(post) {
-        return post.long_description || post.description || post.details || '';
-    }
-    function getPostImageSrc(post) {
-        const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Crect fill='%232d2d2d' width='1200' height='800'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='32' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
-        
-        let imgSrc = post.image_path || post.image || post.cover || '';
-        if (!imgSrc || imgSrc.trim() === '') {
-            return placeholderSvg;
-        }
-        
-        // Use the helper function to get the correct image URL
-        const resolvedUrl = getImageUrl(imgSrc);
-        return resolvedUrl || placeholderSvg;
-    }
-    function openPostModal(post) {
-        const overlay = document.getElementById('postModal');
-        const img = document.getElementById('postModalImg');
-        const title = document.getElementById('postModalTitle');
-        const date = document.getElementById('postModalDate');
-        const desc = document.getElementById('postModalDesc');
-
-        const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Crect fill='%232d2d2d' width='1200' height='800'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='32' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
-        const imgSrc = getPostImageSrc(post) || placeholderSvg;
-        img.src = imgSrc;
-        img.alt = post.title || 'Post image';
-        // Add error handler to fallback to placeholder if image fails to load
-        img.onerror = function() {
-            this.onerror = null; // Prevent infinite loop
-            this.src = placeholderSvg;
-            this.style.backgroundColor = '#2d2d2d';
-        };
-        title.textContent = post.title || '';
-        date.textContent = formatPostDate(normalizePostDate(post));
-        desc.textContent = getPostDescription(post);
-
-        overlay.classList.add('open');
-        overlay.setAttribute('aria-hidden', 'false');
-    }
-    function closePostModal() {
-        const overlay = document.getElementById('postModal');
-        overlay.classList.remove('open');
-        overlay.setAttribute('aria-hidden', 'true');
-    }
-    (function initPostModalClosers(){
-        const overlay = document.getElementById('postModal');
-        const closeBtn = document.getElementById('postModalClose');
-        if (overlay) {
-            overlay.addEventListener('click', (e) => { if (e.target === overlay) closePostModal(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePostModal(); });
-        }
-        if (closeBtn) closeBtn.addEventListener('click', closePostModal);
-    })();
-
-    // Popup functions
-    function showPopup() {
-        const popup = document.getElementById('popupOverlay');
-        popup.style.display = 'flex';
-    }
-
-    function closePopup() {
-        const popup = document.getElementById('popupOverlay');
-        popup.style.display = 'none';
-    }
-
-    // Close popup when clicking outside
-    document.getElementById('popupOverlay').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closePopup();
-        }
-    });
-
-    // OTP Verification Functions
-    let pendingFormData = null;
-    let pendingEndpoint = null;
-
-    function verifyOTP() {
-        const otpInput = document.getElementById('otpInput');
-        const otp = otpInput.value.replace(/\D/g, ''); // Remove non-digits
-        const form = document.getElementById('registerForm');
-        const email = form.elements['email'].value;
-        const verifyBtn = document.getElementById('verifyOtpBtn');
-        const errorDiv = document.getElementById('otpError');
-        
-        if (otp.length !== 6) {
-            errorDiv.textContent = 'Please enter a 6-digit OTP code';
-            errorDiv.style.display = 'block';
-            return;
-        }
-        
-        verifyBtn.disabled = true;
-        verifyBtn.textContent = 'VERIFYING...';
-        errorDiv.style.display = 'none';
-        
-        fetch('verify_registration_otp.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({ 
-                email: email,
-                otp: otp
             })
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.status === 'success') {
-                // Add verification token to form data
-                pendingFormData.append('verification_token', result.verification_token);
-                
-                // Submit the actual registration
-                const submitButton = form.querySelector('button[type="submit"]');
-                submitButton.classList.add('loading');
-                submitButton.textContent = 'SUBMITTING...';
-                
-                fetch(pendingEndpoint, {
-                    method: 'POST',
-                    body: pendingFormData
-                })
-                .then(response => response.json())
-                .then(submitResult => {
-                    submitButton.classList.remove('loading');
-                    submitButton.textContent = 'CONFIRM REGISTRATION';
-                    
-                    if (submitResult.status === 'success') {
-                        closeOTPModal();
-                        showPopup();
-                        form.reset();
-                        pendingFormData = null;
-                        pendingEndpoint = null;
-                    } else {
-                        alert('Error: ' + submitResult.message);
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
                     }
+                    return res.json();
                 })
-                .catch(error => {
-                    submitButton.classList.remove('loading');
-                    submitButton.textContent = 'CONFIRM REGISTRATION';
-                    alert('Error submitting form: ' + error.message);
-                });
-            } else {
-                errorDiv.textContent = result.message;
-                errorDiv.style.display = 'block';
-                verifyBtn.disabled = false;
-                verifyBtn.textContent = 'VERIFY';
-            }
-        })
-        .catch(error => {
-            errorDiv.textContent = 'Error verifying OTP: ' + error.message;
-            errorDiv.style.display = 'block';
-            verifyBtn.disabled = false;
-            verifyBtn.textContent = 'VERIFY';
-        });
-    }
-    
-    function closeOTPModal() {
-        document.getElementById('otpModal').style.display = 'none';
-        document.getElementById('otpInput').value = '';
-        document.getElementById('otpError').style.display = 'none';
-        pendingFormData = null;
-        pendingEndpoint = null;
-    }
-    
-    function resendOTP() {
-        const form = document.getElementById('registerForm');
-        const email = form.elements['email'].value;
-        
-        if (!email) {
-            alert('Please enter your email address first');
-            return;
-        }
-        
-        fetch('send_registration_otp.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({ email: email })
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.status === 'success') {
-                alert('OTP resent successfully. Please check your email.');
-            } else {
-                alert('Error: ' + result.message);
-            }
-        })
-        .catch(error => {
-            alert('Error resending OTP: ' + error.message);
-        });
-    }
+                .then(posts => {
+                    // Handle both array and object responses
+                    const postArray = Array.isArray(posts) ? posts : (posts.posts || []);
 
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('Registration form OTP handler loaded');
-        const form = document.getElementById('registerForm');
-        if (form) {
-            console.log('Form found, attaching submit handler');
-            // Always prevent default form submission
-            form.addEventListener('submit', function (e) {
-                console.log('Form submit intercepted');
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const enrollType = form.elements['enroll_type'].value;
-                const submitButton = form.querySelector('button[type="submit"]');
-                const email = form.elements['email'].value;
-                
-                // Validate enroll type
-                if (!enrollType || (enrollType !== 'Enroll' && enrollType !== 'Trial Session')) {
-                    alert('Please select either "Enroll" or "Trial Session"');
-                    return false;
-                }
-                
-                // Validate email
-                if (!email || !email.includes('@')) {
-                    alert('Please enter a valid email address');
-                    return false;
-                }
-                
-                // Store form data for later submission
-                pendingFormData = new FormData(form);
-                pendingEndpoint = enrollType === 'Enroll' ? 'submit_enrollment_request.php' : 'register_trial_session.php';
-                
-                // Send OTP first
-                submitButton.classList.add('loading');
-                submitButton.textContent = 'SENDING OTP...';
-                submitButton.disabled = true;
-                
-                fetch('send_registration_otp.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({ email: email })
-                })
-                .then(response => {
-                    // Check if response is OK
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.status);
+                    if (!postArray || postArray.length === 0) {
+                        // Render empty state
+                        renderSlider([], sliderId);
+                        return;
                     }
-                    return response.json();
+
+                    // get_posts.php already filters correctly, so we can use posts directly
+                    renderSlider(postArray, sliderId);
+
+                    // Re-initialize coverflow carousel after rendering
+                    setTimeout(() => {
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                const slider = document.getElementById(sliderId);
+                                const track = slider ? slider.querySelector('.slider-track') : null;
+                                if (track) {
+                                    const cards = Array.from(track.querySelectorAll('.slide-card'));
+                                    if (cards.length > 0) {
+                                        // Reset initialization flag to allow re-initialization
+                                        slider.dataset.coverflowInitialized = 'false';
+                                        setupCoverflowCarousel(slider, track, cards);
+                                    } else {
+                                        // No cards, ensure empty state is shown
+                                        renderSlider([], sliderId);
+                                    }
+                                }
+                            });
+                        });
+                    }, 100);
                 })
+                .catch(err => {
+                    console.error(`Error refreshing ${sliderId}:`, err);
+                    // On error, render empty state to prevent stale data
+                    renderSlider([], sliderId);
+                });
+        }
+
+        // Initialize BroadcastChannel listener for real-time updates
+        if (typeof BroadcastChannel !== 'undefined') {
+            const postUpdateChannel = new BroadcastChannel('post-updates');
+
+            postUpdateChannel.addEventListener('message', (event) => {
+                const { type, category, postId } = event.data;
+
+                if (!category) {
+                    console.warn('Received post update without category:', event.data);
+                    return;
+                }
+
+                console.log('Received post update:', type, category, postId);
+
+                // Determine which slider(s) to refresh based on category
+                // For delete/archive operations, always refresh to ensure deleted posts are removed
+                if (type === 'post-archived' || type === 'post-deleted') {
+                    // Force refresh both sliders to ensure deleted posts are removed
+                    if (category === 'achievement' || category === 'achievement_event') {
+                        refreshSlider('achievements-slider', category);
+                    }
+                    if (category === 'event' || category === 'achievement_event') {
+                        refreshSlider('events-slider', category);
+                    }
+                    // If achievement_event, refresh both
+                    if (category === 'achievement_event') {
+                        refreshSlider('achievements-slider', category);
+                        refreshSlider('events-slider', category);
+                    }
+                } else if (type === 'post-slider-toggled') {
+                    // Refresh sliders when post visibility is toggled
+                    // If post was hidden (showInSlider = 0), it should be removed from sliders
+                    // If post was shown (showInSlider = 1), it should be added to sliders
+                    if (category === 'achievement' || category === 'achievement_event') {
+                        refreshSlider('achievements-slider', category);
+                    }
+                    if (category === 'event' || category === 'achievement_event') {
+                        refreshSlider('events-slider', category);
+                    }
+                    // If achievement_event, refresh both
+                    if (category === 'achievement_event') {
+                        refreshSlider('achievements-slider', category);
+                        refreshSlider('events-slider', category);
+                    }
+                } else if (category === 'achievement') {
+                    // Refresh achievements slider only
+                    refreshSlider('achievements-slider', category);
+                } else if (category === 'event') {
+                    // Refresh events slider only
+                    refreshSlider('events-slider', category);
+                } else if (category === 'achievement_event') {
+                    // Refresh both sliders
+                    refreshSlider('achievements-slider', category);
+                    refreshSlider('events-slider', category);
+                } else {
+                    // Unknown category, refresh both to be safe
+                    console.warn('Unknown category, refreshing both sliders:', category);
+                    refreshSlider('achievements-slider', 'achievement');
+                    refreshSlider('events-slider', 'event');
+                }
+            });
+        } else {
+            console.warn('BroadcastChannel not supported. Real-time updates disabled.');
+        }
+
+        // Post modal helpers
+        function normalizePostDate(post) {
+            return post.posted_at || post.date || post.created_at || '';
+        }
+        function formatPostDate(dateString) {
+            if (!dateString) return '';
+            // Normalize common "YYYY-MM-DD HH:MM:SS" into ISO-like "YYYY-MM-DDTHH:MM:SS"
+            const normalized = dateString.replace(' ', 'T');
+            const date = new Date(normalized);
+            if (isNaN(date)) return dateString; // Fallback if parsing fails
+            return date.toLocaleString('en-PH', {
+                month: 'long',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+        function getPostDescription(post) {
+            return post.long_description || post.description || post.details || '';
+        }
+        function getPostImageSrc(post) {
+            const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Crect fill='%232d2d2d' width='1200' height='800'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='32' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+            let imgSrc = post.image_path || post.image || post.cover || '';
+            if (!imgSrc || imgSrc.trim() === '') {
+                return placeholderSvg;
+            }
+
+            // Use the helper function to get the correct image URL
+            const resolvedUrl = getImageUrl(imgSrc);
+            return resolvedUrl || placeholderSvg;
+        }
+        function openPostModal(post) {
+            const overlay = document.getElementById('postModal');
+            const img = document.getElementById('postModalImg');
+            const title = document.getElementById('postModalTitle');
+            const date = document.getElementById('postModalDate');
+            const desc = document.getElementById('postModalDesc');
+
+            const placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Crect fill='%232d2d2d' width='1200' height='800'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-family='Arial, sans-serif' font-size='32' font-weight='bold'%3ENo Image%3C/text%3E%3C/svg%3E";
+            const imgSrc = getPostImageSrc(post) || placeholderSvg;
+            img.src = imgSrc;
+            img.alt = post.title || 'Post image';
+            // Add error handler to fallback to placeholder if image fails to load
+            img.onerror = function () {
+                this.onerror = null; // Prevent infinite loop
+                this.src = placeholderSvg;
+                this.style.backgroundColor = '#2d2d2d';
+            };
+            title.textContent = post.title || '';
+            date.textContent = formatPostDate(normalizePostDate(post));
+            desc.textContent = getPostDescription(post);
+
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+        }
+        function closePostModal() {
+            const overlay = document.getElementById('postModal');
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        (function initPostModalClosers() {
+            const overlay = document.getElementById('postModal');
+            const closeBtn = document.getElementById('postModalClose');
+            if (overlay) {
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) closePostModal(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePostModal(); });
+            }
+            if (closeBtn) closeBtn.addEventListener('click', closePostModal);
+        })();
+
+        // Popup functions
+        function showPopup() {
+            const popup = document.getElementById('popupOverlay');
+            popup.style.display = 'flex';
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('popupOverlay');
+            popup.style.display = 'none';
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('popupOverlay').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        // OTP Verification Functions
+        let pendingFormData = null;
+        let pendingEndpoint = null;
+
+        function verifyOTP() {
+            const otpInput = document.getElementById('otpInput');
+            const otp = otpInput.value.replace(/\D/g, ''); // Remove non-digits
+            const form = document.getElementById('registerForm');
+            const email = form.elements['email'].value;
+            const verifyBtn = document.getElementById('verifyOtpBtn');
+            const errorDiv = document.getElementById('otpError');
+
+            if (otp.length !== 6) {
+                errorDiv.textContent = 'Please enter a 6-digit OTP code';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'VERIFYING...';
+            errorDiv.style.display = 'none';
+
+            fetch('verify_registration_otp.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    email: email,
+                    otp: otp
+                })
+            })
+                .then(response => response.json())
                 .then(result => {
-                    submitButton.classList.remove('loading');
-                    submitButton.textContent = 'CONFIRM REGISTRATION';
-                    submitButton.disabled = false;
-                    
-                    // Log for debugging
-                    console.log('OTP send response:', result);
-                    
-                    if (result && result.status === 'success') {
-                        // Show OTP modal
-                        const otpModal = document.getElementById('otpModal');
-                        if (otpModal) {
-                            otpModal.style.display = 'flex';
-                            const otpInput = document.getElementById('otpInput');
-                            if (otpInput) {
-                                otpInput.focus();
-                            }
-                        } else {
-                            console.error('OTP modal not found!');
-                            alert('OTP sent successfully! Please check your email. (Modal error - contact support)');
-                        }
+                    if (result.status === 'success') {
+                        // Add verification token to form data
+                        pendingFormData.append('verification_token', result.verification_token);
+
+                        // Submit the actual registration
+                        const submitButton = form.querySelector('button[type="submit"]');
+                        submitButton.classList.add('loading');
+                        submitButton.textContent = 'SUBMITTING...';
+
+                        fetch(pendingEndpoint, {
+                            method: 'POST',
+                            body: pendingFormData
+                        })
+                            .then(response => response.json())
+                            .then(submitResult => {
+                                submitButton.classList.remove('loading');
+                                submitButton.textContent = 'CONFIRM REGISTRATION';
+
+                                if (submitResult.status === 'success') {
+                                    closeOTPModal();
+                                    showPopup();
+                                    form.reset();
+                                    pendingFormData = null;
+                                    pendingEndpoint = null;
+                                } else {
+                                    alert('Error: ' + submitResult.message);
+                                }
+                            })
+                            .catch(error => {
+                                submitButton.classList.remove('loading');
+                                submitButton.textContent = 'CONFIRM REGISTRATION';
+                                alert('Error submitting form: ' + error.message);
+                            });
                     } else {
-                        const errorMsg = result && result.message ? result.message : 'Unknown error occurred';
-                        alert('Error: ' + errorMsg);
+                        errorDiv.textContent = result.message;
+                        errorDiv.style.display = 'block';
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'VERIFY';
                     }
                 })
                 .catch(error => {
-                    submitButton.classList.remove('loading');
-                    submitButton.textContent = 'CONFIRM REGISTRATION';
-                    submitButton.disabled = false;
-                    console.error('OTP send error:', error);
-                    alert('Error sending OTP: ' + error.message);
+                    errorDiv.textContent = 'Error verifying OTP: ' + error.message;
+                    errorDiv.style.display = 'block';
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'VERIFY';
                 });
-                
-                return false;
-            });
         }
-        
-        // Auto-format OTP input
-        const otpInput = document.getElementById('otpInput');
-        if (otpInput) {
-            otpInput.addEventListener('input', function(e) {
-                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
-            });
-            
-            otpInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    verifyOTP();
-                }
-            });
+
+        function closeOTPModal() {
+            document.getElementById('otpModal').style.display = 'none';
+            document.getElementById('otpInput').value = '';
+            document.getElementById('otpError').style.display = 'none';
+            pendingFormData = null;
+            pendingEndpoint = null;
         }
-    });
+
+        function resendOTP() {
+            const form = document.getElementById('registerForm');
+            const email = form.elements['email'].value;
+
+            if (!email) {
+                alert('Please enter your email address first');
+                return;
+            }
+
+            fetch('send_registration_otp.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ email: email })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        alert('OTP resent successfully. Please check your email.');
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error resending OTP: ' + error.message);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Registration form OTP handler loaded');
+            const form = document.getElementById('registerForm');
+            if (form) {
+                console.log('Form found, attaching submit handler');
+                // Always prevent default form submission
+                form.addEventListener('submit', function (e) {
+                    console.log('Form submit intercepted');
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const enrollType = form.elements['enroll_type'].value;
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const email = form.elements['email'].value;
+
+                    // Validate enroll type
+                    if (!enrollType || (enrollType !== 'Enroll' && enrollType !== 'Trial Session')) {
+                        alert('Please select either "Enroll" or "Trial Session"');
+                        return false;
+                    }
+
+                    // Validate email
+                    if (!email || !email.includes('@')) {
+                        alert('Please enter a valid email address');
+                        return false;
+                    }
+
+                    // Store form data for later submission
+                    pendingFormData = new FormData(form);
+                    pendingEndpoint = enrollType === 'Enroll' ? 'submit_enrollment_request.php' : 'register_trial_session.php';
+
+                    // Send OTP first
+                    submitButton.classList.add('loading');
+                    submitButton.textContent = 'SENDING OTP...';
+                    submitButton.disabled = true;
+
+                    fetch('send_registration_otp.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({ email: email })
+                    })
+                        .then(response => {
+                            // Check if response is OK
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(result => {
+                            submitButton.classList.remove('loading');
+                            submitButton.textContent = 'CONFIRM REGISTRATION';
+                            submitButton.disabled = false;
+
+                            // Log for debugging
+                            console.log('OTP send response:', result);
+
+                            if (result && result.status === 'success') {
+                                // Show OTP modal
+                                const otpModal = document.getElementById('otpModal');
+                                if (otpModal) {
+                                    otpModal.style.display = 'flex';
+                                    const otpInput = document.getElementById('otpInput');
+                                    if (otpInput) {
+                                        otpInput.focus();
+                                    }
+                                } else {
+                                    console.error('OTP modal not found!');
+                                    alert('OTP sent successfully! Please check your email. (Modal error - contact support)');
+                                }
+                            } else {
+                                const errorMsg = result && result.message ? result.message : 'Unknown error occurred';
+                                alert('Error: ' + errorMsg);
+                            }
+                        })
+                        .catch(error => {
+                            submitButton.classList.remove('loading');
+                            submitButton.textContent = 'CONFIRM REGISTRATION';
+                            submitButton.disabled = false;
+                            console.error('OTP send error:', error);
+                            alert('Error sending OTP: ' + error.message);
+                        });
+
+                    return false;
+                });
+            }
+
+            // Auto-format OTP input
+            const otpInput = document.getElementById('otpInput');
+            if (otpInput) {
+                otpInput.addEventListener('input', function (e) {
+                    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                });
+
+                otpInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        verifyOTP();
+                    }
+                });
+            }
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
+
 </html>
