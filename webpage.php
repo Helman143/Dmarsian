@@ -483,7 +483,7 @@ if (!empty($spacesName)) {
 
                 <hr class="footer-console-divider my-4">
                 <div class="text-center footer-console-copy">
-                    &copy; 2025 D'Marsians Taekwondo Gym. All rights reserved.
+                    &copy; 2026 D'Marsians Taekwondo Gym. All rights reserved.
                 </div>
             </div>
         </div>
