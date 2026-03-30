@@ -219,7 +219,7 @@ if (!empty($spacesName)) {
             <div class="offers-list row g-3 justify-content-center">
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/9.png" alt="Offer 1" class="img-fluid">
+                        <img src="Picture/9.jfif" alt="Offer 1" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Beginner to Advanced Taekwondo Training</h3>
                             <div class="offer-desc">Comprehensive classes for all skill levels, from new students to advanced practitioners.</div>
@@ -228,7 +228,7 @@ if (!empty($spacesName)) {
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/10.png" alt="Offer 2" class="img-fluid">
+                        <img src="Picture/10.jfif" alt="Offer 2" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Self-Defense Techniques</h3>
                             <div class="offer-desc">Practical self-defense skills for real-life situations, taught by experienced instructors.</div>
@@ -237,7 +237,7 @@ if (!empty($spacesName)) {
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/11.png" alt="Offer 3" class="img-fluid">
+                        <img src="Picture/11.jfif" alt="Offer 3" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Belt Promotion & Certification</h3>
                             <div class="offer-desc">Official belt testing and certification to recognize your progress and achievements.</div>
@@ -246,7 +246,7 @@ if (!empty($spacesName)) {
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/6.png" alt="Offer 4" class="img-fluid">
+                        <img src="Picture/6.jfif" alt="Offer 4" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Physical Fitness & Conditioning</h3>
                             <div class="offer-desc">Improve strength, flexibility, and endurance through dynamic martial arts workouts.</div>
@@ -255,7 +255,7 @@ if (!empty($spacesName)) {
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/7.png" alt="Offer 5" class="img-fluid">
+                        <img src="Picture/7.jfif" alt="Offer 5" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Sparring (Kyorugi)</h3>
                             <div class="offer-desc">Competitive and non-contact Taekwondo sparring to develop agility and strategy.</div>
@@ -264,7 +264,7 @@ if (!empty($spacesName)) {
                 </div>
                 <div class="col-12 col-sm-6 col-md-4">
                     <div class="offer-card">
-                        <img src="Picture/8.png" alt="Offer 6" class="img-fluid">
+                        <img src="Picture/8.jfif" alt="Offer 6" class="img-fluid">
                         <div class="offer-text-wrapper">
                             <h3>Patterns (Poomsae)</h3>
                             <div class="offer-desc">A series of choreographed movements to develop focus, discipline, and technique.</div>
